@@ -1,0 +1,16 @@
+Package: bbnet
+Type: Package
+Title: Bayesian Built Environment Network Models
+Version: 0.1.0
+Date: 2020-01-16
+Authors@R: person("Adam", "Peterson", , "atpvyc@umich.edu", c("aut", "cre"))
+BugReports: https://github.com/apeterson91/bbnet/issues
+Description: Motivated by the need to estimate spatial-temporal effects of built environments 
+as a function of their distance from subjects AND other built environment features, the bbnet package
+flexibly estimates the spatial-temporal function by which these effects occur on proximate subjects.
+License: What license is it under?
+Imports: 
+    Rcpp (>= 1.0.3),
+    mgcv,
+    Matrix
+LinkingTo: Rcpp, RcppEigen
