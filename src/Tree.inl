@@ -63,7 +63,7 @@ void Tree<T,D>::BuildTree(S &model,
 				main.copy(subsubtree.get_main());
 			alpha_prime = subsubtree.get_alpha_prime() + subtree.get_alpha_prime();
 			n_alpha = subtree.get_n_alpha() + subsubtree.get_n_alpha();
-			UTI_one = left + right;
+			UTI_one = left + right; // overloaded operators that calculate U-Turn
 			UTI_two = left % right;
 			s_prime = (UTI_one && UTI_two ) ? subsubtree.get_s_prime() : 0 ;
 			n_prime = subtree.get_n_prime() + subsubtree.get_n_prime();
@@ -80,24 +80,9 @@ void Tree<T,D>::Leapfrog(S &model,
 
 	model.calculate_gradient(par);
 
-	Rcpp::Rcout << "Beginning leapfrog" << std::endl;
-	Rcpp::Rcout <<"----------------------" << std::endl;
-	Rcpp::Rcout << "leapfrog epsilon: " << epsilon << std::endl;
-	Rcpp::Rcout <<"pars before leapfrog" << std::endl;
-	par.print_pars();
-	model.print_grads();
 	main.momenta_leapfrog_other(par,epsilon,model.sg);
 
 	main.momenta_leapfrog_position(par,epsilon);
-	Rcpp::Rcout <<"pars after leapfrog" << std::endl;
-	main.print_pars();
-	Rcpp::Rcout <<"----------------------" << std::endl;
-	Rcpp::Rcout <<"momenta that caused  leapfrog" << std::endl;
-	main.print_mom();
-
-	Rcpp::Rcout << "Ending leapfrog" << std::endl;
-	Rcpp::Rcout <<"----------------------" << std::endl;
-	Rcpp::Rcout <<"\n" << std::endl;
 
 	model.calculate_gradient(main);
 

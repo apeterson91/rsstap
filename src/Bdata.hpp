@@ -5,28 +5,32 @@
 // dists - dists matrix
 // y - vector of outcomes
 // Z - matrix of subject constant coefficients
-// spc - sap parameter code vector
 // rpc - regression parameter code vector
+// prior_means - self explanatory
+// prior_scales - self explanatory
+// prior_scales - self explanatory
 class BData
 {
 	public:
-		const Eigen::MappedSparseMatrix& D;
-		const Eigen::VectorXd& y;
-		const Eigen::MatrixXd& Z;
-		const Eigen::ArrayXi& rpc;
-		const Eigen::ArrayXd& prior_means;
-		const Eigen::ArrayXd& prior_scales;
-		SapData(Eigen::VectorXd &y,
-				Eigen::MatrixXd &Z,
-				Eigen::MappedSparseMatrix &D,
-				Eigen::ArrayXi &reg_code,
-				Eigen::ArrayXd &prior_means,
-				Eigen::ArrayXd &prior_scales
-				):
+		const Eigen::MappedSparseMatrix<double> &D;
+		const Eigen::VectorXd &y;
+		const Eigen::MatrixXd &Z;
+		const Eigen::ArrayXi  &rpc;
+		const Eigen::ArrayXi &start_stop;
+		const Eigen::ArrayXd &prior_means;
+		const Eigen::ArrayXd &prior_scales;
+		BData(const Eigen::VectorXd &y,
+				const Eigen::MatrixXd &Z,
+				const Eigen::MappedSparseMatrix<double> &D,
+				const Eigen::ArrayXi &reg_code,
+				const Eigen::ArrayXi &start_stop,
+				const Eigen::ArrayXd &prior_means,
+				const Eigen::ArrayXd &prior_scales) :
 			y(y),
 			Z(Z),
 			D(D),
 			rpc(reg_code),
+			start_stop(start_stop),
 			prior_means(prior_means),
 			prior_scales(prior_scales){};
 

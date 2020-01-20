@@ -5,12 +5,14 @@ Version: 0.1.0
 Date: 2020-01-16
 Authors@R: person("Adam", "Peterson", , "atpvyc@umich.edu", c("aut", "cre"))
 BugReports: https://github.com/apeterson91/bbnet/issues
-Description: Motivated by the need to estimate spatial-temporal effects of built environments 
-as a function of their distance from subjects AND other built environment features, the bbnet package
-flexibly estimates the spatial-temporal function by which these effects occur on proximate subjects.
-License: What license is it under?
+Description: Motivated by the need to estimate spatial-temporal effects of built environments as a function of their distance from subjects AND other built environment features, the bbnet package flexibly estimates the spatial-temporal function by which these effects occur on proximate subjects.
+License: GPL-3
+Encoding: UTF-8
 Imports: 
     Rcpp (>= 1.0.3),
     mgcv,
-    Matrix
+    Matrix,
+    dplyr,
+    magrittr
 LinkingTo: Rcpp, RcppEigen
+RoxygenNote: 6.1.1

@@ -6,59 +6,34 @@
 
 using namespace Rcpp;
 
-// rcppeigen_hello_world
-Eigen::MatrixXd rcppeigen_hello_world();
-RcppExport SEXP _bnet_rcppeigen_hello_world() {
+// bbnet_lm_fit
+Rcpp::List bbnet_lm_fit(const Eigen::VectorXd& y, const Eigen::MatrixXd& Z, const SEXP DD, const Eigen::ArrayXi& rpc, const Eigen::ArrayXi& start_stop, const Eigen::ArrayXd& prior_means, const Eigen::ArrayXd& prior_scales, const int& iter_max, const int& max_treedepth, const int& warm_up, const int& seed);
+RcppExport SEXP _bbnet_bbnet_lm_fit(SEXP ySEXP, SEXP ZSEXP, SEXP DDSEXP, SEXP rpcSEXP, SEXP start_stopSEXP, SEXP prior_meansSEXP, SEXP prior_scalesSEXP, SEXP iter_maxSEXP, SEXP max_treedepthSEXP, SEXP warm_upSEXP, SEXP seedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(rcppeigen_hello_world());
-    return rcpp_result_gen;
-END_RCPP
-}
-// rcppeigen_outerproduct
-Eigen::MatrixXd rcppeigen_outerproduct(const Eigen::VectorXd& x);
-RcppExport SEXP _bnet_rcppeigen_outerproduct(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcppeigen_outerproduct(x));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rcppeigen_innerproduct
-double rcppeigen_innerproduct(const Eigen::VectorXd& x);
-RcppExport SEXP _bnet_rcppeigen_innerproduct(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcppeigen_innerproduct(x));
-    return rcpp_result_gen;
-END_RCPP
-}
-// rcppeigen_bothproducts
-Rcpp::List rcppeigen_bothproducts(const Eigen::VectorXd& x);
-RcppExport SEXP _bnet_rcppeigen_bothproducts(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(rcppeigen_bothproducts(x));
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type Z(ZSEXP);
+    Rcpp::traits::input_parameter< const SEXP >::type DD(DDSEXP);
+    Rcpp::traits::input_parameter< const Eigen::ArrayXi& >::type rpc(rpcSEXP);
+    Rcpp::traits::input_parameter< const Eigen::ArrayXi& >::type start_stop(start_stopSEXP);
+    Rcpp::traits::input_parameter< const Eigen::ArrayXd& >::type prior_means(prior_meansSEXP);
+    Rcpp::traits::input_parameter< const Eigen::ArrayXd& >::type prior_scales(prior_scalesSEXP);
+    Rcpp::traits::input_parameter< const int& >::type iter_max(iter_maxSEXP);
+    Rcpp::traits::input_parameter< const int& >::type max_treedepth(max_treedepthSEXP);
+    Rcpp::traits::input_parameter< const int& >::type warm_up(warm_upSEXP);
+    Rcpp::traits::input_parameter< const int& >::type seed(seedSEXP);
+    rcpp_result_gen = Rcpp::wrap(bbnet_lm_fit(y, Z, DD, rpc, start_stop, prior_means, prior_scales, iter_max, max_treedepth, warm_up, seed));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_bnet_rcppeigen_hello_world", (DL_FUNC) &_bnet_rcppeigen_hello_world, 0},
-    {"_bnet_rcppeigen_outerproduct", (DL_FUNC) &_bnet_rcppeigen_outerproduct, 1},
-    {"_bnet_rcppeigen_innerproduct", (DL_FUNC) &_bnet_rcppeigen_innerproduct, 1},
-    {"_bnet_rcppeigen_bothproducts", (DL_FUNC) &_bnet_rcppeigen_bothproducts, 1},
+    {"_bbnet_bbnet_lm_fit", (DL_FUNC) &_bbnet_bbnet_lm_fit, 11},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_bnet(DllInfo *dll) {
+RcppExport void R_init_bbnet(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }

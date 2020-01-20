@@ -22,11 +22,7 @@ NUTS<T,U,D>::NUTS(
 
 
 template<class T,class U, class D>
-void NUTS<T,U,D>::preTreePrep(
-					   const int &iter_ix,
-					   const int &warm_up,
-					   const int &iter_max,
-					   std::mt19937 &rng){
+void NUTS<T,U,D>::preTreePrep(std::mt19937 &rng){
 
    par.initialize_momenta(rng);
    parLeft.copy(par);
@@ -97,10 +93,8 @@ void NUTS<T,U,D>::store_samples(int &iter_ix, Z &storage){
    storage.epsilons(iter_ix - 1) = epsilon;
    storage.acceptance(iter_ix - 1) = accepted;
 
-   Rcpp::Rcout << "stored treedepth: " << j << std::endl;
-   Rcpp::Rcout << "stored epsilon: " << epsilon << std::endl;
 
    if(accepted)
-	   storage.get_sample(iter_ix,par);
+	   storage.get_sample(iter_ix,par,model);
 
 }

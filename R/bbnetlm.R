@@ -15,18 +15,16 @@
 #'
 #' @export
 #'
-#' @param formula Similar as for \code{\link[mgcv]{gam}}. 
-#' @param data
-#' @param distances
-#' @param distance_weights
-#' @param u_crs
-#' @param iter
-#' @param warm_up
-#' @param chains
-#' @param seed
+#' @param formula Similar as for \code{\link[stats]{lm}}. 
+#' @param data  same as for \code{\link[stats]{lm}}
+#' @param D sparse basis distance matrix
+#' @param T translation matrix
+#' @param iter number of iterations
+#' @param warm_up number of warm up iterations
+#' @param chains number of chains
+#' @param seed random number generator
 #'
-bbnetlm <- function(formula,
-                   functions = NULL,
+bbnet_lm <- function(formula,
                    data,
                    D,
                    T_mat,
@@ -60,10 +58,10 @@ bbnetlm <- function(formula,
 	else
 	  has_intercept <- FALSE
 
-	out <- bnet_lm_fit(y = y,
+	out <- bbnet_lm_fit(y = y,
 	                   Z = Z, 
 	                   DD = D,
-	                   reg_code = c(0,has_intercept,0,0,0,0),
+	                   rpc = c(0,has_intercept,0,0,0,0),
 	                   prior_means = c(0,0,0,0,0,0),
 	                   prior_scales = rep(0,6),
 	                   iter_max = iter,

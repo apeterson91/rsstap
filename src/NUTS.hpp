@@ -22,7 +22,6 @@ class NUTS{
 		int j;
 		int vj;
 		int treedepth;
-		const int chain = 1;
 		bool accepted = false;
 		bool UTI_one;
 		bool UTI_two;
@@ -39,11 +38,7 @@ class NUTS{
 			 );
 
 
-		void preTreePrep(
-				const int &iter_ix,
-				const int &warm_up,
-				const int &iter_max,
-				std::mt19937 &rng);
+		void preTreePrep(std::mt19937 &rng);
 
 		void traverseTree(const D &data,
                       std::mt19937 &rng);
