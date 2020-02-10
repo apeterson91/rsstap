@@ -44,7 +44,8 @@ Eigen::VectorXd initialize_vec(const int n, std::mt19937 &rng ){
     return(out);
 }
 
-#include "BData.hpp"
+#include "BbData.hpp"
+#include "BbPar.hpp"
 #include "BbNet.hpp"
 #include "Tree.hpp"
 #include "NUTS.hpp"
@@ -54,6 +55,10 @@ Eigen::VectorXd initialize_vec(const int n, std::mt19937 &rng ){
 //' @param Z matrix of subject covariates
 //' @param DD sparse matrix of subject distances in basis format
 //' @param rpc array of regression parameter settings
+//' rpc(0): the outcome distribution
+//' rpc(1): boolean use_intercept value
+//' @param max_q array of maximum number of distances per BEF
+//' @param num_basis array of number of basis functions per BEF
 //' @param start_stop array of start-stop beta par indeces for D matrix
 //' @param prior_means real valued vector for holding prior mean information
 //'  prior_means[0] = prior mean for intercept
@@ -70,7 +75,10 @@ Eigen::VectorXd initialize_vec(const int n, std::mt19937 &rng ){
 Rcpp::List bbnet_lm_fit(const Eigen::VectorXd &y,
                        const Eigen::MatrixXd &Z,
                        const SEXP DD,
+                       const SEXP TT,
                        const Eigen::ArrayXi &rpc,
+					   const Eigen::ArrayXi &max_q,
+					   const Eigen::ArrayXi &num_basis,
 					   const Eigen::ArrayXi &start_stop,
                        const Eigen::ArrayXd &prior_means,
                        const Eigen::ArrayXd &prior_scales,
@@ -83,8 +91,9 @@ Rcpp::List bbnet_lm_fit(const Eigen::VectorXd &y,
 	const int chain = 1;
 
 	const Eigen::MappedSparseMatrix<double> D(Rcpp::as<Eigen::MappedSparseMatrix<double> >(DD));
+	const Eigen::MappedSparseMatrix<double> T(Rcpp::as<Eigen::MappedSparseMatrix<double> >(TT));
 
-	const BData data(y,Z,D,rpc,start_stop,prior_means,prior_scales);
+	const BbData data(y,Z,D,T,rpc,max_q,num_basis,start_stop,prior_means,prior_scales);
 
 	std::mt19937 rng;
 	rng = std::mt19937(seed);

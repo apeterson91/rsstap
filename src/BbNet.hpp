@@ -1,17 +1,27 @@
 #ifndef _BbNet_
 #define _BbNet_
 
-class BbNet
+class BbNet 
 {
 
 	private:
-		const BData &data;
+		Eigen::VectorXd residual;
+		Eigen::VectorXd eta;
 	public:
-		BbNet(const BData &data):
+	  const BbData &data;
+		BbNet(const BbData &data):
 			data(data){};
+		
 
-		template<class S>
-		double calculate_energy(S &par);
+		double calculate_ll(BbPar &par);
+
+		double calculate_energy(BbPar &par);
+
+		double gaussian_ll(BbPar &par);
+
+		void calculate_residual(BbPar &par);
+
+		void calculate_eta(BbPar &par);
 };
 
 #include "BbNet.inl"

@@ -18,6 +18,7 @@ NUTS<T,U,D>::NUTS(
 			kappa = 0.75;
 			adapt_delta = .65;
 			epsilon = model.FindReasonableEpsilon(par,rng);
+			mu_beta = log(10 * epsilon);
 }
 
 

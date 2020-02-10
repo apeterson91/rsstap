@@ -13,6 +13,14 @@ Imports:
     mgcv,
     Matrix,
     dplyr,
-    magrittr
+    magrittr,
+    rstanarm,
+    splines,
+    purrr,
+    ggplot2
 LinkingTo: Rcpp, RcppEigen
 RoxygenNote: 6.1.1
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

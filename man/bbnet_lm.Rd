@@ -4,25 +4,23 @@
 \alias{bbnet_lm}
 \title{Built Environment Networks Linear Model}
 \usage{
-bbnet_lm(formula, data, D, T_mat, iter = 2000, warm_up = 1000,
-  chains = 1L, seed = NULL)
+bbnet_lm(formula, subject_data, subject_id = NULL, BEFs = NULL,
+  basis_functions = NULL, dt_data = NULL, BEF_col_name = NULL,
+  dt_col_name = NULL, ...)
 }
 \arguments{
 \item{formula}{Similar as for \code{\link[stats]{lm}}.}
 
-\item{data}{same as for \code{\link[stats]{lm}}}
+\item{subject_id}{string containing the common id column in both data and distance data and/or time_data}
 
-\item{D}{sparse basis distance matrix}
+\item{BEFs}{character vector containing BEF's coded in distance/time dataframe to include}
 
-\item{iter}{number of iterations}
+\item{...}{args for \code{\link[stats]{lm}}}
 
-\item{warm_up}{number of warm up iterations}
+\item{data}{required data argument}
 
-\item{chains}{number of chains}
-
-\item{seed}{random number generator}
-
-\item{T}{translation matrix}
+\item{distance_data}{distance dataframe containing up to four columns:
+(1) subj_ID, (2) BEF_name and (3) Distance OR (4) Time between subj_ID and BEF}
 }
 \description{
 Built Environment Networks Linear Model

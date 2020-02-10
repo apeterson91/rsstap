@@ -6,6 +6,10 @@
 #' @param Z matrix of subject covariates
 #' @param DD sparse matrix of subject distances in basis format
 #' @param rpc array of regression parameter settings
+#' rpc(0): the outcome distribution
+#' rpc(1): boolean use_intercept value
+#' @param max_q array of maximum number of distances per BEF
+#' @param num_basis array of number of basis functions per BEF
 #' @param start_stop array of start-stop beta par indeces for D matrix
 #' @param prior_means real valued vector for holding prior mean information
 #'  prior_means[0] = prior mean for intercept
@@ -19,7 +23,7 @@
 #' @param seed random number generator seed
 NULL
 
-bbnet_lm_fit <- function(y, Z, DD, rpc, start_stop, prior_means, prior_scales, iter_max, max_treedepth, warm_up, seed) {
-    .Call(`_bbnet_bbnet_lm_fit`, y, Z, DD, rpc, start_stop, prior_means, prior_scales, iter_max, max_treedepth, warm_up, seed)
+bbnet_lm_fit <- function(y, Z, DD, TT, rpc, max_q, num_basis, start_stop, prior_means, prior_scales, iter_max, max_treedepth, warm_up, seed) {
+    .Call(`_bbnet_bbnet_lm_fit`, y, Z, DD, TT, rpc, max_q, num_basis, start_stop, prior_means, prior_scales, iter_max, max_treedepth, warm_up, seed)
 }
 

@@ -1,0 +1,89 @@
+---
+title: "Introduction to bbnet"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to bbnet}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(bbnet)
+library(tidyverse)
+```
+
+# Introduction and Motivation
+
+The `rstap` package introduced Spatial Temporal Aggregated Predictor or STAP models, as a method by which the effect of Built Environment Features measured as a point pattern could be incorporated into pre-existing regression models. The `bbnet` package builds on this framework by modifying the way in which the spatial temporal exposure effect is estimated *and* explicitly incorporating the effect of BEF's proximity to one another as a potential component of the model.
+
+# Model Specification
+
+Restricting our attention to only spatial exposure, the STAP model formulated spatial exposure in the following manner:
+
+$$
+E[Y_i] = Z_i^{T}\delta + \beta X(\theta)_i\\
+X(\theta) = \sum_{d \in \mathcal{D}} \mathcal{K}_s(d,\theta)
+$$
+While outcome $Y_i$, and covariates $\bm{Z}_i$ for subject $i=1,...,n$ are identified from a typical regression model, the covariate $X(\theta)$ novelly represented a subject's cumulative exposure across space. This was accomplished by incorporating distances, $d$ through a distance exposure function $\mathcal{K}_s(d,\theta)$, typically through some exponential decay function, like $\exp(-\frac{d}{\theta})$ or $\exp(-(\frac{d}{\theta})^{\eta})$. Unfortunately, estimating this model through typical methods (e.g. MCMC) requires numerous evaluations of the kernel function summed across the, typically numerous, distances in the set $\mathcal{D}$.
+
+To remedy this situation, the `bbnet` package adopts a regression spline basis representation of the spatial exposure effect, removing the kernel and allowing for estimation on a sum of the function of the distances:
+
+$$
+E[Y_i] = Z_i^{T}\delta + \sum_{d \in \mathcal{D}}\beta_0 + \sum_{j=1}^{J}\beta_j\phi_j(d)\\
+E[Y_i] = Z_i^{T}\delta + \beta_0 |\mathcal{D}| +  \sum_{j=1}^{J}\sum_{d \in \mathcal{D}}\beta_j\phi_j(d)
+$$
+
+Since this sum can be done prior to model fitting, standard methods (e.g. `stan_lm`) can be used, dramatically decreasing computational complexity. 
+
+We'll now demonstrate this model specification as implimented in the `bbnet` package using simulated data that only considers the direct effect of distances between subjects and proximal BEFs, saving the previously mentioned distances between BEFs for a later section.
+
+## Simulated Data, Distance Calculation 
+
+```{r}
+knots <- quantile(bbnet_demo$direct_distance_data %>% 
+                    filter(Distance<=2) %>%
+                    pull(Distance),
+                  probs = c(0.25,.75))
+
+fit <- bnet_lm(formula = y ~ sex,
+               stap_formula = ~ sap(HFS),
+               subject_data = bbnet_demo$subject_data,
+               subject_id = "subj_id",
+               basis_functions = list(HFS= function(x){ splines::ns(x,knots=knots,Boundary.knots = c(0,2)) }),
+               dt_data = bbnet_demo$direct_distance_data %>% filter(Distance<=2),
+               BEF_col_name = "BEF",
+               distance_col_name = "Distance")
+
+d <- seq(from = min(bbnet_demo$direct_distance_data %>% filter(Distance<=2) %>% pull(Distance)), 
+         to = max(bbnet_demo$direct_distance_data %>% filter(Distance<=2) %>% pull(Distance)), 
+         by = 0.01)
+plot_effect(fit) + ggplot2::theme_bw() +
+  ggplot2::geom_line(ggplot2::aes(x=d,y=bbnet_demo$true_effect(d)),color='red')
+```
+
+
+```{r}
+summary(fit)
+```
+
+
+```{r}
+fit <- bbnet_stan_lm(formula = y ~ sex,
+               stap_formula = ~ sap(HFS),
+               subject_data = bbnet_demo$subject_data,
+               subject_id = "subj_id",
+               basis_functions = list(HFS= function(x){ splines::ns(x,knots=knots,Boundary.knots = c(0,2)) }),
+               dt_data = bbnet_demo$direct_distance_data %>% filter(Distance<=2),
+               BEF_col_name = "BEF",
+               distance_col_name = "Distance",
+               prior=NULL, ## Uniform prior on R2 from rstanarm::stan_lm
+               iter=1E3)
+plot_effect(fit) + ggplot2::theme_bw()
+```
