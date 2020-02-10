@@ -10,7 +10,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#' Bayesian Built Environment Networks Linear Model 
+#' Built Environment Networks Linear Mixed Effects Regression Model 
 #'
 #'
 #' @export
@@ -23,21 +23,19 @@
 #'  (1) subj_ID, (2) BEF_name and (3) Distance AND/OR (4) Time between subj_ID and BEF 
 #' @param BEF_col_name string name for the column containing the BEF labels in dt_data dataframe
 #' @param distance_col_name string name for the column containing the subject-BEF distances in the dt_data dataframe
-#' @param time_col_name string name for the the column containing the subject-BEF times in the dt_data dataframe 
-#' @param ... args for \code{\link[rstanarm]{stan_lm}}
+#' @param time_col_name string name for the the column containing the subject-BEF times in the dt_data dataframe
+#' @param ... args for \code{\link[stats]{lm}}
 #' 
-bbnet_stan_lm <- function(formula,
-                          stap_formula,
-                          subject_data,
-                          subject_id = NULL,
-                          BEFs = NULL,
-                          basis_functions = NULL,
-                          dt_data = NULL,
-                          BEF_col_name = NULL,
-                          distance_col_name = NULL,
-                          time_col_name = NULL,
-                          ...){
-  
+bnet_lmer <- function(formula,
+                    stap_formula,
+                    subject_data,
+                    subject_id = NULL,
+                    basis_functions = NULL,
+                    dt_data = NULL,
+                    BEF_col_name = NULL,
+                    distance_col_name = NULL,
+                    time_col_name = NULL,
+                    ...){
   bef_df <- bbnet_df(stap_formula = stap_formula,
                      subject_data = subject_data,
                      subject_id = subject_id,
@@ -46,15 +44,15 @@ bbnet_stan_lm <- function(formula,
                      BEF_col_name = BEF_col_name,
                      distance_col_name = distance_col_name,
                      time_col_name = time_col_name)
-  scales <- apply(bef_df,2,function(x) if(median(x)>100) return(round(median(x),0)) else 1)
-  bef_df <- bef_df / scales
+  
   resp <- all.vars(formula)[1]
   covs <- all.vars(formula)[2:length(all.vars(formula))]
   covs <- c(covs,colnames(bef_df))
   formula <- as.formula(paste(resp, " ~ ", paste(covs,collapse = " + ")))
   X <- cbind(subject_data,bef_df)
   
-  fit <- rstanarm::stan_lm(formula,data = X, ...)
+  fit <- lme4::lmer(formula,data = X, ...)
+  
   fit$basis_functions <- basis_functions
   fit$stap_data <- rstap:::extract_stap_data(stap_formula)
   fit$BEFs <- fit$stap_data$covariates
@@ -66,10 +64,6 @@ bbnet_stan_lm <- function(formula,
     fit$timeranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
         dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
         pull(!!dplyr::sym(time_col_name)) %>% range(.)})
-  fit$scales <- scales
-  if(any(scales>1))
-    warning("Note: BEF-covariates were scaled, see object$scale for scales used")
   
-  
-  structure(fit,class=c("stanreg","bbnet"))
+  structure(fit,class=c("lm","bbnet"))
 }

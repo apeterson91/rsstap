@@ -31,10 +31,12 @@ true_direct_effect <- function(x){ ((-.5 + x -.5 *x^2)/3)*(x<=1) }
 
 
 sub_df <- tibble(x = runif(n = num_subj, min = 0, max = 5.0),
-                 y = runif(n = num_subj, min = 0, max = 5.0))
+                 y = runif(n = num_subj, min = 0, max = 5.0),
+                 class = "Subject")
 ## HFS's
 bef_df <- tibble(x = runif(n = num_bef, min = 0, max = 5.0),
-                 y = runif(n = num_bef, min = 0, max = 5.0))
+                 y = runif(n = num_bef, min = 0, max = 5.0),
+                 class = "Healthy Food Stores")
 
 
 
@@ -81,7 +83,9 @@ bbnet_demo <- list(subject_data = subject_data,
                   beta=beta,
                   delta = delta,
                   sigma = sigma,
-                  true_effect = true_direct_effect)
+                  true_effect = true_direct_effect,
+                  subjectbef_positions = rbind(sub_df,bef_df)
+                  )
 
 
 

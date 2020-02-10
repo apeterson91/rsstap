@@ -1,5 +1,5 @@
 ---
-title: "Introduction to bbnet"
+title: "Introduction"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction to bbnet}
@@ -17,73 +17,148 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(bbnet)
 library(tidyverse)
+theme_set(theme_bw())
+data("bbnet_demo")
 ```
 
 # Introduction and Motivation
 
-The `rstap` package introduced Spatial Temporal Aggregated Predictor or STAP models, as a method by which the effect of Built Environment Features measured as a point pattern could be incorporated into pre-existing regression models. The `bbnet` package builds on this framework by modifying the way in which the spatial temporal exposure effect is estimated *and* explicitly incorporating the effect of BEF's proximity to one another as a potential component of the model.
+The [`rstap` package](https://biostatistics4socialimpact.github.io/rstap) introduced Spatial Temporal Aggregated Predictor or STAP models, as a method by which the effect of [Built Environment](https://en.wikipedia.org/wiki/Built_environment) Features (BEFs) measured as a point pattern could be incorporated into pre-existing regression methods. The `bbnet` package builds on this framework by modifying the way in which the spatial temporal exposure effect is estimated *and* allows for incorporation of between BEF distances as a potential component of the model. The former allows for faster estimation of the spatio-temporal exposure effect while the latter identifies an how the BEF effect could be augmented or dampened by being near other BEFs of similar or different types. 
 
 # Model Specification
 
-Restricting our attention to only spatial exposure, the STAP model formulated spatial exposure in the following manner:
+Restricting our attention to only spatial exposure for the following illustrative example, the spatial aggregated predictor was modeled in the following manner in `rstap`:
 
 $$
-E[Y_i] = Z_i^{T}\delta + \beta X(\theta)_i\\
-X(\theta) = \sum_{d \in \mathcal{D}} \mathcal{K}_s(d,\theta)
+E[Y_i] = Z_i^{T}\delta + \beta X_i(\theta) \tag{1}\\
+X_i(\theta) = \sum_{d \in \mathcal{D}_i} \mathcal{K}_s(d,\theta)
 $$
-While outcome $Y_i$, and covariates $\bm{Z}_i$ for subject $i=1,...,n$ are identified from a typical regression model, the covariate $X(\theta)$ novelly represented a subject's cumulative exposure across space. This was accomplished by incorporating distances, $d$ through a distance exposure function $\mathcal{K}_s(d,\theta)$, typically through some exponential decay function, like $\exp(-\frac{d}{\theta})$ or $\exp(-(\frac{d}{\theta})^{\eta})$. Unfortunately, estimating this model through typical methods (e.g. MCMC) requires numerous evaluations of the kernel function summed across the, typically numerous, distances in the set $\mathcal{D}$.
+While continuous outcome $Y_i$, and covariates $Z_i$ for subject $i=1,...,n$ are identified from a typical regression model, the covariate $X_i(\theta)$ novelly represented the $i$th subject's cumulative exposure across space. This was accomplished by incorporating distances, $d$ through a spatial exposure function $\mathcal{K}_s(d,\theta)$ - typically some exponential decay function, like $\exp(-\frac{d}{\theta})$ or $\exp(-(\frac{d}{\theta})^{\eta})$. Unfortunately, estimating this model through typical methods (e.g. MCMC) requires numerous evaluations of the kernel function summed across the, again typically numerous, distances in the set $\mathcal{D}_i$, of subject-BEF distances.
 
-To remedy this situation, the `bbnet` package adopts a regression spline basis representation of the spatial exposure effect, removing the kernel and allowing for estimation on a sum of the function of the distances:
+To remedy this situation, the `bbnet` package adopts a regression spline basis representation, $\phi(d)$, of the spatial exposure effect, removing the kernel and allowing for estimation on a sum of the function of the distances:
 
 $$
-E[Y_i] = Z_i^{T}\delta + \sum_{d \in \mathcal{D}}\beta_0 + \sum_{j=1}^{J}\beta_j\phi_j(d)\\
-E[Y_i] = Z_i^{T}\delta + \beta_0 |\mathcal{D}| +  \sum_{j=1}^{J}\sum_{d \in \mathcal{D}}\beta_j\phi_j(d)
+E[Y_i] = Z_i^{T}\delta + \sum_{d \in \mathcal{D}_i}\beta_0 + \sum_{j=1}^{J}\beta_j\phi_j(d)\\
+E[Y_i] = Z_i^{T}\delta + \beta_0 |\mathcal{D}_i| +  \sum_{j=1}^{J}\sum_{d \in \mathcal{D}_i}\beta_j\phi_j(d) \tag{2}
 $$
 
-Since this sum can be done prior to model fitting, standard methods (e.g. `stan_lm`) can be used, dramatically decreasing computational complexity. 
+In the above, $|\mathcal{D}_i|$ is the size of the set of pairwise distances between subject $i$ and the (in this example only one) class of BEFs. $\beta_0$ can then be interpreted as the effect of a single BEF placed at distance 0 from the subject - analagous to $\beta$ in (1) . Since the size of this set and the sum across distances, $\sum_{d\in \mathcal{D}_i} \phi_j(d)$ can be done prior to model fitting, standard methods (e.g. `stan_lm` for bayesians or `lm` for frequentists) can be used, dramatically decreasing computational complexity. 
 
-We'll now demonstrate this model specification as implimented in the `bbnet` package using simulated data that only considers the direct effect of distances between subjects and proximal BEFs, saving the previously mentioned distances between BEFs for a later section.
+We'll now demonstrate this model specification as implimented in the `bbnet` package using simulated data that only considers the direct effect of distances between subjects and proximal BEFs, saving the previously mentioned distances between BEFs for another vignette.
 
 ## Simulated Data, Distance Calculation 
 
-```{r}
-knots <- quantile(bbnet_demo$direct_distance_data %>% 
-                    filter(Distance<=2) %>%
-                    pull(Distance),
-                  probs = c(0.25,.75))
+First we'll simulate subject and "Healthy Food Stores" (HFS) uniformly across a hypothetical 5x5 square. The importance of using such a large space
+being that we'll want to restrict the number of businesses included in our final calculation to ensure that there are a different
+number for each subject. This is equivalent to having $|\mathcal{D}_i| \neq |\mathcal{D}_{i'}|$ for some $i'$ - an important identifiability condition for estimating $\beta_0$.
 
+```{r,echo=F}
+bbnet_demo$subjectbef_positions %>% 
+  ggplot(aes(x=x,y=y,color=class)) + 
+  geom_point() +
+  theme(legend.title=element_blank()) + 
+  ggtitle("Subject and HFS Spatial Configuration")
+```
+
+We'll calculate the distances between the HFS' and subjects to create a long dataframe, like the following, for our eventual model fitting.
+
+```{r,echo=F}
+bbnet_demo$direct_distance_data %>% head() %>%  knitr::kable()
+```
+
+Next, in order to simulate the outcome of interest, we'll need to express the effect of HFS' as a function of 
+distance from the subject. We'll imagine that the outcome, $Y_i$ is something like BMI and HFS' decrease the BMI on average 
+for those who live close, but does not affect those who live further away, as shown below:
+```{r,echo=F}
+tibble(Distance = seq(from = 0, to = 2.5,by=0.01),
+       Effect = bbnet_demo$true_effect(Distance)) %>% 
+  ggplot(aes(x=Distance,y=Effect)) + geom_line(color='red') + 
+  ylab("Change in BMI") + ggtitle("Spatial Exposure Function") + 
+  ylim(-.25,0.25)
+```
+
+
+  
+  We'll finish our simulation of the data by including a 0-1 sex covariate to make things a little more realistic - the code containing all the simulation details can be found [here](https://github.com/apeterson91/bbnet).
+
+Before we fit the model we'll want to choose some restriction distance. While here we are only using this restriction to ensure the identifiability
+condition is met, this restriction is neccessary in a real world setting, since the number of businesses typically grows quadratically as a function of distance. 
+
+We'll choose an arbitrary restriction distance of 2 and create knots for our basis functions based on the quantiles of the distance distribution within the restriction (note that this is an assumption of the model). 
+
+```{r}
+restricted_distance <- bbnet_demo$direct_distance_data %>% filter(Distance<=2)
+
+demo_knots <- quantile(restricted_distance$Distance,
+                  probs = c(0.25,.75))
+```
+
+Finally we'll fit our model, using syntax similar to the `lm` and `stap_lm` functions, where the `~ sap(HFS)` indicates
+that we're looking to model the healthy food stores as a function of space. Note that we have to define a list of basis 
+functions for each covariate included in the model. We'll use natural cubic splines here, with the interior knots previously defined at 
+the quantiles and set the boundary knot at our inclusion distance. There are a few other arguments that are needed to ensure
+that the subject and bef data are joined and aggregated appropriately. While they are hopefully self-explanatory, more information about these can be found in the documentation if needed.
+
+```{r}
 fit <- bnet_lm(formula = y ~ sex,
                stap_formula = ~ sap(HFS),
                subject_data = bbnet_demo$subject_data,
                subject_id = "subj_id",
-               basis_functions = list(HFS= function(x){ splines::ns(x,knots=knots,Boundary.knots = c(0,2)) }),
-               dt_data = bbnet_demo$direct_distance_data %>% filter(Distance<=2),
+               basis_functions = list(HFS= function(x){ splines::ns(x,knots = demo_knots,
+                                                                    Boundary.knots = c(0,2)) }),
+               dt_data = restricted_distance,
                BEF_col_name = "BEF",
                distance_col_name = "Distance")
 
-d <- seq(from = min(bbnet_demo$direct_distance_data %>% filter(Distance<=2) %>% pull(Distance)), 
-         to = max(bbnet_demo$direct_distance_data %>% filter(Distance<=2) %>% pull(Distance)), 
-         by = 0.01)
-plot_effect(fit) + ggplot2::theme_bw() +
-  ggplot2::geom_line(ggplot2::aes(x=d,y=bbnet_demo$true_effect(d)),color='red')
+summary(fit)
+```
+As we look at the output, we can see this is similar to the `lm` function's summary output. This makes sense because the 
+object returned by the `(b)bnet_` functions inherit the class of whatever function follows the underscore - in this case the `lm` function.
+
+It also inherits a new `bbnet` class which allows for custom methods specific to these objects. For example, if we want to to plot the 
+spatial exposure estimate we can do so using the `plot_directeffect` function. I'll overlay the true exposure effect we simulated for comparison.
+
+```{r}
+d <- seq(from = min(restricted_distance$Distance), to = 2, by =0.01)
+plot_directeffect(fit) + ggplot2::theme_bw() +
+  ggplot2::geom_line(ggplot2::aes(x=d,y=bbnet_demo$true_effect(d)),color='red') + 
+  theme(strip.background = element_blank())
 ```
 
+
+  It looks like we captured the truth with our estimate but we're only able to say there's a definitive effect till about just before 0.25 distance units, at which point the results become less significant.
+
+What about a bayesian approach? This is the *Bayesian* built environment network package after all. In order to obtain bayesian estimates
+we can simply use the ``bbnet_stan_lm` function, which implements the same model using the `rstanarm::stan_lm` function. Note that now we 
+can specify a prior and number of iterations (as well as any number of other optional arguments), to this function. Let's fit the model and plot the same result.
+
+```{r,results="hide",message=FALSE}
+fit <- bbnet_stan_lm(formula = y ~ sex,
+               stap_formula = ~ sap(HFS),
+               subject_data = bbnet_demo$subject_data,
+               subject_id = "subj_id",
+               basis_functions = list(HFS= function(x){ splines::ns(x,knots=demo_knots,Boundary.knots = c(0,2)) }),
+               dt_data = restricted_distance,
+               BEF_col_name = "BEF",
+               distance_col_name = "Distance",
+               prior=NULL, ## Uniform prior on R2 from rstanarm::stan_lm
+               prior_intercept = NULL,## Improper prior on intercept from rstanarm::stan_lm 
+               iter=1E3) ## for demonstration purposes
+plot_directeffect(fit) + 
+  ggplot2::geom_line(ggplot2::aes(x=d,y=bbnet_demo$true_effect(d)),color='red') +
+  theme(strip.background = element_blank())
+```
+
+Looks like we get similar results as the frequentist fit, with a smidge more certainty that the exposure effect extends past a quarter distance unit. 
+
+Analgous to the ability to call methods on the `lm` object, we can call methods for `rstanarm`'s `stanreg` objects to check things like model fit or model diagnostics.
 
 ```{r}
 summary(fit)
 ```
 
+## Recap
 
-```{r}
-fit <- bbnet_stan_lm(formula = y ~ sex,
-               stap_formula = ~ sap(HFS),
-               subject_data = bbnet_demo$subject_data,
-               subject_id = "subj_id",
-               basis_functions = list(HFS= function(x){ splines::ns(x,knots=knots,Boundary.knots = c(0,2)) }),
-               dt_data = bbnet_demo$direct_distance_data %>% filter(Distance<=2),
-               BEF_col_name = "BEF",
-               distance_col_name = "Distance",
-               prior=NULL, ## Uniform prior on R2 from rstanarm::stan_lm
-               iter=1E3)
-plot_effect(fit) + ggplot2::theme_bw()
-```
+This vignette briefly illustrates the `bbnet` modeling framework and typical function uses. Future vignettes will cover the 
+indirect distance effect inclusion mentioned at the beginning of this vignette as well as heirarchical models that allow for the modeling 
+of subject specific effects, including subject specific exposures.

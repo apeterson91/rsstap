@@ -10,14 +10,13 @@ License: GPL-3
 Encoding: UTF-8
 Imports: 
     Rcpp (>= 1.0.3),
-    mgcv,
-    Matrix,
     dplyr,
     magrittr,
     rstanarm,
     splines,
     purrr,
-    ggplot2
+    ggplot2,
+    lme4
 LinkingTo: Rcpp, RcppEigen
 RoxygenNote: 6.1.1
 Suggests: 

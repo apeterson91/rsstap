@@ -3,8 +3,7 @@
 
 #' Bayesian Built Environment Network Model
 #' @param y vector of outcomes
-#' @param Z matrix of subject covariates
-#' @param DD sparse matrix of subject distances in basis format
+#' @param X matrix of subject covariates
 #' @param rpc array of regression parameter settings
 #' rpc(0): the outcome distribution
 #' rpc(1): boolean use_intercept value
@@ -22,8 +21,4 @@
 #' @param warm_up number of iterations to use for epsilon adaptation
 #' @param seed random number generator seed
 NULL
-
-bbnet_lm_fit <- function(y, Z, DD, TT, rpc, max_q, num_basis, start_stop, prior_means, prior_scales, iter_max, max_treedepth, warm_up, seed) {
-    .Call(`_bbnet_bbnet_lm_fit`, y, Z, DD, TT, rpc, max_q, num_basis, start_stop, prior_means, prior_scales, iter_max, max_treedepth, warm_up, seed)
-}
 
