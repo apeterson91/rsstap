@@ -23,7 +23,7 @@ data("bbnet_demo")
 
 # Introduction and Motivation
 
-The [`rstap` package](https://biostatistics4socialimpact.github.io/rstap) introduced Spatial Temporal Aggregated Predictor or STAP models, as a method by which the effect of [Built Environment](https://en.wikipedia.org/wiki/Built_environment) Features (BEFs) measured as a point pattern could be incorporated into pre-existing regression methods. The `bbnet` package builds on this framework by modifying the way in which the spatial temporal exposure effect is estimated *and* allows for incorporation of between BEF distances as a potential component of the model. The former allows for faster estimation of the spatio-temporal exposure effect while the latter identifies an how the BEF effect could be augmented or dampened by being near other BEFs of similar or different types. 
+The [`rstap` package](https://biostatistics4socialimpact.github.io/rstap) introduced Spatial Temporal Aggregated Predictor or STAP models, as a method by which the effect of [Built Environment](https://en.wikipedia.org/wiki/Built_environment) Features (BEFs) measured as a point pattern could be incorporated into pre-existing regression methods. The `bbnet` package builds on this framework by modifying the way in which the spatial temporal exposure effect is estimated *and* allows for incorporation of between BEF distances as a potential component of the model. The former allows for faster estimation of the spatio-temporal exposure effect while the latter identifies how the BEF effect could be augmented or weakened by being near other BEFs of similar or different types. 
 
 # Model Specification
 
@@ -46,7 +46,7 @@ In the above, $|\mathcal{D}_i|$ is the size of the set of pairwise distances bet
 
 We'll now demonstrate this model specification as implimented in the `bbnet` package using simulated data that only considers the direct effect of distances between subjects and proximal BEFs, saving the previously mentioned distances between BEFs for another vignette.
 
-## Simulated Data, Distance Calculation 
+# Simulated Data, Distance Calculation 
 
 First we'll simulate subject and "Healthy Food Stores" (HFS) uniformly across a hypothetical 5x5 square. The importance of using such a large space
 being that we'll want to restrict the number of businesses included in our final calculation to ensure that there are a different
@@ -96,7 +96,7 @@ restricted_distance <- bbnet_demo$direct_distance_data %>% filter(Distance<=2)
 demo_knots <- quantile(restricted_distance$Distance,
                   probs = c(0.25,.75))
 ```
-
+# Model Fitting
 Finally we'll fit our model, using syntax similar to the `lm` and `stap_lm` functions, where the `~ sap(HFS)` indicates
 that we're looking to model the healthy food stores as a function of space. Note that we have to define a list of basis 
 functions for each covariate included in the model. We'll use natural cubic splines here, with the interior knots previously defined at 
@@ -161,7 +161,7 @@ Analgous to the ability to call methods on the `lm` object, we can call methods 
 summary(fit)
 ```
 
-## Recap
+# Recap
 
 This vignette briefly illustrates the `bbnet` modeling framework and typical function uses. Future vignettes will cover the 
 indirect distance effect inclusion mentioned at the beginning of this vignette as well as heirarchical models that allow for the modeling 
