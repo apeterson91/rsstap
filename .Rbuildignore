@@ -4,3 +4,7 @@
 ^LICENSE\.md$
 ^\.travis\.yml$
 ^docs$
+^codecov\.yml$
+^vignettes/articles$
+^_pkgdown\.yml$
+^pkgdown$

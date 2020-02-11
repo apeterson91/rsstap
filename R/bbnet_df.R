@@ -31,13 +31,16 @@ bbnet_df <- function(stap_formula,
                      BEF_col_name = NULL,
                      distance_col_name = NULL,
                      time_col_name = NULL){
+  if(is.null(subject_id)){
+    stop("subject_id must be provided so that distance and subject data can be joined")
+  }
   stap_data <- rstap:::extract_stap_data(stap_formula)
   stcode <- stap_data$stap_code
   stlabels <- sapply(stcode,function(x) if(x%in%c(0,2))return("Spatial") else if(x==1) return("Temporal"))
   BEFs <- stap_data$covariates
-  subject_data <- subject_data %>% dplyr::arrange(!!dplyr::sym(subject_id))
-  dt_data <- dt_data %>% dplyr::arrange(!!dplyr::sym(subject_id)) %>% 
-    right_join(subject_data[,subject_id],by=subject_id)
+  subject_data <- subject_data %>% dplyr::arrange_(.dots=subject_id)
+  dt_data <- dt_data %>% dplyr::arrange_(.dots=subject_id) %>% 
+    dplyr::right_join(subject_data[,subject_id],by=subject_id)
   DirectEffect <- purrr::map(1:length(BEFs),function(ix){
     tmpdf <- dt_data %>% dplyr::filter(!!dplyr::sym(BEF_col_name)==BEFs[ix])
     df <- tmpdf %>% split(.[,subject_id]) %>% 
