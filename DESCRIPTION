@@ -25,3 +25,5 @@ Suggests:
     covr,
     testthat
 VignetteBuilder: knitr
+Depends: 
+    R (>= 3.2)

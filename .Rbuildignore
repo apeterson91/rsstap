@@ -8,3 +8,4 @@
 ^vignettes/articles$
 ^_pkgdown\.yml$
 ^pkgdown$
+^\.covrignore$
