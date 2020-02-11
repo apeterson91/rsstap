@@ -16,7 +16,8 @@ Imports:
     splines,
     purrr,
     ggplot2,
-    lme4
+    lme4,
+    stringr
 LinkingTo: Rcpp, RcppEigen
 RoxygenNote: 6.1.1
 Suggests: 

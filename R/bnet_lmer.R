@@ -36,6 +36,7 @@ bnet_lmer <- function(formula,
                     distance_col_name = NULL,
                     time_col_name = NULL,
                     ...){
+  
   bef_df <- bbnet_df(stap_formula = stap_formula,
                      subject_data = subject_data,
                      subject_id = subject_id,
@@ -45,25 +46,30 @@ bnet_lmer <- function(formula,
                      distance_col_name = distance_col_name,
                      time_col_name = time_col_name)
   
-  resp <- all.vars(formula)[1]
-  covs <- all.vars(formula)[2:length(all.vars(formula))]
+  fixef <- lme4::nobars(formula)
+  resp <- all.vars(fixef)[1]
+  covs <- all.vars(fixef)[2:length(all.vars(fixef))]
   covs <- c(covs,colnames(bef_df))
-  formula <- as.formula(paste(resp, " ~ ", paste(covs,collapse = " + ")))
+  formula <- as.formula(paste(resp, " ~ ", 
+                              paste(paste(covs,collapse = " + "), " + ", ## fixef terms
+                                    paste0("(",lme4::findbars(f),")",collapse=" + ") ))) ## ranef terms
+  subject_data <- subject_data %>% dplyr::arrange_(.dots=subject_id)
   X <- cbind(subject_data,bef_df)
   
   fit <- lme4::lmer(formula,data = X, ...)
   
-  fit$basis_functions <- basis_functions
-  fit$stap_data <- rstap:::extract_stap_data(stap_formula)
-  fit$BEFs <- fit$stap_data$covariates
-  if(any(fit$stap_data$stap_code %in% c(0,2)))
-    fit$spaceranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
-        dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
-        pull(!!dplyr::sym(distance_col_name)) %>% range(.)})
-  if(any(fit$stap_data$stap_code %in% c(1,2)))
-    fit$timeranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
-        dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
-        pull(!!dplyr::sym(time_col_name)) %>% range(.)})
+  #TBD
+  # fit$basis_functions <- basis_functions
+  # fit$stap_data <- rstap:::extract_stap_data(stap_formula)
+  # fit$BEFs <- fit$stap_data$covariates
+  # if(any(fit$stap_data$stap_code %in% c(0,2)))
+  #   fit$spaceranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
+  #       dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
+  #       pull(!!dplyr::sym(distance_col_name)) %>% range(.)})
+  # if(any(fit$stap_data$stap_code %in% c(1,2)))
+  #   fit$timeranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
+  #       dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
+  #       pull(!!dplyr::sym(time_col_name)) %>% range(.)})
   
-  structure(fit,class=c("lm","bbnet"))
+  # structure(fit,class=c("merMod","bbnet"))
 }

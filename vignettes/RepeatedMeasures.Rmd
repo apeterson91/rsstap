@@ -1,0 +1,38 @@
+---
+title: "Repeated Measures"
+---
+
+```{r, eval=F,include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(bbnet)
+```
+
+
+```{r}
+quantile_knots <- quantile(rstap::homog_longitudinal_bef_data$dist,probs = c(0.25,0.75))
+repeated_subject_data <- rstap::homog_longitudinal_subject_data %>%
+  dplyr::select(subj_ID,measure_ID,Age,Income,y,sex)
+repeated_bef_data <- rstap::homog_longitudinal_bef_data %>% 
+  dplyr::select(subj_ID,measure_ID,class,dist,time) %>% 
+  dplyr::mutate(time = as.numeric(time))
+```
+
+```{r}
+fit <- bnet_lmer(formula = y ~ Age + Income + sex + (1|subj_ID),
+                 stap_formula = ~sap(Coffee_Shop),
+                 subject_data = repeated_subject_data,
+                 subject_id = c("subj_ID","measure_ID"),
+                 basis_functions = list(Coffee_Shop=function(x) splines::bs(x,knots=quantile_knots,Boundary.knots = c(0,2.6))),
+                 dt_data = repeated_bef_data,
+                 BEF_col_name = "class",
+                 distance_col_name = "dist")
+summary(fit)
+```
+
+

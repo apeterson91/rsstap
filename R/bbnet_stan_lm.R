@@ -52,6 +52,7 @@ bbnet_stan_lm <- function(formula,
   covs <- all.vars(formula)[2:length(all.vars(formula))]
   covs <- c(covs,colnames(bef_df))
   formula <- as.formula(paste(resp, " ~ ", paste(covs,collapse = " + ")))
+  subject_data <- subject_data %>% dplyr::arrange_(.dots=subject_id)
   X <- cbind(subject_data,bef_df)
   
   fit <- rstanarm::stan_lm(formula,data = X, ...)

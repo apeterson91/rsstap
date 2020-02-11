@@ -10,13 +10,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#' Built Environment Networks Frequentist Linear Model 
+#' Built Environment Networks Frequentist Generalized Linear Model 
 #'
 #'
 #' @export
 #'
-#' @param formula Similar as for \code{\link[stats]{lm}}. 
-#' @param stap_formula See \code{\link[rstap]{stap_lm}}
+#' @param formula Similar as for \code{\link[stats]{glm}}. 
+#' @param stap_formula See \code{\link[rstap]{stap_glm}}
 #' @param subject_data required data argument containing subject level outcome and covariates
 #' @param subject_id string name for the common id column in both data and distance data and/or time_data
 #' @param dt_data distance dataframe containing up to four columns:
@@ -26,7 +26,7 @@
 #' @param time_col_name string name for the the column containing the subject-BEF times in the dt_data dataframe
 #' @param ... args for \code{\link[stats]{lm}}
 #' 
-bnet_lm <- function(formula,
+bnet_glm <- function(formula,
                     stap_formula,
                     subject_data,
                     subject_id = NULL,
@@ -35,7 +35,8 @@ bnet_lm <- function(formula,
                     BEF_col_name = NULL,
                     distance_col_name = NULL,
                     time_col_name = NULL,
-                     ...){
+                    family = gaussian(),
+                    ...){
   bef_df <- bbnet_df(stap_formula = stap_formula,
                      subject_data = subject_data,
                      subject_id = subject_id,
@@ -44,31 +45,26 @@ bnet_lm <- function(formula,
                      BEF_col_name = BEF_col_name,
                      distance_col_name = distance_col_name,
                      time_col_name = time_col_name)
-
+  
   resp <- all.vars(formula)[1]
   covs <- all.vars(formula)[2:length(all.vars(formula))]
   covs <- c(covs,colnames(bef_df))
   formula <- as.formula(paste(resp, " ~ ", paste(covs,collapse = " + ")))
-  subject_data <- subject_data %>% dplyr::arrange_(.dots=subject_id)
   X <- cbind(subject_data,bef_df)
   
-  fit <- lm(formula,data = X, ...)
+  fit <- glm(formula,data = X, family = family,...)
   
   fit$basis_functions <- basis_functions
   fit$stap_data <- rstap:::extract_stap_data(stap_formula)
   fit$BEFs <- fit$stap_data$covariates
   if(any(fit$stap_data$stap_code %in% c(0,2)))
     fit$spaceranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
-                           dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
-                           dplyr::pull(!!dplyr::sym(distance_col_name)) %>%
-        range(.)
-      })
+        dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
+        pull(!!dplyr::sym(distance_col_name)) %>% range(.)})
   if(any(fit$stap_data$stap_code %in% c(1,2)))
     fit$timeranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
         dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
-        pull(!!dplyr::sym(time_col_name)) %>% 
-        range(.)
-      })
+        pull(!!dplyr::sym(time_col_name)) %>% range(.)})
   
-  structure(fit,class=c("lm","bbnet"))
+  structure(fit,class=c("glm","lm","bbnet"))
 }

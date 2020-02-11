@@ -69,7 +69,7 @@ Eigen::VectorXd initialize_vec(const int n, std::mt19937 &rng ){
 //' @param max_treedepth max treedepth for NUTS
 //' @param warm_up number of iterations to use for epsilon adaptation
 //' @param seed random number generator seed
-//
+// [[Rcpp::export]]
 Rcpp::List bbnet_binomial_fit(const Eigen::VectorXd &y,
 							  const Eigen::MatrixXd &X,
 							   const Eigen::ArrayXi &rpc,
@@ -81,6 +81,8 @@ Rcpp::List bbnet_binomial_fit(const Eigen::VectorXd &y,
 							   const int &warm_up,
 							   const int &seed) {
 
+	Rcpp::Rcout << " This function is not yet functional " << std::endl;
+	/*
 	auto start = std::chrono::high_resolution_clock::now();
 	const int chain = 1;
 
@@ -95,6 +97,7 @@ Rcpp::List bbnet_binomial_fit(const Eigen::VectorXd &y,
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop-start);
 	double sampling_time = duration.count();
+	*/
 
     return(Rcpp::List::create(Rcpp::Named("sampling_time")=0));
 

@@ -41,18 +41,24 @@ bbnet_df <- function(stap_formula,
   subject_data <- subject_data %>% dplyr::arrange_(.dots=subject_id)
   dt_data <- dt_data %>% dplyr::arrange_(.dots=subject_id) %>% 
     dplyr::right_join(subject_data[,subject_id],by=subject_id)
+  if(length(subject_id)>1)
+    dt_data$new_id <- Reduce(function(x,y) stringr::str_c(x,y,sep="_"),purrr::map(subject_id,function(x) dt_data[,x,drop=TRUE]))
+  else
+    dt_data$new_id <- dt_data[,subject_id,drop=TRUE]
   DirectEffect <- purrr::map(1:length(BEFs),function(ix){
-    tmpdf <- dt_data %>% dplyr::filter(!!dplyr::sym(BEF_col_name)==BEFs[ix])
-    df <- tmpdf %>% split(.[,subject_id]) %>% 
+    tmpdf <- dt_data %>% dplyr::filter(!!dplyr::sym(BEF_col_name)==BEFs[ix]||is.na(!!dplyr::sym(BEF_col_name)))
+    df <- tmpdf %>% split(.[,"new_id"]) %>% 
       purrr::map(.,function(x){
         if(stcode[ix] %in% c(0,2))
           dt_col_name <- distance_col_name
         else
           dt_col_name <- time_col_name
-        if(is.na(x[1,dt_col_name]))
+        if(any(is.na(x[,dt_col_name,drop=TRUE])) ){
           return(c(0,basis_functions[[ix]](0)))
-        else
+        }
+        else{
           return(colSums(cbind(1,basis_functions[[ix]](x[,dt_col_name,drop=TRUE]))))
+        }
       })
     df <- do.call(rbind,df)
     colnames(df) <- paste0("Direct",stlabels[ix],"Effect_",BEFs[ix], "_",0:(ncol(df)-1))
@@ -63,7 +69,7 @@ bbnet_df <- function(stap_formula,
     st_ics <- which(stcode==2)
     STimeDirectEffect <- purrr::map(st_ics,function(ix){
       tmpdf <- dt_data %>% dplyr::filter(!!dplyr::sym(BEF_col_name)==BEFs[ix])
-      df <- tmpdf %>% split(.[,subject_id]) %>% 
+      df <- tmpdf %>% split(.[,"new_id"]) %>% 
         purrr::map(.,function(x){
           dt_col_name <- time_col_name
           if(is.na(x[1,dt_col_name]))

@@ -37,7 +37,7 @@ bbnet_lm <- function(formula,
     BEFs <- unique(dt_data[,BEF_col_name])
   
   bef_df <- bbnet_df(subject_data,
-                     subject_id,
+                     join_id = subject_id,
                      BEFs,
                      basis_functions,
                      dt_data,

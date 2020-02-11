@@ -20,5 +20,7 @@
 #' @param max_treedepth max treedepth for NUTS
 #' @param warm_up number of iterations to use for epsilon adaptation
 #' @param seed random number generator seed
-NULL
+bbnet_binomial_fit <- function(y, X, rpc, max_q, prior_means, prior_scales, iter_max, max_treedepth, warm_up, seed) {
+    .Call(`_bbnet_bbnet_binomial_fit`, y, X, rpc, max_q, prior_means, prior_scales, iter_max, max_treedepth, warm_up, seed)
+}
 

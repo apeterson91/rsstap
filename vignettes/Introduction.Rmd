@@ -79,7 +79,11 @@ tibble(Distance = seq(from = 0, to = 2.5,by=0.01),
 
 
   
-  We'll finish our simulation of the data by including a 0-1 sex covariate to make things a little more realistic - the code containing all the simulation details can be found [here](https://github.com/apeterson91/bbnet).
+  We'll finish our simulation of the data by including a 0-1 sex covariate to make things a little more realistic - the code containing all the simulation details can be found [here](https://github.com/apeterson91/bbnet), and the resulting dataframe will look like the following.
+  
+```{r,echo=F}
+bbnet_demo$subject_data %>% head() %>% knitr::kable()
+```
 
 Before we fit the model we'll want to choose some restriction distance. While here we are only using this restriction to ensure the identifiability
 condition is met, this restriction is neccessary in a real world setting, since the number of businesses typically grows quadratically as a function of distance. 
