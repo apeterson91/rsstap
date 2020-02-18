@@ -17,14 +17,15 @@ Imports:
     purrr,
     ggplot2,
     lme4,
-    stringr
+    stringr,
+    brms
 LinkingTo: Rcpp, RcppEigen
 RoxygenNote: 6.1.1
 Suggests: 
     knitr,
     rmarkdown,
     covr,
-    testthat
+    testthat (>= 2.1.0)
 VignetteBuilder: knitr
 Depends: 
     R (>= 3.2)

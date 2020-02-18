@@ -1,11 +1,12 @@
 // -*- mode: C++; c-indent-level: 4; c-basic-offset: 4; indent-tabs-mode: nil; -*-
 
 // we only include RcppEigen.h which pulls Rcpp.h in for us
+// [[Rcpp::depends(RcppEigen)]]
+/*
 #include <RcppEigen.h>
 #include <random>
 #include <cmath>
 
-// [[Rcpp::depends(RcppEigen)]]
 
 
 void print_progress(const int &iter_ix, const int &warm_up, const int &iter_max, const int &chain){
@@ -56,7 +57,6 @@ Eigen::VectorXd initialize_vec(const int n, std::mt19937 &rng ){
 //' @param rpc array of regression parameter settings
 //' rpc(0): the outcome distribution
 //' rpc(1): boolean use_intercept value
-//' @param max_q array of maximum number of distances per BEF
 //' @param num_basis array of number of basis functions per BEF
 //' @param start_stop array of start-stop beta par indeces for D matrix
 //' @param prior_means real valued vector for holding prior mean information
@@ -73,7 +73,6 @@ Eigen::VectorXd initialize_vec(const int n, std::mt19937 &rng ){
 Rcpp::List bbnet_binomial_fit(const Eigen::VectorXd &y,
 							  const Eigen::MatrixXd &X,
 							   const Eigen::ArrayXi &rpc,
-							   const Eigen::ArrayXi &max_q,
 							   const Eigen::ArrayXd &prior_means,
 							   const Eigen::ArrayXd &prior_scales,
 							   const int &iter_max,
@@ -82,7 +81,6 @@ Rcpp::List bbnet_binomial_fit(const Eigen::VectorXd &y,
 							   const int &seed) {
 
 	Rcpp::Rcout << " This function is not yet functional " << std::endl;
-	/*
 	auto start = std::chrono::high_resolution_clock::now();
 	const int chain = 1;
 
@@ -97,8 +95,8 @@ Rcpp::List bbnet_binomial_fit(const Eigen::VectorXd &y,
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop-start);
 	double sampling_time = duration.count();
-	*/
 
     return(Rcpp::List::create(Rcpp::Named("sampling_time")=0));
 
 }
+*/

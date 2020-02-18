@@ -24,9 +24,10 @@
 #' @param BEF_col_name string name for the column containing the BEF labels in dt_data dataframe
 #' @param distance_col_name string name for the column containing the subject-BEF distances in the dt_data dataframe
 #' @param time_col_name string name for the the column containing the subject-BEF times in the dt_data dataframe
+#' @param method one of c("lm","stan_lm" or "brm") for frequentist or bayesian method implimentation
 #' @param ... args for \code{\link[stats]{lm}}
 #' 
-bnet_lm <- function(formula,
+bbnet_lm <- function(formula,
                     stap_formula,
                     subject_data,
                     subject_id = NULL,
@@ -35,7 +36,11 @@ bnet_lm <- function(formula,
                     BEF_col_name = NULL,
                     distance_col_name = NULL,
                     time_col_name = NULL,
+					method = "brm",
                      ...){
+	if(!(method %in% c('lm','stan_lm','brm')))
+		stop("method must be one of c('lm','stan_lm','brm')")
+
   bef_df <- bbnet_df(stap_formula = stap_formula,
                      subject_data = subject_data,
                      subject_id = subject_id,
@@ -51,24 +56,65 @@ bnet_lm <- function(formula,
   formula <- as.formula(paste(resp, " ~ ", paste(covs,collapse = " + ")))
   subject_data <- subject_data %>% dplyr::arrange_(.dots=subject_id)
   X <- cbind(subject_data,bef_df)
+  if(method == "lm"){
   
-  fit <- lm(formula,data = X, ...)
-  
-  fit$basis_functions <- basis_functions
-  fit$stap_data <- rstap:::extract_stap_data(stap_formula)
-  fit$BEFs <- fit$stap_data$covariates
-  if(any(fit$stap_data$stap_code %in% c(0,2)))
-    fit$spaceranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
-                           dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
-                           dplyr::pull(!!dplyr::sym(distance_col_name)) %>%
-        range(.)
-      })
-  if(any(fit$stap_data$stap_code %in% c(1,2)))
-    fit$timeranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
-        dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
-        pull(!!dplyr::sym(time_col_name)) %>% 
-        range(.)
-      })
-  
-  structure(fit,class=c("lm","bbnet"))
+	  fit <- lm(formula,data = X, ...)
+	  
+	  fit$basis_functions <- basis_functions
+	  fit$stap_data <- rstap:::extract_stap_data(stap_formula)
+	  fit$BEFs <- fit$stap_data$covariates
+	  if(any(fit$stap_data$stap_code %in% c(0,2)))
+		fit$spaceranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
+							   dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
+							   dplyr::pull(!!dplyr::sym(distance_col_name)) %>%
+			range(.)
+		  })
+	  
+	  if(any(fit$stap_data$stap_code %in% c(1,2)))
+		fit$timeranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
+			dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
+			pull(!!dplyr::sym(time_col_name)) %>% 
+			range(.)
+		  })
+	  
+	  structure(fit,class=c("lm","bbnet"))
+  }else if(method == "stan_lm"){
+	  fit <- rstanarm::stan_lm(formula,data = X, ...)
+	  fit$basis_functions <- basis_functions
+	  fit$stap_data <- rstap:::extract_stap_data(stap_formula)
+	  fit$BEFs <- fit$stap_data$covariates
+	  if(any(fit$stap_data$stap_code %in% c(0,2)))
+		fit$spaceranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
+							   dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
+							   dplyr::pull(!!dplyr::sym(distance_col_name)) %>%
+			range(.)
+		  })
+	  
+	  if(any(fit$stap_data$stap_code %in% c(1,2)))
+		fit$timeranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
+			dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
+			pull(!!dplyr::sym(time_col_name)) %>% 
+			range(.)
+		  })
+	  structure(fit,class=c("stanreg","bbnet"))
+  }else{
+	  fit <- brms::brm(formula,data= X,...)
+	  fit$basis_functions <- basis_functions
+	  fit$stap_data <- rstap:::extract_stap_data(stap_formula)
+	  fit$BEFs <- fit$stap_data$covariates
+	  if(any(fit$stap_data$stap_code %in% c(0,2)))
+		fit$spaceranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
+							   dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
+							   dplyr::pull(!!dplyr::sym(distance_col_name)) %>%
+			range(.)
+		  })
+	  
+	  if(any(fit$stap_data$stap_code %in% c(1,2)))
+		fit$timeranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
+			dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
+			pull(!!dplyr::sym(time_col_name)) %>% 
+			range(.)
+		  })
+	  structure(fit,class=c("brmsfit","bbnet"))
+  }
 }

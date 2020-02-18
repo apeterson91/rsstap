@@ -6,33 +6,3 @@
 
 using namespace Rcpp;
 
-// bbnet_binomial_fit
-Rcpp::List bbnet_binomial_fit(const Eigen::VectorXd& y, const Eigen::MatrixXd& X, const Eigen::ArrayXi& rpc, const Eigen::ArrayXi& max_q, const Eigen::ArrayXd& prior_means, const Eigen::ArrayXd& prior_scales, const int& iter_max, const int& max_treedepth, const int& warm_up, const int& seed);
-RcppExport SEXP _bbnet_bbnet_binomial_fit(SEXP ySEXP, SEXP XSEXP, SEXP rpcSEXP, SEXP max_qSEXP, SEXP prior_meansSEXP, SEXP prior_scalesSEXP, SEXP iter_maxSEXP, SEXP max_treedepthSEXP, SEXP warm_upSEXP, SEXP seedSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type y(ySEXP);
-    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type X(XSEXP);
-    Rcpp::traits::input_parameter< const Eigen::ArrayXi& >::type rpc(rpcSEXP);
-    Rcpp::traits::input_parameter< const Eigen::ArrayXi& >::type max_q(max_qSEXP);
-    Rcpp::traits::input_parameter< const Eigen::ArrayXd& >::type prior_means(prior_meansSEXP);
-    Rcpp::traits::input_parameter< const Eigen::ArrayXd& >::type prior_scales(prior_scalesSEXP);
-    Rcpp::traits::input_parameter< const int& >::type iter_max(iter_maxSEXP);
-    Rcpp::traits::input_parameter< const int& >::type max_treedepth(max_treedepthSEXP);
-    Rcpp::traits::input_parameter< const int& >::type warm_up(warm_upSEXP);
-    Rcpp::traits::input_parameter< const int& >::type seed(seedSEXP);
-    rcpp_result_gen = Rcpp::wrap(bbnet_binomial_fit(y, X, rpc, max_q, prior_means, prior_scales, iter_max, max_treedepth, warm_up, seed));
-    return rcpp_result_gen;
-END_RCPP
-}
-
-static const R_CallMethodDef CallEntries[] = {
-    {"_bbnet_bbnet_binomial_fit", (DL_FUNC) &_bbnet_bbnet_binomial_fit, 10},
-    {NULL, NULL, 0}
-};
-
-RcppExport void R_init_bbnet(DllInfo *dll) {
-    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
-    R_useDynamicSymbols(dll, FALSE);
-}

@@ -97,14 +97,14 @@ demo_knots <- quantile(restricted_distance$Distance,
                   probs = c(0.25,.75))
 ```
 # Model Fitting
-Finally we'll fit our model, using syntax similar to the `lm` and `stap_lm` functions, where the `~ sap(HFS)` indicates
+Finally we'll fit our model, using syntax similar to the `lm` function, where the `~ sap(HFS)` indicates
 that we're looking to model the healthy food stores as a function of space. Note that we have to define a list of basis 
 functions for each covariate included in the model. We'll use natural cubic splines here, with the interior knots previously defined at 
 the quantiles and set the boundary knot at our inclusion distance. There are a few other arguments that are needed to ensure
 that the subject and bef data are joined and aggregated appropriately. While they are hopefully self-explanatory, more information about these can be found in the documentation if needed.
 
 ```{r}
-fit <- bnet_lm(formula = y ~ sex,
+fit <- bbnet_lm(formula = y ~ sex,
                stap_formula = ~ sap(HFS),
                subject_data = bbnet_demo$subject_data,
                subject_id = "subj_id",
@@ -112,32 +112,32 @@ fit <- bnet_lm(formula = y ~ sex,
                                                                     Boundary.knots = c(0,2)) }),
                dt_data = restricted_distance,
                BEF_col_name = "BEF",
-               distance_col_name = "Distance")
+               distance_col_name = "Distance",method='lm')
 
 summary(fit)
 ```
 As we look at the output, we can see this is similar to the `lm` function's summary output. This makes sense because the 
-object returned by the `(b)bnet_` functions inherit the class of whatever function follows the underscore - in this case the `lm` function.
+object returned by the `bbnet_` functions inherit the class of whatever function was chosen using the `method` argument - in this case the `lm` function.
 
 It also inherits a new `bbnet` class which allows for custom methods specific to these objects. For example, if we want to to plot the 
-spatial exposure estimate we can do so using the `plot_directeffect` function. I'll overlay the true exposure effect we simulated for comparison.
+spatial exposure estimate we can do so using the `plot_effects` function. I'll overlay the true exposure effect we simulated for comparison.
 
 ```{r}
 d <- seq(from = min(restricted_distance$Distance), to = 2, by =0.01)
-plot_directeffect(fit) + ggplot2::theme_bw() +
+plot_effects(fit) + ggplot2::theme_bw() +
   ggplot2::geom_line(ggplot2::aes(x=d,y=bbnet_demo$true_effect(d)),color='red') + 
-  theme(strip.background = element_blank())
+  theme(strip.background = element_blank()) + xlab("Distance")
 ```
 
 
-  It looks like we captured the truth with our estimate but we're only able to say there's a definitive effect till about just before 0.25 distance units, at which point the results become less significant.
+It looks like we captured the truth with our estimate but we're only able to say there's a definitive effect till about just before 0.25 distance units, at which point the results become less significant.
 
 What about a bayesian approach? This is the *Bayesian* built environment network package after all. In order to obtain bayesian estimates
-we can simply use the ``bbnet_stan_lm` function, which implements the same model using the `rstanarm::stan_lm` function. Note that now we 
+we can simply use the ``bbnet_lm` function setting the `method` argument to either `"stan_lm"` or `"brm"`, to use the function from the rstanarm or brms packages respectively. Note that now we 
 can specify a prior and number of iterations (as well as any number of other optional arguments), to this function. Let's fit the model and plot the same result.
 
 ```{r,results="hide",message=FALSE}
-fit <- bbnet_stan_lm(formula = y ~ sex,
+fit <- bbnet_lm(formula = y ~ sex,
                stap_formula = ~ sap(HFS),
                subject_data = bbnet_demo$subject_data,
                subject_id = "subj_id",
@@ -145,10 +145,11 @@ fit <- bbnet_stan_lm(formula = y ~ sex,
                dt_data = restricted_distance,
                BEF_col_name = "BEF",
                distance_col_name = "Distance",
+               method='stan_lm',
                prior=NULL, ## Uniform prior on R2 from rstanarm::stan_lm
                prior_intercept = NULL,## Improper prior on intercept from rstanarm::stan_lm 
                iter=1E3) ## for demonstration purposes
-plot_directeffect(fit) + 
+plot_effects(fit) + 
   ggplot2::geom_line(ggplot2::aes(x=d,y=bbnet_demo$true_effect(d)),color='red') +
   theme(strip.background = element_blank())
 ```

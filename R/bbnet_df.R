@@ -34,9 +34,19 @@ bbnet_df <- function(stap_formula,
   if(is.null(subject_id)){
     stop("subject_id must be provided so that distance and subject data can be joined")
   }
-  stap_data <- rstap:::extract_stap_data(stap_formula)
+  if(!(BEF_col_name %in% colnames(dt_data)))
+    stop("`BEF_col_name` must be a column in dt_data")
+  if(!(distance_col_name %in% colnames(dt_data)) && !is.null(distance_col_name))
+    stop("`distance_col_name` must be a column in dt_data")
+  if(!(time_col_name %in% colnames(dt_data)) && !is.null(time_col_name))
+    stop("`time_col_name` must be a column in dt_data")
+  if(!(subject_id %in% colnames(dt_data)) || !(subject_id %in% colnames(subject_data)))
+    stop("`subject_id` must be a column in both dt_data and subject_data")
+  
+  stap_data <- extract_stap_data(stap_formula)
   stcode <- stap_data$stap_code
-  stlabels <- sapply(stcode,function(x) if(x%in%c(0,2))return("Spatial") else if(x==1) return("Temporal"))
+  stlabels <- sapply(stcode,function(x) if(x%in%c(0,2)) return("Spatial") else if(x==1) return("Temporal"))
+  group_labels <- sapply(seq_along(stap_data$group_indicator),function(x) if(stap_data$group_indicator[x]==1) return(paste0(stap_data$group_term[x],"_")) else return(""))
   BEFs <- stap_data$covariates
   subject_data <- subject_data %>% dplyr::arrange_(.dots=subject_id)
   dt_data <- dt_data %>% dplyr::arrange_(.dots=subject_id) %>% 
@@ -45,25 +55,27 @@ bbnet_df <- function(stap_formula,
     dt_data$new_id <- Reduce(function(x,y) stringr::str_c(x,y,sep="_"),purrr::map(subject_id,function(x) dt_data[,x,drop=TRUE]))
   else
     dt_data$new_id <- dt_data[,subject_id,drop=TRUE]
+  dt_data$new_id <- factor(dt_data$new_id,levels=unique(dt_data$new_id))
+  
   DirectEffect <- purrr::map(1:length(BEFs),function(ix){
-    tmpdf <- dt_data %>% dplyr::filter(!!dplyr::sym(BEF_col_name)==BEFs[ix]||is.na(!!dplyr::sym(BEF_col_name)))
+    if(stcode[ix] %in% c(0,2))
+      dt_col_name <- distance_col_name
+    else
+      dt_col_name <- time_col_name
+    tmpdf <- dt_data %>% dplyr::filter(!!dplyr::sym(BEF_col_name)==BEFs[ix]|is.na(!!dplyr::sym(BEF_col_name)))
     df <- tmpdf %>% split(.[,"new_id"]) %>% 
       purrr::map(.,function(x){
-        if(stcode[ix] %in% c(0,2))
-          dt_col_name <- distance_col_name
-        else
-          dt_col_name <- time_col_name
         if(any(is.na(x[,dt_col_name,drop=TRUE])) ){
           return(c(0,basis_functions[[ix]](0)))
-        }
-        else{
+        }else{
           return(colSums(cbind(1,basis_functions[[ix]](x[,dt_col_name,drop=TRUE]))))
         }
       })
     df <- do.call(rbind,df)
-    colnames(df) <- paste0("Direct",stlabels[ix],"Effect_",BEFs[ix], "_",0:(ncol(df)-1))
+    colnames(df) <- paste0(stlabels[ix],"Effect_",group_labels[ix],BEFs[ix], "_",0:(ncol(df)-1))
     return(df)
   })
+
   DirectEffect <- do.call(cbind,DirectEffect)
   if(any(stcode==2)){
     st_ics <- which(stcode==2)
@@ -78,7 +90,7 @@ bbnet_df <- function(stap_formula,
             return(colSums(cbind(1,basis_functions[[ix]](x[,dt_col_name,drop=TRUE]))))
         })
       df <- do.call(rbind,df)
-      colnames(df) <- paste0("DirectTemporalEffect","_",0:(ncol(ST)))
+      colnames(df) <- paste0("TemporalEffect","_",group_labels[ix],BEFs[ix],0:(ncol(df)-1))
       return(df)
     })
     STimeDirectEffect <- do.call(cbind,STimeDirectEffect)
