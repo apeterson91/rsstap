@@ -1,4 +1,4 @@
-Package:rsstap 
+Package: rsstap 
 Type: Package
 Title: Spline Spatial Temporal Aggregated Predictors in R
 Version: 0.1.0

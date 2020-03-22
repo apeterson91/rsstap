@@ -125,4 +125,4 @@ rsstap_repeatedmeasures <- list(distance_df = subject_bef_df %>% filter(Distance
                                 subject_df = subject_df,
                                 exposure_function = true_direct_effect)
 
-usethis::use_data(bbnet_repeatedmeasures, overwrite = TRUE)
+usethis::use_data(rsstap_repeatedmeasures, overwrite = TRUE)

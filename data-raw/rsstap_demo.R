@@ -89,4 +89,4 @@ rsstap_demo <- list(subject_data = subject_data,
 
 
 
-usethis::use_data(bbnet_demo, overwrite = TRUE)
+usethis::use_data(rsstap_demo, overwrite = TRUE)

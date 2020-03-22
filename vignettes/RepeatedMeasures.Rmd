@@ -1,5 +1,10 @@
 ---
 title: "Repeated Measures"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to rsstap}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, eval=F,include = FALSE}
@@ -43,7 +48,7 @@ summary(fit)
 plot_effects_mer(fit)
 ```
 
-```{r}
+```{r,eval=F,echo=F}
 fit <- sstap_lmer(formula = BMI ~ sex + time + (time|subj_ID),
                  stap_formula = ~sap(HFS),
                  subject_data = rsstap_repeatedmeasures$subject_df,
@@ -57,7 +62,7 @@ summary(fit)
 ```
 
 
-```{r}
+```{r,eval=F,echo=F}
 plot_effects(fit)
 ```
 
