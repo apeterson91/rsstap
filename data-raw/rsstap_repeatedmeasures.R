@@ -74,6 +74,25 @@ subject_bef_df <- subject_bef_df %>%
 y_3 <- alpha + Z*delta + X_1 + subject_intercepts + time_effect*2 + subject_slopes*2 +  rnorm(n = num_subj, mean = 0, sd = sigma) ## timepoint 2
 
 
+movers <- sample(1:num_subj,10)
+
+sub_df[movers,c("x","y")] <- cbind(runif(n = 10,min = 0, max = 5.0),
+                                   runif(n = 10, min = 0, max = 5.0))
+
+direct_dists <- fields::rdist(as.matrix(sub_df[,1:2]),
+                              as.matrix(bef_df[,1:2]))
+
+X_1 <- rowSums(true_direct_effect(direct_dists))
+
+subject_bef_df <- subject_bef_df %>% 
+  rbind(.,as_tibble(direct_dists) %>% 
+          mutate(subj_ID = 1:num_subj) %>% 
+          gather(contains("V"),key="BEF",value="Distance") %>% 
+          mutate(BEF = "HFS",measure_ID = 2L))
+
+y_4 <- alpha + Z*delta + X_1 + subject_intercepts + time_effect*3 + subject_slopes*3 +  rnorm(n = num_subj, mean = 0, sd = sigma) ## timepoint 3
+
+
 
 subject_df <- tibble(subj_ID = 1:num_subj,
                      BMI = y,
@@ -89,15 +108,20 @@ subject_df <- tibble(subj_ID = 1:num_subj,
                  BMI = y_3,
                  sex = Z, 
                  time = 2, 
-                 measure_ID = 2L))
+                 measure_ID = 2L)) %>% 
+  rbind(.,tibble(subj_ID = 1:num_subj,
+                 BMI = y_4,
+                 sex = Z,
+                 time = 3,
+                 measure_ID = 3L))
 
 subject_bef_df <- subject_bef_df %>% 
   rbind(.,as_tibble(direct_dists) %>% 
   mutate(subj_ID = 1:num_subj) %>% 
   gather(contains("V"),key="BEF",value="Distance") %>% 
-  mutate(BEF = "HFS",measure_ID = 2L))
+  mutate(BEF = "HFS",measure_ID = 3L))
 
-bbnet_repeatedmeasures <- list(distance_df = subject_bef_df %>% filter(Distance<=2),
+rsstap_repeatedmeasures <- list(distance_df = subject_bef_df %>% filter(Distance<=2),
                                 subject_df = subject_df,
                                 exposure_function = true_direct_effect)
 

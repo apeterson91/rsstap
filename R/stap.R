@@ -1,4 +1,4 @@
-# Part of the bbnet package 
+# Part of the rsstap package 
 # 
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License

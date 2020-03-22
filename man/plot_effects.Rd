@@ -5,7 +5,7 @@
 \alias{plot_effects}
 \title{Parent Method for plot_directeffect}
 \usage{
-plot_effects_mer(object, pars)
+plot_effects_mer(object, pars = NULL)
 
 plot_effects(object, pars = NULL)
 }

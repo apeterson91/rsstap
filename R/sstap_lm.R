@@ -27,7 +27,7 @@
 #' @param method one of c("lm","stan_lm" or "brm") for frequentist or bayesian method implimentation
 #' @param ... args for \code{\link[stats]{lm}}
 #' 
-bbnet_lm <- function(formula,
+sstap_lm <- function(formula,
                     stap_formula,
                     subject_data,
                     subject_id = NULL,
@@ -41,7 +41,7 @@ bbnet_lm <- function(formula,
 	if(!(method %in% c('lm','stan_lm','brm')))
 		stop("method must be one of c('lm','stan_lm','brm')")
 
-  bef_df <- bbnet_df(stap_formula = stap_formula,
+  bef_df <- sstap_df(stap_formula = stap_formula,
                      subject_data = subject_data,
                      subject_id = subject_id,
                      basis_functions = basis_functions,
@@ -77,7 +77,7 @@ bbnet_lm <- function(formula,
 			range(.)
 		  })
 	  
-	  structure(fit,class=c("lm","bbnet"))
+	  structure(fit,class=c("lm","sstap"))
   }else if(method == "stan_lm"){
 	  fit <- rstanarm::stan_lm(formula,data = X, ...)
 	  fit$basis_functions <- basis_functions
@@ -96,7 +96,7 @@ bbnet_lm <- function(formula,
 			pull(!!dplyr::sym(time_col_name)) %>% 
 			range(.)
 		  })
-	  structure(fit,class=c("stanreg","bbnet"))
+	  structure(fit,class=c("stanreg","sstap"))
   }else{
 	  fit <- brms::brm(formula,data= X,...)
 	  fit$basis_functions <- basis_functions
@@ -115,6 +115,6 @@ bbnet_lm <- function(formula,
 			pull(!!dplyr::sym(time_col_name)) %>% 
 			range(.)
 		  })
-	  structure(fit,class=c("brmsfit","bbnet"))
+	  structure(fit,class=c("brmsfit","sstap"))
   }
 }

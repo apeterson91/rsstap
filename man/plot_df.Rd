@@ -5,7 +5,7 @@
 \alias{plot_df}
 \title{Parent Method for getting plot dataframe}
 \usage{
-plot_df_mer(object, pars)
+plot_df_mer(object, pars = NULL)
 
 plot_df(object, pars = NULL)
 }

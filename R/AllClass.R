@@ -10,12 +10,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#' @title Lmer bbnet model objects
+#' @title Lmer rsstap model objects
 #'
 #' @description
-#' A fitted lmer bbnet object. Inherits from \pkg{lme4}'s
+#' A fitted lmer rsstap object. Inherits from \pkg{lme4}'s
 #' \code{\link[lme4]{merMod}} so that most methods defined for this
-#' parent class should work seamlessly within \pkg{bbnet} analysis
+#' parent class should work seamlessly within \pkg{rsstap} analysis
 #'
 #' @slot resp
 #'   An \code{lme4::\link[lme4]{lmResp}} object to store a
@@ -26,10 +26,10 @@
 #' @slot BEFs
 #'   A character vector containing the names of the BEFs included in the model fit
 #'
-#' @name bbMod
+#' @name sstapMod
 #' @export
 #'
-bbMod <- setClass("bbMod",
+sstapMod <- setClass("sstapMod",
                   slots = c(
                     basis_functions = "list",
                     BEFs = "character",

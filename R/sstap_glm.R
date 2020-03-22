@@ -28,7 +28,7 @@
 #' @param method one of c("glm","stan_glm" or "brm") for frequentist or bayesian method implimentation
 #' @param ... args for \code{\link[stats]{glm}} or \code{\link[brms]{brm}} or \code{\link[rstanarm]{stan_glm}}
 #' 
-bbnet_glm <- function(formula,
+sstap_glm <- function(formula,
                     stap_formula,
                     subject_data,
                     subject_id = NULL,
@@ -43,7 +43,7 @@ bbnet_glm <- function(formula,
 	if(!(method %in% c('glm','stan_glm','brm')))
 		stop("method must be one of c('glm','stan_glm','brm')")
 
-	bef_df <- bbnet_df(stap_formula = stap_formula,
+	bef_df <- sstap_df(stap_formula = stap_formula,
 					   subject_data = subject_data,
 					   subject_id = subject_id,
 					   basis_functions = basis_functions,
@@ -81,7 +81,7 @@ bbnet_glm <- function(formula,
 				dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
 				pull(!!dplyr::sym(time_col_name)) %>% range(.)})
 
-		structure(fit,class=c("glm","lm","bbnet"))
+		structure(fit,class=c("glm","lm","sstap"))
 	}else if(method == "stan_glm"){
 		fit <- rstanarm::stan_glm(formula,data = X, family = family, ...)
 		fit$basis_functions <- basis_functions
@@ -98,7 +98,7 @@ bbnet_glm <- function(formula,
 		fit$scales <- scales
 		if(any(scales>1))
 			warning("Note: BEF-covariates were scaled, see object$scale for scales used")
-		structure(fit,class=c("stanreg","bbnet"))
+		structure(fit,class=c("stanreg","sstap"))
 	}else if(method == "brms"){
 		fit <- brms::brm(formula,data = X, family = family, ...)
 		fit$basis_functions <- basis_functions
@@ -116,6 +116,6 @@ bbnet_glm <- function(formula,
 		if(any(scales>1))
 			warning("Note: BEF-covariates were scaled, see object$scale for scales used")
 
-		structure(fit,class=c("brmsfit","bbnet"))
+		structure(fit,class=c("brmsfit","sstap"))
 	}
 }

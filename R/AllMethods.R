@@ -7,10 +7,10 @@ setGeneric("plot_effects_mer", function(object,pars = NULL) standardGeneric("plo
 setGeneric("plot_df_mer", function(object,pars = NULL) standardGeneric("plot_df_mer"))
 
 
-#' Method for creating plot dataframe for bbMod objects
+#' Method for creating plot dataframe for sstapMod objects
 #' @export
 #' 
-setMethod("plot_df_mer",signature=signature("bbMod"),
+setMethod("plot_df_mer",signature=signature("sstapMod"),
 	function(object,pars = NULL){
 		if(!is.null(pars))
 			code <- object@stap_code[which(object@BEFs %in% pars)]
@@ -39,10 +39,10 @@ setMethod("plot_df_mer",signature=signature("bbMod"),
       return(pltdf)
 })
 
-#' Method for plotting bbMod objects
+#' Method for plotting sstapMod objects
 #' @export
 #' 
-setMethod("plot_effects_mer",signature = signature("bbMod"),
+setMethod("plot_effects_mer",signature = signature("sstapMod"),
 			function(object,pars= NULL){
 			  pltdf <- plot_df_mer(object,pars)
 			  p <- pltdf %>% ggplot2::ggplot(ggplot2::aes(x=Grid,y=Effect)) + 

@@ -76,7 +76,7 @@ bef_bef_distance_data <- fields::rdist(as.matrix(bef_df[,1:2]),
 
 
 
-bbnet_demo <- list(subject_data = subject_data,
+rsstap_demo <- list(subject_data = subject_data,
                   direct_distance_data = subject_distance_data,
                   indirect_distance_data = bef_bef_distance_data,
                   alpha = alpha,

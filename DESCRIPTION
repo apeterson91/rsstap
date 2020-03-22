@@ -1,15 +1,14 @@
-Package: bbnet
+Package:rsstap 
 Type: Package
-Title: Bayesian Built Environment Network Models
+Title: Spline Spatial Temporal Aggregated Predictors in R
 Version: 0.1.0
 Date: 2020-01-16
 Authors@R: person("Adam", "Peterson", , "atpvyc@umich.edu", c("aut", "cre"))
-BugReports: https://github.com/apeterson91/bbnet/issues
-Description: Motivated by the need to estimate spatial-temporal effects of built environments as a function of their distance from subjects AND other built environment features, the bbnet package flexibly estimates the spatial-temporal function by which these effects occur on proximate subjects.
+BugReports: https://github.com/apeterson91/rsstap/issues
+Description: This package offers a spline implementation of the previous kernel spatial temporal aggregated predictors implimented in rstap. 
 License: GPL-3
 Encoding: UTF-8
 Imports: 
-    Rcpp (>= 1.0.3),
     dplyr,
     magrittr,
     rstanarm,
@@ -19,7 +18,6 @@ Imports:
     lme4,
     stringr,
     brms
-LinkingTo: Rcpp, RcppEigen
 RoxygenNote: 6.1.1
 Suggests: 
     knitr,

@@ -15,15 +15,16 @@
 #'
 #' @export
 #'
-#' @param formula Similar as for \code{\link[stats]{lm}}. 
+#' @param formula Similar as for \code{\link[rstap]{stap_lm}}. 
 #' @param subject_data required data argument
 #' @param subject_id string containing the common id column in both data and distance data and/or time_data
+#' @param basis_functions list with length equal to the number of BEFs in the stap_formula that specifies the basis function expansion
 #' @param dt_data distance-time dataframe containing three columns (1) subj_ID, (2) BEF_name and (3) Distance between subj_ID and BEF 
 #' @param BEF_col_name string name of the column in the dt dataframe that contains the character vectors describing the BEFs
 #' @param distance_col_name string name of the column in the dt dataframe that contains the distance values
 #' @param time_col_name string name of the column in the dt dataframe that contains the time values
 #'
-bbnet_df <- function(stap_formula,
+sstap_df <- function(stap_formula,
                      subject_data,
                      subject_id = NULL,
                      basis_functions = NULL,
@@ -67,12 +68,14 @@ bbnet_df <- function(stap_formula,
       purrr::map(.,function(x){
         if(any(is.na(x[,dt_col_name,drop=TRUE])) ){
           return(c(0,basis_functions[[ix]](0)))
-        }else{
+        }else if(stap_data$group_indicator[ix]==0){
           return(colSums(cbind(1,basis_functions[[ix]](x[,dt_col_name,drop=TRUE]))))
+        }else{
+          return(colSums(basis_functions[[ix]](x[,dt_col_name,drop=TRUE])))
         }
       })
     df <- do.call(rbind,df)
-    colnames(df) <- paste0(stlabels[ix],"Effect_",group_labels[ix],BEFs[ix], "_",0:(ncol(df)-1))
+    colnames(df) <- paste0(stlabels[ix],"Effect_",group_labels[ix],BEFs[ix], "_",(0:(ncol(df)-1) + stap_data$group_indicator[ix]))
     return(df)
   })
 
@@ -86,11 +89,11 @@ bbnet_df <- function(stap_formula,
           dt_col_name <- time_col_name
           if(is.na(x[1,dt_col_name]))
             return(c(0,basis_functions[[ix]](0)))
-          else
+          else 
             return(colSums(cbind(1,basis_functions[[ix]](x[,dt_col_name,drop=TRUE]))))
         })
       df <- do.call(rbind,df)
-      colnames(df) <- paste0("TemporalEffect","_",group_labels[ix],BEFs[ix],0:(ncol(df)-1))
+      colnames(df) <- paste0("TemporalEffect","_",group_labels[ix],BEFs[ix],(0:(ncol(df)-1) + stap_data$group_indicator[ix]))
       return(df)
     })
     STimeDirectEffect <- do.call(cbind,STimeDirectEffect)

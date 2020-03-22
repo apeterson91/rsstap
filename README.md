@@ -1,4 +1,4 @@
-# bbnet: Bayesian Built Environment Network Models
+# rsstap: Spline Spatial Temporal Aggregated Predictors
 <!-- badges: start -->
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Travis build status](https://travis-ci.org/apeterson91/bbnet.svg?branch=master)](https://travis-ci.org/apeterson91/bbnet)
@@ -7,9 +7,8 @@
 
 ## About
 
-This is an R package that fits the bayesian built environment network model to
-subject indexed spatio-temporal data. The primary target audience is researchers interested in the effect of built environment features (BEFs) on human health, 
-though other applications are possible.
+This is an R package that fits spline spatial temporal aggregated predictors to subject indexed spatio-temporal data.
+The primary target audience is researchers interested in the effect of built environment features (BEFs) on human health,though other applications are possible.
 
 ## Installation
 
@@ -24,13 +23,13 @@ though other applications are possible.
 	library(devtools)
  }
 
-install_github("apeterson91/bbnet",dependencies = TRUE)
+install_github("apeterson91/rsstap",dependencies = TRUE)
  ```
 
 
 #### Code of Conduct
 
-Please note that `bbnet` is released with a [Contributor Code of Conduct](https://www.contributor-covenant.org/). By contributing to this project, you agree to abide by its terms.
+Please note that `rsstap` is released with a [Contributor Code of Conduct](https://www.contributor-covenant.org/). By contributing to this project, you agree to abide by its terms.
 
 
 ## How to cite this package

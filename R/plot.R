@@ -24,15 +24,15 @@ plot_df <- function(object,pars = NULL){
   UseMethod("plot_df")
 }
 
-#' Plots the Direct Spatio-Temporal Exposure of a bbnet Model
+#' Plots the Direct Spatio-Temporal Exposure of a sstap Model
 #'
 #'
 #' @export
 #'
-#' @param object of type bbnet
+#' @param object of type sstap
 #' @param pars optional parameter selection
 #' 
-plot_effects.bbnet <- function(object,pars = NULL){
+plot_effects.sstap <- function(object,pars = NULL){
   
   pltdf <- plot_df(object,pars)
   if("lm" %in% class(object) || "lmerMod" %in% class(object))
@@ -50,7 +50,7 @@ plot_effects.bbnet <- function(object,pars = NULL){
 
 #'
 #'@export  
-plot_df.bbnet <- function(object,pars){
+plot_df.sstap <- function(object,pars){
   
   if(!is.null(pars))
     code <- object$stap_data$stap_code[which(object$stap_data$covariates %in% pars)]
@@ -90,9 +90,9 @@ plot_df.bbnet <- function(object,pars){
 pltdf_helper <- function(object,spacegrids,spacegridmats,spatial_covs,spatial_BEFs,
                          timegrids,timegridmats,temporal_covs,temporal_BEFs){
 
-	if("lm" %in% class(object) || "bbMod" %in% class(object)){
+	if("lm" %in% class(object) || "sstapMod" %in% class(object)){
 	  intervals <-  confint(object)
-	  if("bbMod" %in% class(object))
+	  if("sstapMod" %in% class(object))
 	    coefs <- lme4::fixef(object)
 	  else
 	    coefs <- coef(object)

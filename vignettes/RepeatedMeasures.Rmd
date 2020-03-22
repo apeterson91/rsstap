@@ -10,28 +10,29 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(bbnet)
-data("bbnet_repeatedmeasures")
+library(tidyverse)
+library(rsstap)
+data("rsstap_repeatedmeasures")
 ```
 
 
-## Repeated Measures with bbnet
+## Repeated Measures with rsstap
 
-Building off the Introductory 
+Building off the Introductory vignette where the effect of Healthy Food Stores was modeled as a function of 
 
 
-# Subject Specific Intercepts
+# Subject Specific terms
 
 
 ```{r}
-quantile_knots <- quantile(bbnet_repeatedmeasures$distance_df$Distance,c(0.5))
+quantile_knots <- quantile(rsstap_repeatedmeasures$distance_df$Distance,c(0.5))
 
-fit <- bbnet_lmer(formula = BMI ~ sex + time + (time|subj_ID),
+fit <- sstap_lmer(formula = BMI ~ sex + time + (time|subj_ID),
                  stap_formula = ~sap(HFS),
-                 subject_data = bbnet_repeatedmeasures$subject_df,
+                 subject_data = rsstap_repeatedmeasures$subject_df,
                  subject_id =  c("subj_ID","measure_ID"),
                  basis_functions = list(HFS=function(x) splines::bs(x,knots=quantile_knots,Boundary.knots = c(0,2))),
-                 dt_data = bbnet_repeatedmeasures$distance_df,
+                 dt_data = rsstap_repeatedmeasures$distance_df,
                  BEF_col_name = "BEF",
                  method='lmer',
                  distance_col_name = "Distance")
@@ -43,12 +44,12 @@ plot_effects_mer(fit)
 ```
 
 ```{r}
-fit <- bbnet_lmer(formula = BMI ~ sex + time + (time|subj_ID),
+fit <- sstap_lmer(formula = BMI ~ sex + time + (time|subj_ID),
                  stap_formula = ~sap(HFS),
-                 subject_data = bbnet_repeatedmeasures$subject_df,
+                 subject_data = rsstap_repeatedmeasures$subject_df,
                  subject_id =  c("subj_ID","measure_ID"),
                  basis_functions = list(HFS=function(x) splines::bs(x,knots=quantile_knots,Boundary.knots = c(0,2))),
-                 dt_data = bbnet_repeatedmeasures$distance_df,
+                 dt_data = rsstap_repeatedmeasures$distance_df,
                  BEF_col_name = "BEF",
                  method='brm',
                  distance_col_name = "Distance",cores = 4, chains = 4,iter=3E3)
@@ -61,31 +62,3 @@ plot_effects(fit)
 ```
 
 
-## Subject Specific BEF-Effects
-
-
-Just as we can have subject specific intercepts and time-slopes that try to capture the between - within subject variability of subjects' outcomes over time, we can also have subject specific spatial-temporal effects that
-capture the between-within subject variability of BEF effects. To demonstrate how to fit these models in 
-bbnet, consider the following example.
-
-```{r}
-quantile_knots <- quantile(bbnet_repeatedmeasures$distance_df$Distance,c(0.5))
-
-fit <- bbnet_lmer(formula = BMI ~ sex + time,
-                 stap_formula = ~ sap(HFS) + (sap(HFS)|subj_ID),
-                 subject_data = bbnet_repeatedmeasures$subject_df,
-                 subject_id =  c("subj_ID","measure_ID"),
-                 basis_functions = list(HFS=function(x) splines::bs(x,knots=quantile_knots,Boundary.knots = c(0,2)),
-                                        HFS=function(x) splines::bs(x,knots=quantile_knots,Boundary.knots = c(0,2))),
-                 dt_data = bbnet_repeatedmeasures$distance_df,
-                 BEF_col_name = "BEF",
-                 method='lmer',
-                 distance_col_name = "Distance")
-summary(fit)
-```
-
-
-
-```{r}
-
-```
