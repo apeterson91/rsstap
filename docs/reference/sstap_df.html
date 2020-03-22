@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Pipe operator — %&gt;% • rsstap</title>
+<title>Built Environment Network Direct Effect Matrix — sstap_df • rsstap</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,8 @@
 
 
 
-<meta property="og:title" content="Pipe operator — %&gt;%" />
-<meta property="og:description" content="See magrittr::%&amp;gt;% for details." />
+<meta property="og:title" content="Built Environment Network Direct Effect Matrix — sstap_df" />
+<meta property="og:description" content="Built Environment Network Direct Effect Matrix" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -115,23 +115,62 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Pipe operator</h1>
+    <h1>Built Environment Network Direct Effect Matrix</h1>
     
-    <div class="hidden name"><code>pipe.Rd</code></div>
+    <div class="hidden name"><code>sstap_df.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>See <code>magrittr::%&gt;%</code> for details.</p>
+    <p>Built Environment Network Direct Effect Matrix</p>
     </div>
 
-    <pre class="usage"><span class='no'>lhs</span> <span class='kw'>%&gt;%</span> <span class='no'>rhs</span></pre>
+    <pre class="usage"><span class='fu'>sstap_df</span>(<span class='no'>stap_formula</span>, <span class='no'>subject_data</span>, <span class='kw'>subject_id</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>basis_functions</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>dt_data</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>BEF_col_name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>distance_col_name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>time_col_name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
 
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>subject_data</th>
+      <td><p>required data argument</p></td>
+    </tr>
+    <tr>
+      <th>subject_id</th>
+      <td><p>string containing the common id column in both data and distance data and/or time_data</p></td>
+    </tr>
+    <tr>
+      <th>basis_functions</th>
+      <td><p>list with length equal to the number of BEFs in the stap_formula that specifies the basis function expansion</p></td>
+    </tr>
+    <tr>
+      <th>dt_data</th>
+      <td><p>distance-time dataframe containing three columns (1) subj_ID, (2) BEF_name and (3) Distance between subj_ID and BEF</p></td>
+    </tr>
+    <tr>
+      <th>BEF_col_name</th>
+      <td><p>string name of the column in the dt dataframe that contains the character vectors describing the BEFs</p></td>
+    </tr>
+    <tr>
+      <th>distance_col_name</th>
+      <td><p>string name of the column in the dt dataframe that contains the distance values</p></td>
+    </tr>
+    <tr>
+      <th>time_col_name</th>
+      <td><p>string name of the column in the dt dataframe that contains the time values</p></td>
+    </tr>
+    <tr>
+      <th>formula</th>
+      <td><p>Similar as for <code><a href='https://rdrr.io/pkg/rstap/man/stap_glm.html'>stap_lm</a></code>.</p></td>
+    </tr>
+    </table>
 
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
+      <li><a href="#arguments">Arguments</a></li>
     </ul>
 
   </div>

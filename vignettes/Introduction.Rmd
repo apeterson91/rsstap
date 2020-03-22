@@ -104,7 +104,7 @@ the quantiles and set the boundary knot at our inclusion distance. There are a f
 that the subject and bef data are joined and aggregated appropriately. While they are hopefully self-explanatory, more information about these can be found in the documentation if needed.
 
 ```{r}
-fit <- rsstap_lm(formula = y ~ sex,
+fit <- sstap_lm(formula = y ~ sex,
                stap_formula = ~ sap(HFS),
                subject_data = rsstap_demo$subject_data,
                subject_id = "subj_id",

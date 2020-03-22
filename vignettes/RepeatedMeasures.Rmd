@@ -23,7 +23,7 @@ data("rsstap_repeatedmeasures")
 
 ## Repeated Measures with rsstap
 
-Building off the Introductory vignette where the effect of Healthy Food Stores was modeled as a function of 
+Building off the Introductory vignette where the effect of Healthy Food Stores was modeled as a function of the stores in the immediate environment around
 
 
 # Subject Specific terms

@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Introduction • bbnet</title>
+<title>Introduction • rsstap</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/sandstone/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/all.min.css" integrity="sha256-PbSmjxuVAzJ6FPvNYsrXygfGhNJYyZ2GktDbkMBqQZg=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/v4-shims.min.css" integrity="sha256-A6jcAdwFD48VMjlI3GDxUd+eCQa7/KWy6G9oe/ovaPA=" crossorigin="anonymous">
@@ -30,7 +30,7 @@
         <span class="icon-bar"></span>
       </button>
       <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">bbnet</a>
+        <a class="navbar-link" href="../index.html">rsstap</a>
         <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
@@ -85,22 +85,22 @@
 
     
     
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(bbnet)</a>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(rsstap)</a>
 <a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(tidyverse)</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="co">#&gt; ── Attaching packages ──────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse 1.2.1 ──</span></a>
-<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="co">#&gt; ✓ ggplot2 3.2.1     ✓ purrr   0.3.3</span></a>
-<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="co">#&gt; ✓ tibble  2.1.3     ✓ dplyr   0.8.3</span></a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="co">#&gt; ── Attaching packages ────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse 1.2.1 ──</span></a>
+<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="co">#&gt; ✓ ggplot2 3.3.0     ✓ purrr   0.3.3</span></a>
+<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="co">#&gt; ✓ tibble  2.1.3     ✓ dplyr   0.8.5</span></a>
 <a class="sourceLine" id="cb1-6" data-line-number="6"><span class="co">#&gt; ✓ tidyr   1.0.0     ✓ stringr 1.4.0</span></a>
 <a class="sourceLine" id="cb1-7" data-line-number="7"><span class="co">#&gt; ✓ readr   1.3.1     ✓ forcats 0.4.0</span></a>
-<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="co">#&gt; ── Conflicts ─────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──</span></a>
+<a class="sourceLine" id="cb1-8" data-line-number="8"><span class="co">#&gt; ── Conflicts ───────────────────────────────────────────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──</span></a>
 <a class="sourceLine" id="cb1-9" data-line-number="9"><span class="co">#&gt; x dplyr::filter() masks stats::filter()</span></a>
 <a class="sourceLine" id="cb1-10" data-line-number="10"><span class="co">#&gt; x dplyr::lag()    masks stats::lag()</span></a>
 <a class="sourceLine" id="cb1-11" data-line-number="11"><span class="kw">theme_set</span>(<span class="kw">theme_bw</span>())</a>
-<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="st">"bbnet_demo"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb1-12" data-line-number="12"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="st">"rsstap_demo"</span>)</a></code></pre></div>
 <div id="introduction-and-motivation" class="section level1">
 <h1 class="hasAnchor">
 <a href="#introduction-and-motivation" class="anchor"></a>Introduction and Motivation</h1>
-<p>The <a href="https://biostatistics4socialimpact.github.io/rstap"><code>rstap</code> package</a> introduced Spatial Temporal Aggregated Predictor or STAP models, as a method by which the effect of <a href="https://en.wikipedia.org/wiki/Built_environment">Built Environment</a> Features (BEFs) measured as a point pattern could be incorporated into pre-existing regression methods. The <code>bbnet</code> package builds on this framework by modifying the way in which the spatial temporal exposure effect is estimated <em>and</em> allows for incorporation of between BEF distances as a potential component of the model. The former allows for faster estimation of the spatio-temporal exposure effect while the latter identifies an how the BEF effect could be augmented or dampened by being near other BEFs of similar or different types.</p>
+<p>The <a href="https://biostatistics4socialimpact.github.io/rstap"><code>rstap</code> package</a> introduced Spatial Temporal Aggregated Predictor or STAP models, as a method by which the effect of <a href="https://en.wikipedia.org/wiki/Built_environment">Built Environment</a> Features (BEFs) measured as a point pattern could be incorporated into pre-existing regression methods. The <code>rsstap</code> package builds on this framework by modifying the way in which the spatial temporal exposure effect is estimated <em>and</em> allows for incorporation of between BEF distances as a potential component of the model. The former allows for faster estimation of the spatio-temporal exposure effect while the latter identifies how the BEF effect could be augmented or weakened by being near other BEFs of similar or different types.</p>
 </div>
 <div id="model-specification" class="section level1">
 <h1 class="hasAnchor">
@@ -110,16 +110,17 @@
 E[Y_i] = Z_i^{T}\delta + \beta X_i(\theta) \tag{1}\\
 X_i(\theta) = \sum_{d \in \mathcal{D}_i} \mathcal{K}_s(d,\theta)
 \]</span> While continuous outcome <span class="math inline">\(Y_i\)</span>, and covariates <span class="math inline">\(Z_i\)</span> for subject <span class="math inline">\(i=1,...,n\)</span> are identified from a typical regression model, the covariate <span class="math inline">\(X_i(\theta)\)</span> novelly represented the <span class="math inline">\(i\)</span>th subject’s cumulative exposure across space. This was accomplished by incorporating distances, <span class="math inline">\(d\)</span> through a spatial exposure function <span class="math inline">\(\mathcal{K}_s(d,\theta)\)</span> - typically some exponential decay function, like <span class="math inline">\(\exp(-\frac{d}{\theta})\)</span> or <span class="math inline">\(\exp(-(\frac{d}{\theta})^{\eta})\)</span>. Unfortunately, estimating this model through typical methods (e.g. MCMC) requires numerous evaluations of the kernel function summed across the, again typically numerous, distances in the set <span class="math inline">\(\mathcal{D}_i\)</span>, of subject-BEF distances.</p>
-<p>To remedy this situation, the <code>bbnet</code> package adopts a regression spline basis representation, <span class="math inline">\(\phi(d)\)</span>, of the spatial exposure effect, removing the kernel and allowing for estimation on a sum of the function of the distances:</p>
+<p>To remedy this situation, the <code>rsstap</code> package adopts a regression spline basis representation, <span class="math inline">\(\phi(d)\)</span>, of the spatial exposure effect, removing the kernel and allowing for estimation on a sum of the function of the distances:</p>
 <p><span class="math display">\[
 E[Y_i] = Z_i^{T}\delta + \sum_{d \in \mathcal{D}_i}\beta_0 + \sum_{j=1}^{J}\beta_j\phi_j(d)\\
 E[Y_i] = Z_i^{T}\delta + \beta_0 |\mathcal{D}_i| +  \sum_{j=1}^{J}\sum_{d \in \mathcal{D}_i}\beta_j\phi_j(d) \tag{2}
 \]</span></p>
 <p>In the above, <span class="math inline">\(|\mathcal{D}_i|\)</span> is the size of the set of pairwise distances between subject <span class="math inline">\(i\)</span> and the (in this example only one) class of BEFs. <span class="math inline">\(\beta_0\)</span> can then be interpreted as the effect of a single BEF placed at distance 0 from the subject - analagous to <span class="math inline">\(\beta\)</span> in (1) . Since the size of this set and the sum across distances, <span class="math inline">\(\sum_{d\in \mathcal{D}_i} \phi_j(d)\)</span> can be done prior to model fitting, standard methods (e.g. <code>stan_lm</code> for bayesians or <code>lm</code> for frequentists) can be used, dramatically decreasing computational complexity.</p>
-<p>We’ll now demonstrate this model specification as implimented in the <code>bbnet</code> package using simulated data that only considers the direct effect of distances between subjects and proximal BEFs, saving the previously mentioned distances between BEFs for another vignette.</p>
-<div id="simulated-data-distance-calculation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#simulated-data-distance-calculation" class="anchor"></a>Simulated Data, Distance Calculation</h2>
+<p>We’ll now demonstrate this model specification as implimented in the <code>rsstap</code> package using simulated data that only considers the direct effect of distances between subjects and proximal BEFs, saving the previously mentioned distances between BEFs for another vignette.</p>
+</div>
+<div id="simulated-data-distance-calculation" class="section level1">
+<h1 class="hasAnchor">
+<a href="#simulated-data-distance-calculation" class="anchor"></a>Simulated Data, Distance Calculation</h1>
 <p>First we’ll simulate subject and “Healthy Food Stores” (HFS) uniformly across a hypothetical 5x5 square. The importance of using such a large space being that we’ll want to restrict the number of businesses included in our final calculation to ensure that there are a different number for each subject. This is equivalent to having <span class="math inline">\(|\mathcal{D}_i| \neq |\mathcal{D}_{i'}|\)</span> for some <span class="math inline">\(i'\)</span> - an important identifiability condition for estimating <span class="math inline">\(\beta_0\)</span>.</p>
 <p><img src="Introduction_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
 <p>We’ll calculate the distances between the HFS’ and subjects to create a long dataframe, like the following, for our eventual model fitting.</p>
@@ -163,7 +164,7 @@ E[Y_i] = Z_i^{T}\delta + \beta_0 |\mathcal{D}_i| +  \sum_{j=1}^{J}\sum_{d \in \m
 </tbody>
 </table>
 <p>Next, in order to simulate the outcome of interest, we’ll need to express the effect of HFS’ as a function of distance from the subject. We’ll imagine that the outcome, <span class="math inline">\(Y_i\)</span> is something like BMI and HFS’ decrease the BMI on average for those who live close, but does not affect those who live further away, as shown below: <img src="Introduction_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
-<p>We’ll finish our simulation of the data by including a 0-1 sex covariate to make things a little more realistic - the code containing all the simulation details can be found <a href="https://github.com/apeterson91/bbnet">here</a>, and the resulting dataframe will look like the following.</p>
+<p>We’ll finish our simulation of the data by including a 0-1 sex covariate to make things a little more realistic - the code containing all the simulation details can be found <a href="https://github.com/apeterson91/rsstap">here</a>, and the resulting dataframe will look like the following.</p>
 <table class="table">
 <thead><tr class="header">
 <th align="right">subj_id</th>
@@ -205,67 +206,76 @@ E[Y_i] = Z_i^{T}\delta + \beta_0 |\mathcal{D}_i| +  \sum_{j=1}^{J}\sum_{d \in \m
 </table>
 <p>Before we fit the model we’ll want to choose some restriction distance. While here we are only using this restriction to ensure the identifiability condition is met, this restriction is neccessary in a real world setting, since the number of businesses typically grows quadratically as a function of distance.</p>
 <p>We’ll choose an arbitrary restriction distance of 2 and create knots for our basis functions based on the quantiles of the distance distribution within the restriction (note that this is an assumption of the model).</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">restricted_distance &lt;-<span class="st"> </span>bbnet_demo<span class="op">$</span>direct_distance_data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span>(Distance<span class="op">&lt;=</span><span class="dv">2</span>)</a>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">restricted_distance &lt;-<span class="st"> </span>rsstap_demo<span class="op">$</span>direct_distance_data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span>(Distance<span class="op">&lt;=</span><span class="dv">2</span>)</a>
 <a class="sourceLine" id="cb2-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb2-3" data-line-number="3">demo_knots &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/quantile.html">quantile</a></span>(restricted_distance<span class="op">$</span>Distance,</a>
 <a class="sourceLine" id="cb2-4" data-line-number="4">                  <span class="dt">probs =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.25</span>,.<span class="dv">75</span>))</a></code></pre></div>
-<p>Finally we’ll fit our model, using syntax similar to the <code>lm</code> and <code>stap_lm</code> functions, where the <code>~ sap(HFS)</code> indicates that we’re looking to model the healthy food stores as a function of space. Note that we have to define a list of basis functions for each covariate included in the model. We’ll use natural cubic splines here, with the interior knots previously defined at the quantiles and set the boundary knot at our inclusion distance. There are a few other arguments that are needed to ensure that the subject and bef data are joined and aggregated appropriately. While they are hopefully self-explanatory, more information about these can be found in the documentation if needed.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/bnet_lm.html">bnet_lm</a></span>(<span class="dt">formula =</span> y <span class="op">~</span><span class="st"> </span>sex,</a>
+</div>
+<div id="model-fitting" class="section level1">
+<h1 class="hasAnchor">
+<a href="#model-fitting" class="anchor"></a>Model Fitting</h1>
+<p>Finally we’ll fit our model, using syntax similar to the <code>lm</code> function, where the <code>~ sap(HFS)</code> indicates that we’re looking to model the healthy food stores as a function of space. Note that we have to define a list of basis functions for each covariate included in the model. We’ll use natural cubic splines here, with the interior knots previously defined at the quantiles and set the boundary knot at our inclusion distance. There are a few other arguments that are needed to ensure that the subject and bef data are joined and aggregated appropriately. While they are hopefully self-explanatory, more information about these can be found in the documentation if needed.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/sstap_lm.html">sstap_lm</a></span>(<span class="dt">formula =</span> y <span class="op">~</span><span class="st"> </span>sex,</a>
 <a class="sourceLine" id="cb3-2" data-line-number="2">               <span class="dt">stap_formula =</span> <span class="op">~</span><span class="st"> </span><span class="kw">sap</span>(HFS),</a>
-<a class="sourceLine" id="cb3-3" data-line-number="3">               <span class="dt">subject_data =</span> bbnet_demo<span class="op">$</span>subject_data,</a>
+<a class="sourceLine" id="cb3-3" data-line-number="3">               <span class="dt">subject_data =</span> rsstap_demo<span class="op">$</span>subject_data,</a>
 <a class="sourceLine" id="cb3-4" data-line-number="4">               <span class="dt">subject_id =</span> <span class="st">"subj_id"</span>,</a>
 <a class="sourceLine" id="cb3-5" data-line-number="5">               <span class="dt">basis_functions =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">HFS=</span> <span class="cf">function</span>(x){ splines<span class="op">::</span><span class="kw"><a href="https://rdrr.io/r/splines/ns.html">ns</a></span>(x,<span class="dt">knots =</span> demo_knots,</a>
 <a class="sourceLine" id="cb3-6" data-line-number="6">                                                                    <span class="dt">Boundary.knots =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">0</span>,<span class="dv">2</span>)) }),</a>
 <a class="sourceLine" id="cb3-7" data-line-number="7">               <span class="dt">dt_data =</span> restricted_distance,</a>
 <a class="sourceLine" id="cb3-8" data-line-number="8">               <span class="dt">BEF_col_name =</span> <span class="st">"BEF"</span>,</a>
-<a class="sourceLine" id="cb3-9" data-line-number="9">               <span class="dt">distance_col_name =</span> <span class="st">"Distance"</span>)</a>
-<a class="sourceLine" id="cb3-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(fit)</a>
-<a class="sourceLine" id="cb3-12" data-line-number="12"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb3-13" data-line-number="13"><span class="co">#&gt; Call:</span></a>
-<a class="sourceLine" id="cb3-14" data-line-number="14"><span class="co">#&gt; lm(formula = formula, data = X)</span></a>
-<a class="sourceLine" id="cb3-15" data-line-number="15"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb3-16" data-line-number="16"><span class="co">#&gt; Residuals:</span></a>
-<a class="sourceLine" id="cb3-17" data-line-number="17"><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></a>
-<a class="sourceLine" id="cb3-18" data-line-number="18"><span class="co">#&gt; -2.9553 -0.6684  0.0396  0.6219  3.2174 </span></a>
+<a class="sourceLine" id="cb3-9" data-line-number="9">               <span class="dt">distance_col_name =</span> <span class="st">"Distance"</span>,<span class="dt">method=</span><span class="st">'lm'</span>)</a>
+<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="co">#&gt; Registered S3 methods overwritten by 'rstap':</span></a>
+<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="co">#&gt;   method                  from    </span></a>
+<a class="sourceLine" id="cb3-12" data-line-number="12"><span class="co">#&gt;   predictive_error.ppd    rstanarm</span></a>
+<a class="sourceLine" id="cb3-13" data-line-number="13"><span class="co">#&gt;   predictive_interval.ppd rstanarm</span></a>
+<a class="sourceLine" id="cb3-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb3-15" data-line-number="15"><span class="kw"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(fit)</a>
+<a class="sourceLine" id="cb3-16" data-line-number="16"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb3-17" data-line-number="17"><span class="co">#&gt; Call:</span></a>
+<a class="sourceLine" id="cb3-18" data-line-number="18"><span class="co">#&gt; lm(formula = formula, data = X)</span></a>
 <a class="sourceLine" id="cb3-19" data-line-number="19"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb3-20" data-line-number="20"><span class="co">#&gt; Coefficients:</span></a>
-<a class="sourceLine" id="cb3-21" data-line-number="21"><span class="co">#&gt;                           Estimate Std. Error t value Pr(&gt;|t|)    </span></a>
-<a class="sourceLine" id="cb3-22" data-line-number="22"><span class="co">#&gt; (Intercept)               26.35966    0.12055 218.653  &lt; 2e-16 ***</span></a>
-<a class="sourceLine" id="cb3-23" data-line-number="23"><span class="co">#&gt; sexF                      -0.73469    0.08541  -8.602  &lt; 2e-16 ***</span></a>
-<a class="sourceLine" id="cb3-24" data-line-number="24"><span class="co">#&gt; DirectSpatialEffect_HFS_0 -0.28681    0.06741  -4.255 2.47e-05 ***</span></a>
-<a class="sourceLine" id="cb3-25" data-line-number="25"><span class="co">#&gt; DirectSpatialEffect_HFS_1  0.14711    0.04708   3.125  0.00187 ** </span></a>
-<a class="sourceLine" id="cb3-26" data-line-number="26"><span class="co">#&gt; DirectSpatialEffect_HFS_2  0.63434    0.16029   3.957 8.58e-05 ***</span></a>
-<a class="sourceLine" id="cb3-27" data-line-number="27"><span class="co">#&gt; DirectSpatialEffect_HFS_3 -0.02349    0.03797  -0.619  0.53633    </span></a>
-<a class="sourceLine" id="cb3-28" data-line-number="28"><span class="co">#&gt; ---</span></a>
-<a class="sourceLine" id="cb3-29" data-line-number="29"><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></a>
-<a class="sourceLine" id="cb3-30" data-line-number="30"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb3-31" data-line-number="31"><span class="co">#&gt; Residual standard error: 0.9893 on 544 degrees of freedom</span></a>
-<a class="sourceLine" id="cb3-32" data-line-number="32"><span class="co">#&gt; Multiple R-squared:  0.1402, Adjusted R-squared:  0.1323 </span></a>
-<a class="sourceLine" id="cb3-33" data-line-number="33"><span class="co">#&gt; F-statistic: 17.74 on 5 and 544 DF,  p-value: 2.675e-16</span></a></code></pre></div>
-<p>As we look at the output, we can see this is similar to the <code>lm</code> function’s summary output. This makes sense because the object returned by the <code>(b)bnet_</code> functions inherit the class of whatever function follows the underscore - in this case the <code>lm</code> function.</p>
-<p>It also inherits a new <code>bbnet</code> class which allows for custom methods specific to these objects. For example, if we want to to plot the spatial exposure estimate we can do so using the <code>plot_directeffect</code> function. I’ll overlay the true exposure effect we simulated for comparison.</p>
+<a class="sourceLine" id="cb3-20" data-line-number="20"><span class="co">#&gt; Residuals:</span></a>
+<a class="sourceLine" id="cb3-21" data-line-number="21"><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></a>
+<a class="sourceLine" id="cb3-22" data-line-number="22"><span class="co">#&gt; -2.9553 -0.6684  0.0396  0.6219  3.2174 </span></a>
+<a class="sourceLine" id="cb3-23" data-line-number="23"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb3-24" data-line-number="24"><span class="co">#&gt; Coefficients:</span></a>
+<a class="sourceLine" id="cb3-25" data-line-number="25"><span class="co">#&gt;                     Estimate Std. Error t value Pr(&gt;|t|)    </span></a>
+<a class="sourceLine" id="cb3-26" data-line-number="26"><span class="co">#&gt; (Intercept)         26.35966    0.12055 218.653  &lt; 2e-16 ***</span></a>
+<a class="sourceLine" id="cb3-27" data-line-number="27"><span class="co">#&gt; sexF                -0.73469    0.08541  -8.602  &lt; 2e-16 ***</span></a>
+<a class="sourceLine" id="cb3-28" data-line-number="28"><span class="co">#&gt; SpatialEffect_HFS_0 -0.28681    0.06741  -4.255 2.47e-05 ***</span></a>
+<a class="sourceLine" id="cb3-29" data-line-number="29"><span class="co">#&gt; SpatialEffect_HFS_1  0.14711    0.04708   3.125  0.00187 ** </span></a>
+<a class="sourceLine" id="cb3-30" data-line-number="30"><span class="co">#&gt; SpatialEffect_HFS_2  0.63434    0.16029   3.957 8.58e-05 ***</span></a>
+<a class="sourceLine" id="cb3-31" data-line-number="31"><span class="co">#&gt; SpatialEffect_HFS_3 -0.02349    0.03797  -0.619  0.53633    </span></a>
+<a class="sourceLine" id="cb3-32" data-line-number="32"><span class="co">#&gt; ---</span></a>
+<a class="sourceLine" id="cb3-33" data-line-number="33"><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></a>
+<a class="sourceLine" id="cb3-34" data-line-number="34"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb3-35" data-line-number="35"><span class="co">#&gt; Residual standard error: 0.9893 on 544 degrees of freedom</span></a>
+<a class="sourceLine" id="cb3-36" data-line-number="36"><span class="co">#&gt; Multiple R-squared:  0.1402, Adjusted R-squared:  0.1323 </span></a>
+<a class="sourceLine" id="cb3-37" data-line-number="37"><span class="co">#&gt; F-statistic: 17.74 on 5 and 544 DF,  p-value: 2.675e-16</span></a></code></pre></div>
+<p>As we look at the output, we can see this is similar to the <code>lm</code> function’s summary output. This makes sense because the object returned by the <code>sstap_</code> functions inherit the class of whatever function was chosen using the <code>method</code> argument - in this case the <code>lm</code> function.</p>
+<p>It also inherits a new <code>rsstap</code> class which allows for custom methods specific to these objects. For example, if we want to to plot the spatial exposure estimate we can do so using the <code>plot_effects</code> function. I’ll overlay the true exposure effect we simulated for comparison.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">d &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="dt">from =</span> <span class="kw"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span>(restricted_distance<span class="op">$</span>Distance), <span class="dt">to =</span> <span class="dv">2</span>, <span class="dt">by =</span><span class="fl">0.01</span>)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw"><a href="../reference/plot_directeffect.html">plot_directeffect</a></span>(fit) <span class="op">+</span><span class="st"> </span>ggplot2<span class="op">::</span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() <span class="op">+</span></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="st">  </span>ggplot2<span class="op">::</span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>(ggplot2<span class="op">::</span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x=</span>d,<span class="dt">y=</span>bbnet_demo<span class="op">$</span><span class="kw">true_effect</span>(d)),<span class="dt">color=</span><span class="st">'red'</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">strip.background =</span> <span class="kw">element_blank</span>())</a></code></pre></div>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw"><a href="../reference/plot_effects.html">plot_effects</a></span>(fit) <span class="op">+</span><span class="st"> </span>ggplot2<span class="op">::</span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_bw</a></span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="st">  </span>ggplot2<span class="op">::</span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>(ggplot2<span class="op">::</span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x=</span>d,<span class="dt">y=</span>rsstap_demo<span class="op">$</span><span class="kw">true_effect</span>(d)),<span class="dt">color=</span><span class="st">'red'</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">strip.background =</span> <span class="kw">element_blank</span>()) <span class="op">+</span><span class="st"> </span><span class="kw">xlab</span>(<span class="st">"Distance"</span>)</a></code></pre></div>
 <p><img src="Introduction_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
 <p>It looks like we captured the truth with our estimate but we’re only able to say there’s a definitive effect till about just before 0.25 distance units, at which point the results become less significant.</p>
-<p>What about a bayesian approach? This is the <em>Bayesian</em> built environment network package after all. In order to obtain bayesian estimates we can simply use the `<code>bbnet_stan_lm</code> function, which implements the same model using the <code>rstanarm::stan_lm</code> function. Note that now we can specify a prior and number of iterations (as well as any number of other optional arguments), to this function. Let’s fit the model and plot the same result.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/bbnet_stan_lm.html">bbnet_stan_lm</a></span>(<span class="dt">formula =</span> y <span class="op">~</span><span class="st"> </span>sex,</a>
+<p>What about a bayesian approach? This is the <em>Bayesian</em> built environment network package after all. In order to obtain bayesian estimates we can simply use the `<code>sstap_lm</code> function setting the <code>method</code> argument to either <code>"stan_lm"</code> or <code>"brm"</code>, to use the function from the rstanarm or brms packages respectively. Note that now we can specify a prior and number of iterations (as well as any number of other optional arguments), to this function. Let’s fit the model and plot the same result.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/sstap_lm.html">sstap_lm</a></span>(<span class="dt">formula =</span> y <span class="op">~</span><span class="st"> </span>sex,</a>
 <a class="sourceLine" id="cb5-2" data-line-number="2">               <span class="dt">stap_formula =</span> <span class="op">~</span><span class="st"> </span><span class="kw">sap</span>(HFS),</a>
-<a class="sourceLine" id="cb5-3" data-line-number="3">               <span class="dt">subject_data =</span> bbnet_demo<span class="op">$</span>subject_data,</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3">               <span class="dt">subject_data =</span> rsstap_demo<span class="op">$</span>subject_data,</a>
 <a class="sourceLine" id="cb5-4" data-line-number="4">               <span class="dt">subject_id =</span> <span class="st">"subj_id"</span>,</a>
 <a class="sourceLine" id="cb5-5" data-line-number="5">               <span class="dt">basis_functions =</span> <span class="kw"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="dt">HFS=</span> <span class="cf">function</span>(x){ splines<span class="op">::</span><span class="kw"><a href="https://rdrr.io/r/splines/ns.html">ns</a></span>(x,<span class="dt">knots=</span>demo_knots,<span class="dt">Boundary.knots =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="dv">0</span>,<span class="dv">2</span>)) }),</a>
 <a class="sourceLine" id="cb5-6" data-line-number="6">               <span class="dt">dt_data =</span> restricted_distance,</a>
 <a class="sourceLine" id="cb5-7" data-line-number="7">               <span class="dt">BEF_col_name =</span> <span class="st">"BEF"</span>,</a>
 <a class="sourceLine" id="cb5-8" data-line-number="8">               <span class="dt">distance_col_name =</span> <span class="st">"Distance"</span>,</a>
-<a class="sourceLine" id="cb5-9" data-line-number="9">               <span class="dt">prior=</span><span class="ot">NULL</span>, <span class="co">## Uniform prior on R2 from rstanarm::stan_lm</span></a>
-<a class="sourceLine" id="cb5-10" data-line-number="10">               <span class="dt">prior_intercept =</span> <span class="ot">NULL</span>,<span class="co">## Improper prior on intercept from rstanarm::stan_lm </span></a>
-<a class="sourceLine" id="cb5-11" data-line-number="11">               <span class="dt">iter=</span><span class="fl">1E3</span>) <span class="co">## for demonstration purposes</span></a>
-<a class="sourceLine" id="cb5-12" data-line-number="12"><span class="kw"><a href="../reference/plot_directeffect.html">plot_directeffect</a></span>(fit) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb5-13" data-line-number="13"><span class="st">  </span>ggplot2<span class="op">::</span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>(ggplot2<span class="op">::</span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x=</span>d,<span class="dt">y=</span>bbnet_demo<span class="op">$</span><span class="kw">true_effect</span>(d)),<span class="dt">color=</span><span class="st">'red'</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">strip.background =</span> <span class="kw">element_blank</span>())</a></code></pre></div>
+<a class="sourceLine" id="cb5-9" data-line-number="9">               <span class="dt">method=</span><span class="st">'stan_lm'</span>,</a>
+<a class="sourceLine" id="cb5-10" data-line-number="10">               <span class="dt">prior=</span><span class="ot">NULL</span>, <span class="co">## Uniform prior on R2 from rstanarm::stan_lm</span></a>
+<a class="sourceLine" id="cb5-11" data-line-number="11">               <span class="dt">prior_intercept =</span> <span class="ot">NULL</span>,<span class="co">## Improper prior on intercept from rstanarm::stan_lm </span></a>
+<a class="sourceLine" id="cb5-12" data-line-number="12">               <span class="dt">iter=</span><span class="fl">1E3</span>) <span class="co">## for demonstration purposes</span></a>
+<a class="sourceLine" id="cb5-13" data-line-number="13"><span class="kw"><a href="../reference/plot_effects.html">plot_effects</a></span>(fit) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb5-14" data-line-number="14"><span class="st">  </span>ggplot2<span class="op">::</span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>(ggplot2<span class="op">::</span><span class="kw"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="dt">x=</span>d,<span class="dt">y=</span>rsstap_demo<span class="op">$</span><span class="kw">true_effect</span>(d)),<span class="dt">color=</span><span class="st">'red'</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb5-15" data-line-number="15"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">strip.background =</span> <span class="kw">element_blank</span>())</a></code></pre></div>
 <p><img src="Introduction_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 <p>Looks like we get similar results as the frequentist fit, with a smidge more certainty that the exposure effect extends past a quarter distance unit.</p>
 <p>Analgous to the ability to call methods on the <code>lm</code> object, we can call methods for <code>rstanarm</code>’s <code>stanreg</code> objects to check things like model fit or model diagnostics.</p>
@@ -274,8 +284,8 @@ E[Y_i] = Z_i^{T}\delta + \beta_0 |\mathcal{D}_i| +  \sum_{j=1}^{J}\sum_{d \in \m
 <a class="sourceLine" id="cb6-3" data-line-number="3"><span class="co">#&gt; Model Info:</span></a>
 <a class="sourceLine" id="cb6-4" data-line-number="4"><span class="co">#&gt;  function:     stan_lm</span></a>
 <a class="sourceLine" id="cb6-5" data-line-number="5"><span class="co">#&gt;  family:       gaussian [identity]</span></a>
-<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="co">#&gt;  formula:      y ~ sex + DirectSpatialEffect_HFS_0 + DirectSpatialEffect_HFS_1 + </span></a>
-<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co">#&gt;     DirectSpatialEffect_HFS_2 + DirectSpatialEffect_HFS_3</span></a>
+<a class="sourceLine" id="cb6-6" data-line-number="6"><span class="co">#&gt;  formula:      y ~ sex + SpatialEffect_HFS_0 + SpatialEffect_HFS_1 + SpatialEffect_HFS_2 + </span></a>
+<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="co">#&gt;     SpatialEffect_HFS_3</span></a>
 <a class="sourceLine" id="cb6-8" data-line-number="8"><span class="co">#&gt;  algorithm:    sampling</span></a>
 <a class="sourceLine" id="cb6-9" data-line-number="9"><span class="co">#&gt;  sample:       2000 (posterior sample size)</span></a>
 <a class="sourceLine" id="cb6-10" data-line-number="10"><span class="co">#&gt;  priors:       see help('prior_summary')</span></a>
@@ -283,16 +293,16 @@ E[Y_i] = Z_i^{T}\delta + \beta_0 |\mathcal{D}_i| +  \sum_{j=1}^{J}\sum_{d \in \m
 <a class="sourceLine" id="cb6-12" data-line-number="12"><span class="co">#&gt;  predictors:   6</span></a>
 <a class="sourceLine" id="cb6-13" data-line-number="13"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb6-14" data-line-number="14"><span class="co">#&gt; Estimates:</span></a>
-<a class="sourceLine" id="cb6-15" data-line-number="15"><span class="co">#&gt;                             mean   sd   10%   50%   90%</span></a>
-<a class="sourceLine" id="cb6-16" data-line-number="16"><span class="co">#&gt; (Intercept)               26.3    0.1 26.2  26.3  26.5 </span></a>
-<a class="sourceLine" id="cb6-17" data-line-number="17"><span class="co">#&gt; sexF                      -0.7    0.1 -0.8  -0.7  -0.6 </span></a>
-<a class="sourceLine" id="cb6-18" data-line-number="18"><span class="co">#&gt; DirectSpatialEffect_HFS_0 -0.3    0.1 -0.4  -0.3  -0.2 </span></a>
-<a class="sourceLine" id="cb6-19" data-line-number="19"><span class="co">#&gt; DirectSpatialEffect_HFS_1  0.1    0.0  0.1   0.1   0.2 </span></a>
-<a class="sourceLine" id="cb6-20" data-line-number="20"><span class="co">#&gt; DirectSpatialEffect_HFS_2  0.6    0.2  0.4   0.6   0.8 </span></a>
-<a class="sourceLine" id="cb6-21" data-line-number="21"><span class="co">#&gt; DirectSpatialEffect_HFS_3  0.0    0.0 -0.1   0.0   0.0 </span></a>
-<a class="sourceLine" id="cb6-22" data-line-number="22"><span class="co">#&gt; sigma                      1.0    0.0  1.0   1.0   1.0 </span></a>
-<a class="sourceLine" id="cb6-23" data-line-number="23"><span class="co">#&gt; log-fit_ratio              0.0    0.0  0.0   0.0   0.0 </span></a>
-<a class="sourceLine" id="cb6-24" data-line-number="24"><span class="co">#&gt; R2                         0.1    0.0  0.1   0.1   0.2 </span></a>
+<a class="sourceLine" id="cb6-15" data-line-number="15"><span class="co">#&gt;                       mean   sd   10%   50%   90%</span></a>
+<a class="sourceLine" id="cb6-16" data-line-number="16"><span class="co">#&gt; (Intercept)         26.3    0.1 26.2  26.3  26.5 </span></a>
+<a class="sourceLine" id="cb6-17" data-line-number="17"><span class="co">#&gt; sexF                -0.7    0.1 -0.8  -0.7  -0.6 </span></a>
+<a class="sourceLine" id="cb6-18" data-line-number="18"><span class="co">#&gt; SpatialEffect_HFS_0 -0.3    0.1 -0.4  -0.3  -0.2 </span></a>
+<a class="sourceLine" id="cb6-19" data-line-number="19"><span class="co">#&gt; SpatialEffect_HFS_1  0.1    0.0  0.1   0.1   0.2 </span></a>
+<a class="sourceLine" id="cb6-20" data-line-number="20"><span class="co">#&gt; SpatialEffect_HFS_2  0.6    0.2  0.4   0.6   0.8 </span></a>
+<a class="sourceLine" id="cb6-21" data-line-number="21"><span class="co">#&gt; SpatialEffect_HFS_3  0.0    0.0 -0.1   0.0   0.0 </span></a>
+<a class="sourceLine" id="cb6-22" data-line-number="22"><span class="co">#&gt; sigma                1.0    0.0  1.0   1.0   1.0 </span></a>
+<a class="sourceLine" id="cb6-23" data-line-number="23"><span class="co">#&gt; log-fit_ratio        0.0    0.0  0.0   0.0   0.0 </span></a>
+<a class="sourceLine" id="cb6-24" data-line-number="24"><span class="co">#&gt; R2                   0.1    0.0  0.1   0.1   0.2 </span></a>
 <a class="sourceLine" id="cb6-25" data-line-number="25"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb6-26" data-line-number="26"><span class="co">#&gt; Fit Diagnostics:</span></a>
 <a class="sourceLine" id="cb6-27" data-line-number="27"><span class="co">#&gt;            mean   sd   10%   50%   90%</span></a>
@@ -301,26 +311,25 @@ E[Y_i] = Z_i^{T}\delta + \beta_0 |\mathcal{D}_i| +  \sum_{j=1}^{J}\sum_{d \in \m
 <a class="sourceLine" id="cb6-30" data-line-number="30"><span class="co">#&gt; The mean_ppd is the sample average posterior predictive distribution of the outcome variable (for details see help('summary.stanreg')).</span></a>
 <a class="sourceLine" id="cb6-31" data-line-number="31"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb6-32" data-line-number="32"><span class="co">#&gt; MCMC diagnostics</span></a>
-<a class="sourceLine" id="cb6-33" data-line-number="33"><span class="co">#&gt;                           mcse Rhat n_eff</span></a>
-<a class="sourceLine" id="cb6-34" data-line-number="34"><span class="co">#&gt; (Intercept)               0.0  1.0   871 </span></a>
-<a class="sourceLine" id="cb6-35" data-line-number="35"><span class="co">#&gt; sexF                      0.0  1.0  1284 </span></a>
-<a class="sourceLine" id="cb6-36" data-line-number="36"><span class="co">#&gt; DirectSpatialEffect_HFS_0 0.0  1.0  1864 </span></a>
-<a class="sourceLine" id="cb6-37" data-line-number="37"><span class="co">#&gt; DirectSpatialEffect_HFS_1 0.0  1.0  2041 </span></a>
-<a class="sourceLine" id="cb6-38" data-line-number="38"><span class="co">#&gt; DirectSpatialEffect_HFS_2 0.0  1.0  1953 </span></a>
-<a class="sourceLine" id="cb6-39" data-line-number="39"><span class="co">#&gt; DirectSpatialEffect_HFS_3 0.0  1.0  1594 </span></a>
-<a class="sourceLine" id="cb6-40" data-line-number="40"><span class="co">#&gt; sigma                     0.0  1.0  1610 </span></a>
-<a class="sourceLine" id="cb6-41" data-line-number="41"><span class="co">#&gt; log-fit_ratio             0.0  1.0  1353 </span></a>
-<a class="sourceLine" id="cb6-42" data-line-number="42"><span class="co">#&gt; R2                        0.0  1.0  1212 </span></a>
-<a class="sourceLine" id="cb6-43" data-line-number="43"><span class="co">#&gt; mean_PPD                  0.0  1.0  1666 </span></a>
-<a class="sourceLine" id="cb6-44" data-line-number="44"><span class="co">#&gt; log-posterior             0.1  1.0   577 </span></a>
+<a class="sourceLine" id="cb6-33" data-line-number="33"><span class="co">#&gt;                     mcse Rhat n_eff</span></a>
+<a class="sourceLine" id="cb6-34" data-line-number="34"><span class="co">#&gt; (Intercept)         0.0  1.0   926 </span></a>
+<a class="sourceLine" id="cb6-35" data-line-number="35"><span class="co">#&gt; sexF                0.0  1.0  1332 </span></a>
+<a class="sourceLine" id="cb6-36" data-line-number="36"><span class="co">#&gt; SpatialEffect_HFS_0 0.0  1.0  2294 </span></a>
+<a class="sourceLine" id="cb6-37" data-line-number="37"><span class="co">#&gt; SpatialEffect_HFS_1 0.0  1.0  2247 </span></a>
+<a class="sourceLine" id="cb6-38" data-line-number="38"><span class="co">#&gt; SpatialEffect_HFS_2 0.0  1.0  2383 </span></a>
+<a class="sourceLine" id="cb6-39" data-line-number="39"><span class="co">#&gt; SpatialEffect_HFS_3 0.0  1.0  1998 </span></a>
+<a class="sourceLine" id="cb6-40" data-line-number="40"><span class="co">#&gt; sigma               0.0  1.0  2105 </span></a>
+<a class="sourceLine" id="cb6-41" data-line-number="41"><span class="co">#&gt; log-fit_ratio       0.0  1.0  1580 </span></a>
+<a class="sourceLine" id="cb6-42" data-line-number="42"><span class="co">#&gt; R2                  0.0  1.0  1413 </span></a>
+<a class="sourceLine" id="cb6-43" data-line-number="43"><span class="co">#&gt; mean_PPD            0.0  1.0  2234 </span></a>
+<a class="sourceLine" id="cb6-44" data-line-number="44"><span class="co">#&gt; log-posterior       0.1  1.0   515 </span></a>
 <a class="sourceLine" id="cb6-45" data-line-number="45"><span class="co">#&gt; </span></a>
 <a class="sourceLine" id="cb6-46" data-line-number="46"><span class="co">#&gt; For each parameter, mcse is Monte Carlo standard error, n_eff is a crude measure of effective sample size, and Rhat is the potential scale reduction factor on split chains (at convergence Rhat=1).</span></a></code></pre></div>
 </div>
-<div id="recap" class="section level2">
-<h2 class="hasAnchor">
-<a href="#recap" class="anchor"></a>Recap</h2>
-<p>This vignette briefly illustrates the <code>bbnet</code> modeling framework and typical function uses. Future vignettes will cover the indirect distance effect inclusion mentioned at the beginning of this vignette as well as heirarchical models that allow for the modeling of subject specific effects, including subject specific exposures.</p>
-</div>
+<div id="recap" class="section level1">
+<h1 class="hasAnchor">
+<a href="#recap" class="anchor"></a>Recap</h1>
+<p>This vignette briefly illustrates the <code>rsstap</code> modeling framework and typical function uses. Future vignettes will cover the indirect distance effect inclusion mentioned at the beginning of this vignette as well as heirarchical models that allow for the modeling of subject specific effects, including subject specific exposures.</p>
 </div>
   </div>
 
@@ -331,12 +340,10 @@ E[Y_i] = Z_i^{T}\delta + \beta_0 |\mathcal{D}_i| +  \sum_{j=1}^{J}\sum_{d \in \m
 <a href="#tocnav" class="anchor"></a>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
 <li><a href="#introduction-and-motivation">Introduction and Motivation</a></li>
-      <li>
-<a href="#model-specification">Model Specification</a><ul class="nav nav-pills nav-stacked">
-<li><a href="#simulated-data-distance-calculation">Simulated Data, Distance Calculation</a></li>
+      <li><a href="#model-specification">Model Specification</a></li>
+      <li><a href="#simulated-data-distance-calculation">Simulated Data, Distance Calculation</a></li>
+      <li><a href="#model-fitting">Model Fitting</a></li>
       <li><a href="#recap">Recap</a></li>
-      </ul>
-</li>
       </ul>
 </div>
       </div>
