@@ -2,12 +2,12 @@
 title: "Repeated Measures"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Introduction to rsstap}
+  %\VignetteIndexEntry{Repeated Measures with rsstap}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, eval=F,include = FALSE}
+```{r, eval=T,include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -15,9 +15,9 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(tidyverse)
-library(rsstap)
-data("rsstap_repeatedmeasures")
+# library(tidyverse)
+# library(rsstap)
+# data("rsstap_repeatedmeasures")
 ```
 
 
@@ -30,40 +30,40 @@ Building off the Introductory vignette where the effect of Healthy Food Stores w
 
 
 ```{r}
-quantile_knots <- quantile(rsstap_repeatedmeasures$distance_df$Distance,c(0.5))
-
-fit <- sstap_lmer(formula = BMI ~ sex + time + (time|subj_ID),
-                 stap_formula = ~sap(HFS),
-                 subject_data = rsstap_repeatedmeasures$subject_df,
-                 subject_id =  c("subj_ID","measure_ID"),
-                 basis_functions = list(HFS=function(x) splines::bs(x,knots=quantile_knots,Boundary.knots = c(0,2))),
-                 dt_data = rsstap_repeatedmeasures$distance_df,
-                 BEF_col_name = "BEF",
-                 method='lmer',
-                 distance_col_name = "Distance")
-summary(fit)
+# quantile_knots <- quantile(rsstap_repeatedmeasures$distance_df$Distance,c(0.5))
+# 
+# fit <- sstap_lmer(formula = BMI ~ sex + time + (time|subj_ID),
+#                  stap_formula = ~sap(HFS),
+#                  subject_data = rsstap_repeatedmeasures$subject_df,
+#                  subject_id =  c("subj_ID","measure_ID"),
+#                  basis_functions = list(HFS=function(x) splines::bs(x,knots=quantile_knots,Boundary.knots = c(0,2))),
+#                  dt_data = rsstap_repeatedmeasures$distance_df,
+#                  BEF_col_name = "BEF",
+#                  method='lmer',
+#                  distance_col_name = "Distance")
+# summary(fit)
 ```
 
 ```{r}
-plot_effects_mer(fit)
+# plot_effects_mer(fit)
 ```
 
 ```{r,eval=F,echo=F}
-fit <- sstap_lmer(formula = BMI ~ sex + time + (time|subj_ID),
-                 stap_formula = ~sap(HFS),
-                 subject_data = rsstap_repeatedmeasures$subject_df,
-                 subject_id =  c("subj_ID","measure_ID"),
-                 basis_functions = list(HFS=function(x) splines::bs(x,knots=quantile_knots,Boundary.knots = c(0,2))),
-                 dt_data = rsstap_repeatedmeasures$distance_df,
-                 BEF_col_name = "BEF",
-                 method='brm',
-                 distance_col_name = "Distance",cores = 4, chains = 4,iter=3E3)
-summary(fit)
+# fit <- sstap_lmer(formula = BMI ~ sex + time + (time|subj_ID),
+#                  stap_formula = ~sap(HFS),
+#                  subject_data = rsstap_repeatedmeasures$subject_df,
+#                  subject_id =  c("subj_ID","measure_ID"),
+#                  basis_functions = list(HFS=function(x) splines::bs(x,knots=quantile_knots,Boundary.knots = c(0,2))),
+#                  dt_data = rsstap_repeatedmeasures$distance_df,
+#                  BEF_col_name = "BEF",
+#                  method='brm',
+#                  distance_col_name = "Distance",cores = 4, chains = 4,iter=3E3)
+# summary(fit)
 ```
 
 
 ```{r,eval=F,echo=F}
-plot_effects(fit)
+# plot_effects(fit)
 ```
 
 
