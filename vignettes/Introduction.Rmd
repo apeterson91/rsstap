@@ -5,6 +5,8 @@ vignette: >
   %\VignetteIndexEntry{Introduction to rsstap}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{dplyr}
+  %\VignetteDepends{ggplot2}
 ---
 
 ```{r, include = FALSE}
@@ -13,6 +15,7 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+
 
 ```{r setup}
 library(rsstap)

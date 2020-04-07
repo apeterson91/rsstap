@@ -19,8 +19,8 @@ Imports:
     stringr,
     brms,
     stats,
-    methods,
-    rstap
+	rstap (>= 1.1.7),
+    methods
 RoxygenNote: 6.1.1
 Suggests: 
     knitr,
@@ -30,3 +30,16 @@ Suggests:
 VignetteBuilder: knitr
 Depends: 
     R (>= 3.2)
+Collate: 
+    'AllClass.R'
+    'AllMethods.R'
+    'doc-datasets.R'
+    'misc.R'
+    'plot.R'
+    'sstap_df.R'
+    'sstap_glm.R'
+    'sstap_glmer.R'
+    'sstap_lm.R'
+    'sstap_lmer.R'
+    'stap.R'
+    'utils-pipe.R'

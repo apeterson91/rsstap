@@ -1,4 +1,4 @@
 library(testthat)
-library(bbnet)
+library(rsstap)
 
-test_check("bbnet")
+test_check("rsstap")

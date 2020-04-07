@@ -19,6 +19,7 @@
 #' @param stap_formula See \code{\link[rstap]{stap_lm}}
 #' @param subject_data required data argument containing subject level outcome and covariates
 #' @param subject_id string name for the common id column in both data and distance data and/or time_data
+#' @param basis_functions  list of basis functions for modeling the spatial (and/or) temporal exposure to BEFs
 #' @param dt_data distance dataframe containing up to four columns:
 #'  (1) subj_ID, (2) BEF_name and (3) Distance AND/OR (4) Time between subj_ID and BEF 
 #' @param BEF_col_name string name for the column containing the BEF labels in dt_data dataframe
@@ -41,6 +42,9 @@ sstap_lm <- function(formula,
 	if(!(method %in% c('lm','stan_lm','brm')))
 		stop("method must be one of c('lm','stan_lm','brm')")
 
+	# To pass R CMD Check
+	. <- NULL
+
   bef_df <- sstap_df(stap_formula = stap_formula,
                      subject_data = subject_data,
                      subject_id = subject_id,
@@ -53,15 +57,15 @@ sstap_lm <- function(formula,
   resp <- all.vars(formula)[1]
   covs <- all.vars(formula)[2:length(all.vars(formula))]
   covs <- c(covs,colnames(bef_df))
-  formula <- as.formula(paste(resp, " ~ ", paste(covs,collapse = " + ")))
+  formula <- stats::as.formula(paste(resp, " ~ ", paste(covs,collapse = " + ")))
   subject_data <- subject_data %>% dplyr::arrange_(.dots=subject_id)
   X <- cbind(subject_data,bef_df)
   if(method == "lm"){
   
-	  fit <- lm(formula,data = X, ...)
+	  fit <- stats::lm(formula,data = X, ...)
 	  
 	  fit$basis_functions <- basis_functions
-	  fit$stap_data <- rstap:::extract_stap_data(stap_formula)
+	  fit$stap_data <- extract_stap_data(stap_formula)
 	  fit$BEFs <- fit$stap_data$covariates
 	  if(any(fit$stap_data$stap_code %in% c(0,2)))
 		fit$spaceranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
@@ -73,7 +77,7 @@ sstap_lm <- function(formula,
 	  if(any(fit$stap_data$stap_code %in% c(1,2)))
 		fit$timeranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
 			dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
-			pull(!!dplyr::sym(time_col_name)) %>% 
+			dplyr::pull(!!dplyr::sym(time_col_name)) %>% 
 			range(.)
 		  })
 	  
@@ -81,7 +85,7 @@ sstap_lm <- function(formula,
   }else if(method == "stan_lm"){
 	  fit <- rstanarm::stan_lm(formula,data = X, ...)
 	  fit$basis_functions <- basis_functions
-	  fit$stap_data <- rstap:::extract_stap_data(stap_formula)
+	  fit$stap_data <- extract_stap_data(stap_formula)
 	  fit$BEFs <- fit$stap_data$covariates
 	  if(any(fit$stap_data$stap_code %in% c(0,2)))
 		fit$spaceranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
@@ -93,14 +97,14 @@ sstap_lm <- function(formula,
 	  if(any(fit$stap_data$stap_code %in% c(1,2)))
 		fit$timeranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
 			dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
-			pull(!!dplyr::sym(time_col_name)) %>% 
+			dplyr::pull(!!dplyr::sym(time_col_name)) %>% 
 			range(.)
 		  })
 	  structure(fit,class=c("stanreg","sstap"))
   }else{
 	  fit <- brms::brm(formula,data= X,...)
 	  fit$basis_functions <- basis_functions
-	  fit$stap_data <- rstap:::extract_stap_data(stap_formula)
+	  fit$stap_data <- extract_stap_data(stap_formula)
 	  fit$BEFs <- fit$stap_data$covariates
 	  if(any(fit$stap_data$stap_code %in% c(0,2)))
 		fit$spaceranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
@@ -112,7 +116,7 @@ sstap_lm <- function(formula,
 	  if(any(fit$stap_data$stap_code %in% c(1,2)))
 		fit$timeranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
 			dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
-			pull(!!dplyr::sym(time_col_name)) %>% 
+			dplyr::pull(!!dplyr::sym(time_col_name)) %>% 
 			range(.)
 		  })
 	  structure(fit,class=c("brmsfit","sstap"))

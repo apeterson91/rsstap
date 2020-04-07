@@ -17,25 +17,26 @@
 #' \code{\link[lme4]{merMod}} so that most methods defined for this
 #' parent class should work seamlessly within \pkg{rsstap} analysis
 #'
-#' @slot resp
-#'   An \code{lme4::\link[lme4]{lmResp}} object to store a
-#'   (mixed) model response variable
-#' @slot stap_code
-#'   stap_code designation
-#'   
+#' @slot basis_functions 
+#'      list of basis functions used for each STAP
 #' @slot BEFs
 #'   A character vector containing the names of the BEFs included in the model fit
+#' @slot stap_code
+#'   stap_code designation
+#' @slot spaceranges 
+#'    list of spatial range for each STAP
+#' @slot timeranges 
+#'    list of temporal ranges for each STAP 
 #'
-#' @name sstapMod
 #' @export
 #'
 sstapMod <- setClass("sstapMod",
                   slots = c(
                     basis_functions = "list",
                     BEFs = "character",
-					          stap_code = "array",
-					          spaceranges = "list",
-					          timeranges = "list"
+				    stap_code = "array",
+					spaceranges = "list",
+					timeranges = "list"
                   ),
                   contains = "lmerMod"  # also from lme4
 				)

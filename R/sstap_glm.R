@@ -19,6 +19,7 @@
 #' @param stap_formula See \code{\link[rstap]{stap_glm}}
 #' @param subject_data required data argument containing subject level outcome and covariates
 #' @param subject_id string name for the common id column in both data and distance data and/or time_data
+#' @param basis_functions  list of basis functions for modeling the spatial (and/or) temporal exposure to BEFs
 #' @param dt_data distance dataframe containing up to four columns:
 #'  (1) subj_ID, (2) BEF_name and (3) Distance AND/OR (4) Time between subj_ID and BEF 
 #' @param BEF_col_name string name for the column containing the BEF labels in dt_data dataframe
@@ -27,6 +28,8 @@
 #' @param family same as \code{\link[stats]{glm}}.
 #' @param method one of c("glm","stan_glm" or "brm") for frequentist or bayesian method implimentation
 #' @param ... args for \code{\link[stats]{glm}} or \code{\link[brms]{brm}} or \code{\link[rstanarm]{stan_glm}}
+#' @importFrom rstap extract_stap_data
+#'
 #' 
 sstap_glm <- function(formula,
                     stap_formula,
@@ -37,11 +40,14 @@ sstap_glm <- function(formula,
                     BEF_col_name = NULL,
                     distance_col_name = NULL,
                     time_col_name = NULL,
-                    family = gaussian(),
+                    family = stats::gaussian(),
 					method = "brm",
                     ...){
 	if(!(method %in% c('glm','stan_glm','brm')))
 		stop("method must be one of c('glm','stan_glm','brm')")
+
+	## To pass R CMD Check
+	. <- NULL
 
 	bef_df <- sstap_df(stap_formula = stap_formula,
 					   subject_data = subject_data,
@@ -64,57 +70,51 @@ sstap_glm <- function(formula,
   
   
 	covs <- c(covs,colnames(bef_df))
-	formula <- as.formula(paste(resp, " ~ ", paste(covs,collapse = " + ")))
+	formula <- stats::as.formula(paste(resp, " ~ ", paste(covs,collapse = " + ")))
 	X <- cbind(subject_data,bef_df)
 	if(method =="glm"){
 
-		fit <- glm(formula,data = X, family = family,...)
+		fit <- stats::glm(formula,data = X, family = family,...)
 		fit$basis_functions <- basis_functions
-		fit$stap_data <- rstap:::extract_stap_data(stap_formula)
+		fit$stap_data <- extract_stap_data(stap_formula)
 		fit$BEFs <- fit$stap_data$covariates
 		if(any(fit$stap_data$stap_code %in% c(0,2)))
 			fit$spaceranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
 				dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
-				pull(!!dplyr::sym(distance_col_name)) %>% range(.)})
+				dplyr::pull(!!dplyr::sym(distance_col_name)) %>% range(.)})
 		if(any(fit$stap_data$stap_code %in% c(1,2)))
 			fit$timeranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
 				dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
-				pull(!!dplyr::sym(time_col_name)) %>% range(.)})
+				dplyr::pull(!!dplyr::sym(time_col_name)) %>% range(.)})
 
 		structure(fit,class=c("glm","lm","sstap"))
 	}else if(method == "stan_glm"){
 		fit <- rstanarm::stan_glm(formula,data = X, family = family, ...)
 		fit$basis_functions <- basis_functions
-		fit$stap_data <- rstap:::extract_stap_data(stap_formula)
+		fit$stap_data <- extract_stap_data(stap_formula)
 		fit$BEFs <- fit$stap_data$covariates
 		if(any(fit$stap_data$stap_code %in% c(0,2)))
 		fit$spaceranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
 			dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
-			pull(!!dplyr::sym(distance_col_name)) %>% range(.)})
+			dplyr::pull(!!dplyr::sym(distance_col_name)) %>% range(.)})
 		if(any(fit$stap_data$stap_code %in% c(1,2)))
 		fit$timeranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
 			dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
-			pull(!!dplyr::sym(time_col_name)) %>% range(.)})
-		fit$scales <- scales
-		if(any(scales>1))
-			warning("Note: BEF-covariates were scaled, see object$scale for scales used")
+			dplyr::pull(!!dplyr::sym(time_col_name)) %>% range(.)})
 		structure(fit,class=c("stanreg","sstap"))
 	}else if(method == "brms"){
 		fit <- brms::brm(formula,data = X, family = family, ...)
 		fit$basis_functions <- basis_functions
-		fit$stap_data <- rstap:::extract_stap_data(stap_formula)
+		fit$stap_data <- extract_stap_data(stap_formula)
 		fit$BEFs <- fit$stap_data$covariates
 		if(any(fit$stap_data$stap_code %in% c(0,2)))
 		fit$spaceranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
 			dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
-			pull(!!dplyr::sym(distance_col_name)) %>% range(.)})
+			dplyr::pull(!!dplyr::sym(distance_col_name)) %>% range(.)})
 		if(any(fit$stap_data$stap_code %in% c(1,2)))
 		fit$timeranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
 			dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
-			pull(!!dplyr::sym(time_col_name)) %>% range(.)})
-		fit$scales <- scales
-		if(any(scales>1))
-			warning("Note: BEF-covariates were scaled, see object$scale for scales used")
+			dplyr::pull(!!dplyr::sym(time_col_name)) %>% range(.)})
 
 		structure(fit,class=c("brmsfit","sstap"))
 	}

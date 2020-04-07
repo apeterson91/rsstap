@@ -15,7 +15,7 @@
 #'
 #' @export
 #'
-#' @param formula Similar as for \code{\link[rstap]{stap_lm}}. 
+#' @param stap_formula Similar as for \code{\link[rstap]{stap_lm}}. 
 #' @param subject_data required data argument
 #' @param subject_id string containing the common id column in both data and distance data and/or time_data
 #' @param basis_functions list with length equal to the number of BEFs in the stap_formula that specifies the basis function expansion
@@ -23,6 +23,7 @@
 #' @param BEF_col_name string name of the column in the dt dataframe that contains the character vectors describing the BEFs
 #' @param distance_col_name string name of the column in the dt dataframe that contains the distance values
 #' @param time_col_name string name of the column in the dt dataframe that contains the time values
+#' @return matrix containing the aggregated distances/times across the basis functions provided for the respective BEFs
 #'
 sstap_df <- function(stap_formula,
                      subject_data,
@@ -41,8 +42,11 @@ sstap_df <- function(stap_formula,
     stop("`distance_col_name` must be a column in dt_data")
   if(!(time_col_name %in% colnames(dt_data)) && !is.null(time_col_name))
     stop("`time_col_name` must be a column in dt_data")
-  if(!(subject_id %in% colnames(dt_data)) || !(subject_id %in% colnames(subject_data)))
+  if(! all(subject_id %in% colnames(dt_data)) || !all((subject_id %in% colnames(subject_data))) )
     stop("`subject_id` must be a column in both dt_data and subject_data")
+
+  # To pass R CMD Check
+  . <- NULL
   
   stap_data <- extract_stap_data(stap_formula)
   stcode <- stap_data$stap_code

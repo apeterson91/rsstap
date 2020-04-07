@@ -7,7 +7,7 @@
 sstap_glm(formula, stap_formula, subject_data, subject_id = NULL,
   basis_functions = NULL, dt_data = NULL, BEF_col_name = NULL,
   distance_col_name = NULL, time_col_name = NULL,
-  family = gaussian(), method = "brm", ...)
+  family = stats::gaussian(), method = "brm", ...)
 }
 \arguments{
 \item{formula}{Similar as for \code{\link[stats]{glm}}.}
@@ -17,6 +17,8 @@ sstap_glm(formula, stap_formula, subject_data, subject_id = NULL,
 \item{subject_data}{required data argument containing subject level outcome and covariates}
 
 \item{subject_id}{string name for the common id column in both data and distance data and/or time_data}
+
+\item{basis_functions}{list of basis functions for modeling the spatial (and/or) temporal exposure to BEFs}
 
 \item{dt_data}{distance dataframe containing up to four columns:
 (1) subj_ID, (2) BEF_name and (3) Distance AND/OR (4) Time between subj_ID and BEF}

@@ -6,6 +6,9 @@
 \usage{
 get_grp_string(BEFs)
 }
+\arguments{
+\item{BEFs}{string of BEFs coding}
+}
 \description{
 pastes string for regex expression
 }

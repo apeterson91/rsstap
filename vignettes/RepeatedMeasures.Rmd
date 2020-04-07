@@ -15,55 +15,54 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-# library(tidyverse)
-# library(rsstap)
-# data("rsstap_repeatedmeasures")
+library(rsstap)
+data("rsstap_repeatedmeasures")
 ```
 
 
 ## Repeated Measures with rsstap
 
-Building off the Introductory vignette where the effect of Healthy Food Stores was modeled as a function of the stores in the immediate environment around
+Building off the Introductory vignette where the effect of Healthy Food Stores was modeled as a function of the stores in the immediate environment around hypothetical subjects' residences, we now turn to
 
 
 # Subject Specific terms
 
 
 ```{r}
-# quantile_knots <- quantile(rsstap_repeatedmeasures$distance_df$Distance,c(0.5))
-# 
-# fit <- sstap_lmer(formula = BMI ~ sex + time + (time|subj_ID),
-#                  stap_formula = ~sap(HFS),
-#                  subject_data = rsstap_repeatedmeasures$subject_df,
-#                  subject_id =  c("subj_ID","measure_ID"),
-#                  basis_functions = list(HFS=function(x) splines::bs(x,knots=quantile_knots,Boundary.knots = c(0,2))),
-#                  dt_data = rsstap_repeatedmeasures$distance_df,
-#                  BEF_col_name = "BEF",
-#                  method='lmer',
-#                  distance_col_name = "Distance")
-# summary(fit)
+quantile_knots <- quantile(rsstap_repeatedmeasures$distance_df$Distance,c(0.5))
+
+fit <- sstap_lmer(formula = BMI ~ sex + time + (time|subj_ID),
+                 stap_formula = ~sap(HFS),
+                 subject_data = rsstap_repeatedmeasures$subject_df,
+                 subject_id =  c("subj_ID","measure_ID"),
+                 basis_functions = list(HFS=function(x) splines::bs(x,knots=quantile_knots,Boundary.knots = c(0,2))),
+                 dt_data = rsstap_repeatedmeasures$distance_df,
+                 BEF_col_name = "BEF",
+                 method='lmer',
+                 distance_col_name = "Distance")
+summary(fit)
 ```
 
 ```{r}
-# plot_effects_mer(fit)
+plot_effects_mer(fit)
 ```
 
 ```{r,eval=F,echo=F}
-# fit <- sstap_lmer(formula = BMI ~ sex + time + (time|subj_ID),
-#                  stap_formula = ~sap(HFS),
-#                  subject_data = rsstap_repeatedmeasures$subject_df,
-#                  subject_id =  c("subj_ID","measure_ID"),
-#                  basis_functions = list(HFS=function(x) splines::bs(x,knots=quantile_knots,Boundary.knots = c(0,2))),
-#                  dt_data = rsstap_repeatedmeasures$distance_df,
-#                  BEF_col_name = "BEF",
-#                  method='brm',
-#                  distance_col_name = "Distance",cores = 4, chains = 4,iter=3E3)
-# summary(fit)
+fit <- sstap_lmer(formula = BMI ~ sex + time + (time|subj_ID),
+                 stap_formula = ~sap(HFS),
+                 subject_data = rsstap_repeatedmeasures$subject_df,
+                 subject_id =  c("subj_ID","measure_ID"),
+                 basis_functions = list(HFS=function(x) splines::bs(x,knots=quantile_knots,Boundary.knots = c(0,2))),
+                 dt_data = rsstap_repeatedmeasures$distance_df,
+                 BEF_col_name = "BEF",
+                 method='brm',
+                 distance_col_name = "Distance",cores = 4, chains = 4,iter=3E3)
+summary(fit)
 ```
 
 
 ```{r,eval=F,echo=F}
-# plot_effects(fit)
+plot_effects(fit)
 ```
 
 

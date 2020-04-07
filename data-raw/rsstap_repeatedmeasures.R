@@ -1,7 +1,5 @@
 ## code to prepare `bbnet_repeatedmeasures` dataset goes here
 
-library(dplyr)
-library(tidyr)
 
 set.seed(1214)
 num_subj <- 5.5E2
@@ -18,23 +16,23 @@ sigma <- 1
 
 true_direct_effect <- function(x){ ((-.5 + x -.5 *x^2))*(x<=1) }
 
-sub_df <- tibble(x = runif(n = num_subj, min = 0, max = 5.0),
+sub_df <- dplyr::tibble(x = runif(n = num_subj, min = 0, max = 5.0),
                  y = runif(n = num_subj, min = 0, max = 5.0),
                  class = "Subject")
 
 
 
 ## HFS's
-bef_df <- tibble(x = runif(n = num_bef, min = 0, max = 5.0),
+bef_df <- dplyr::tibble(x = runif(n = num_bef, min = 0, max = 5.0),
                  y = runif(n = num_bef, min = 0, max = 5.0),
                  class = "Healthy Food Stores")
 
 direct_dists <- fields::rdist(as.matrix(sub_df[,1:2]),
                               as.matrix(bef_df[,1:2]))
-subject_bef_df <- as_tibble(direct_dists) %>% 
-  mutate(subj_ID = 1:num_subj) %>% 
-  gather(contains("V"),key="BEF",value="Distance") %>% 
-  mutate(BEF = "HFS",measure_ID = 0L)
+subject_bef_df <- dplyr::as_tibble(direct_dists) %>% 
+  dplyr::mutate(subj_ID = 1:num_subj) %>% 
+  tidyr::gather(dplyr::contains("V"),key="BEF",value="Distance") %>% 
+  dplyr::mutate(BEF = "HFS",measure_ID = 0L)
 
 X_1 <- rowSums(true_direct_effect(direct_dists))
 
@@ -66,10 +64,10 @@ direct_dists <- fields::rdist(as.matrix(sub_df[,1:2]),
 X_1 <- rowSums(true_direct_effect(direct_dists))
 
 subject_bef_df <- subject_bef_df %>% 
-  rbind(.,as_tibble(direct_dists) %>% 
-          mutate(subj_ID = 1:num_subj) %>% 
-          gather(contains("V"),key="BEF",value="Distance") %>% 
-          mutate(BEF = "HFS",measure_ID = 1L))
+  rbind(.,dplyr::as_tibble(direct_dists) %>% 
+          dplyr::mutate(subj_ID = 1:num_subj) %>% 
+          tidyr::gather(dplyr::contains("V"),key="BEF",value="Distance") %>% 
+          dplyr::mutate(BEF = "HFS",measure_ID = 1L))
 
 y_3 <- alpha + Z*delta + X_1 + subject_intercepts + time_effect*2 + subject_slopes*2 +  rnorm(n = num_subj, mean = 0, sd = sigma) ## timepoint 2
 
@@ -85,41 +83,41 @@ direct_dists <- fields::rdist(as.matrix(sub_df[,1:2]),
 X_1 <- rowSums(true_direct_effect(direct_dists))
 
 subject_bef_df <- subject_bef_df %>% 
-  rbind(.,as_tibble(direct_dists) %>% 
-          mutate(subj_ID = 1:num_subj) %>% 
-          gather(contains("V"),key="BEF",value="Distance") %>% 
-          mutate(BEF = "HFS",measure_ID = 2L))
+  rbind(.,dplyr::as_tibble(direct_dists) %>% 
+          dplyr::mutate(subj_ID = 1:num_subj) %>% 
+          tidyr::gather(dplyr::contains("V"),key="BEF",value="Distance") %>% 
+          dplyr::mutate(BEF = "HFS",measure_ID = 2L))
 
 y_4 <- alpha + Z*delta + X_1 + subject_intercepts + time_effect*3 + subject_slopes*3 +  rnorm(n = num_subj, mean = 0, sd = sigma) ## timepoint 3
 
 
 
-subject_df <- tibble(subj_ID = 1:num_subj,
+subject_df <- dplyr::tibble(subj_ID = 1:num_subj,
                      BMI = y,
                      sex = Z,
                      time = 0,
                      measure_ID = 0L) %>% 
-  rbind(.,tibble(subj_ID = 1:num_subj,
+  rbind(.,dplyr::tibble(subj_ID = 1:num_subj,
                  BMI = y_2,
                  sex = Z,
                  time = 1,
                  measure_ID = 1L)) %>% 
-  rbind(.,tibble(subj_ID = 1:num_subj,
+  rbind(.,dplyr::tibble(subj_ID = 1:num_subj,
                  BMI = y_3,
                  sex = Z, 
                  time = 2, 
                  measure_ID = 2L)) %>% 
-  rbind(.,tibble(subj_ID = 1:num_subj,
+  rbind(.,dplyr::tibble(subj_ID = 1:num_subj,
                  BMI = y_4,
                  sex = Z,
                  time = 3,
                  measure_ID = 3L))
 
 subject_bef_df <- subject_bef_df %>% 
-  rbind(.,as_tibble(direct_dists) %>% 
-  mutate(subj_ID = 1:num_subj) %>% 
-  gather(contains("V"),key="BEF",value="Distance") %>% 
-  mutate(BEF = "HFS",measure_ID = 3L))
+  rbind(.,dplyr::as_tibble(direct_dists) %>% 
+  dplyr::mutate(subj_ID = 1:num_subj) %>% 
+  tidyr::gather(dplyr::contains("V"),key="BEF",value="Distance") %>% 
+  dplyr::mutate(BEF = "HFS",measure_ID = 3L))
 
 rsstap_repeatedmeasures <- list(distance_df = subject_bef_df %>% filter(Distance<=2),
                                 subject_df = subject_df,

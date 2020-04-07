@@ -12,6 +12,6 @@ test_that("extract_stap_formula works", {
 # })
 
 
-# test_that("bbnet_df works", {
+# test_that("sstap_df works", {
 # 
 # })

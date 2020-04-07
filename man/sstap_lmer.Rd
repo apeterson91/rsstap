@@ -18,6 +18,8 @@ sstap_lmer(formula, stap_formula, subject_data, subject_id = NULL,
 
 \item{subject_id}{string name for the common id column in both data and distance data and/or time_data}
 
+\item{basis_functions}{list of basis functions for modeling the spatial (and/or) temporal exposure to BEFs}
+
 \item{dt_data}{distance dataframe containing up to four columns:
 (1) subj_ID, (2) BEF_name and (3) Distance AND/OR (4) Time between subj_ID and BEF}
 

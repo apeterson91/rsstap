@@ -10,30 +10,35 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#' Parent Method for plot_directeffect
+#' Plot Effects 
+#' 
+#' @param object sstap object
+#' @param pars  optional vector of parameter strings to subset the plotting dataframe
 #' @export
 #' 
 plot_effects <- function(object,pars = NULL){
   UseMethod("plot_effects")
 }
 
-#' Parent Method for getting plot dataframe
+#' Plot Dataframe
+#' 
+#' @param object sstap object
+#' @param pars  optional vector of parameter strings to subset the plotting dataframe
 #' @export
 #' 
 plot_df <- function(object,pars = NULL){
   UseMethod("plot_df")
 }
 
-#' Plots the Direct Spatio-Temporal Exposure of a sstap Model
-#'
-#'
 #' @export
 #'
-#' @param object of type sstap
-#' @param pars optional parameter selection
+#' @describeIn plot_effects Plots the Direct Spatio-Temporal Exposure of a sstap Model
 #' 
 plot_effects.sstap <- function(object,pars = NULL){
   
+	#To pass R CMD check
+	Grid <- Effect <- lower <- upper <- NULL
+
   pltdf <- plot_df(object,pars)
   if("lm" %in% class(object) || "lmerMod" %in% class(object))
     subtitle_string <- "Shaded Area represents 95% Confidence Interval"
@@ -48,8 +53,10 @@ plot_effects.sstap <- function(object,pars = NULL){
     return(p)
 }
 
+#' @export  
 #'
-#'@export  
+#' @describeIn  plot_df retrieves dataframe for plotting STAP effects
+#' 
 plot_df.sstap <- function(object,pars){
   
   if(!is.null(pars))
@@ -66,8 +73,8 @@ plot_df.sstap <- function(object,pars){
   spatial_BEFs_grp <- get_grp_string(spatial_BEFs)
   temporal_BEFs_grp <- get_grp_string(temporal_BEFs)
   if(length(intersect(c("lm","stanreg"),class(object)))>0){
-    spatial_covs <- lapply(spatial_BEFs_grp,function(x) grep(x,names(coef(object)),value=TRUE))
-    temporal_covs <- lapply(temporal_BEFs_grp,function(x) grep(x,names(coef(object)),value=TRUE))  
+    spatial_covs <- lapply(spatial_BEFs_grp,function(x) grep(x,names(stats::coef(object)),value=TRUE))
+    temporal_covs <- lapply(temporal_BEFs_grp,function(x) grep(x,names(stats::coef(object)),value=TRUE))  
   }
   else if("brmsfit" %in% class(object)){
     spatial_covs <- lapply(spatial_BEFs_grp,function(x) paste0("b_",grep(x,rownames(brms::fixef(object)),value=TRUE)))
@@ -79,8 +86,8 @@ plot_df.sstap <- function(object,pars){
   timegrids <- lapply(temporal_ics,function(x) seq(from = object$timeranges[[x]][1],
                                                    to = object$timeranges[[x]][2],
                                                    by = 0.01))
-  spacegridmats <- purrr::map(seq_along(spacegrids),function(x) cbind(1,predict(object$basis_functions[[x]](0),spacegrids[[x]])))
-  timegridmats <- purrr::map(seq_along(timegrids),function(x) cbind(1,predict(object$basis_functions[[x]](0),timegrids[[x]])))
+  spacegridmats <- purrr::map(seq_along(spacegrids),function(x) cbind(1,stats::predict(object$basis_functions[[x]](0),spacegrids[[x]])))
+  timegridmats <- purrr::map(seq_along(timegrids),function(x) cbind(1,stats::predict(object$basis_functions[[x]](0),timegrids[[x]])))
 	pltdf <- pltdf_helper(object,spacegrids,spacegridmats,spatial_covs,spatial_BEFs,
 	                      timegridmats,temporal_covs,temporal_BEFs)
 	
@@ -90,12 +97,15 @@ plot_df.sstap <- function(object,pars){
 pltdf_helper <- function(object,spacegrids,spacegridmats,spatial_covs,spatial_BEFs,
                          timegrids,timegridmats,temporal_covs,temporal_BEFs){
 
+	## To pass R CMD CHECK
+	type <- BEF <- . <- NULL
+
 	if("lm" %in% class(object) || "sstapMod" %in% class(object)){
-	  intervals <-  confint(object)
+	  intervals <-  stats::confint(object)
 	  if("sstapMod" %in% class(object))
 	    coefs <- lme4::fixef(object)
 	  else
-	    coefs <- coef(object)
+	    coefs <- stats::coef(object)
 	}
 	else if("stanreg" %in% class(object) || "brmsfit" %in% class(object)){
 	  intervals <- rstanarm::posterior_interval(object)
@@ -104,7 +114,7 @@ pltdf_helper <- function(object,spacegrids,spacegridmats,spatial_covs,spatial_BE
 	    names(coefs) <- paste0("b_",names(coefs))
 	  }
 	  else
-	    coefs <- coef(object)
+	    coefs <- stats::coef(object)
 	}
     effects <- lapply(seq_along(spacegridmats),function(x) spacegridmats[[x]] %*% coefs[spatial_covs[[x]]])
     lowers <- lapply(seq_along(spacegridmats),function(x) spacegridmats[[x]] %*% intervals[spatial_covs[[x]],1])
@@ -131,6 +141,9 @@ pltdf_helper <- function(object,spacegrids,spacegridmats,spatial_covs,spatial_BE
 }
 
 #' pastes string for regex expression
+#' 
+#' @param BEFs string of BEFs coding
+#' 
 get_grp_string <- function(BEFs){
   if(length(BEFs)==0)
     return(character())

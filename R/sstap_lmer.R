@@ -20,6 +20,7 @@
 #' @param stap_formula See \code{\link[rstap]{stap_lm}}
 #' @param subject_data required data argument containing subject level outcome and covariates
 #' @param subject_id string name for the common id column in both data and distance data and/or time_data
+#' @param basis_functions  list of basis functions for modeling the spatial (and/or) temporal exposure to BEFs
 #' @param dt_data distance dataframe containing up to four columns:
 #'  (1) subj_ID, (2) BEF_name and (3) Distance AND/OR (4) Time between subj_ID and BEF 
 #' @param BEF_col_name string name for the column containing the BEF labels in dt_data dataframe
@@ -45,6 +46,8 @@ sstap_lmer <- function(formula,
 		stop("subject_id, basis_functions, dt_data and BEF_col_name cannot be NULL")
 	if(is.null(distance_col_name) && is.null(time_col_name))
 		stop("At least one of distance_col_name or time_col_name cannot be NULL")
+
+	. <- NULL
   
 	bef_df <- sstap_df(stap_formula = stap_formula,
 				 subject_data = subject_data,
@@ -72,7 +75,7 @@ sstap_lmer <- function(formula,
 	  fstr <- paste(fstr," + " ,paste0(paste0("(",lme4::findbars(formula),")",collapse = " + ")))
 	if(length(stap_lmers)>0)
 	  fstr <- paste(fstr, " + ", stap_lmers)
-	fstr <- as.formula(fstr)
+	fstr <- stats::as.formula(fstr)
 
 	subject_data <- subject_data %>% dplyr::arrange_(.dots=subject_id)
 	X <- cbind(subject_data,bef_df)

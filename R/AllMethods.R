@@ -1,14 +1,32 @@
+#' sstapMod Plot Effects Method
+#'
 #' @export
-#' @rdname plot_effects
+#'
+#' @param object sstapMod object
+#' @param pars  optional vector of parameter strings to subset the plotting dataframe
+#' @return plot with STAP effects 
+#' 
+#'
 setGeneric("plot_effects_mer", function(object,pars = NULL) standardGeneric("plot_effects_mer"))
 
+#' sstapMod plot_df Method
 #' @export
-#' @rdname plot_df 
+#'
+#' @param object sstapMod object
+#' @param pars  optional vector of parameter strings to subset the plotting dataframe
+#' @return plotting dataframe
+#'
 setGeneric("plot_df_mer", function(object,pars = NULL) standardGeneric("plot_df_mer"))
 
 
-#' Method for creating plot dataframe for sstapMod objects
+#' Plotting Dataframe - sstapMod objects Method
+#'
 #' @export
+#' @param object sstapMod object
+#' @param pars  optional vector of parameter strings to subset the plotting dataframe
+#' @return plotting dataframe
+#'
+#' @include AllClass.R AllMethods.R
 #' 
 setMethod("plot_df_mer",signature=signature("sstapMod"),
 	function(object,pars = NULL){
@@ -24,6 +42,7 @@ setMethod("plot_df_mer",signature=signature("sstapMod"),
 	  temporal_ics <- union(temporal_ics,st_ics)
 	  spatial_BEFs <- object@BEFs[spatial_ics]
 	  temporal_BEFs <- object@BEFs[temporal_ics]
+
 	  spatial_covs <- lapply(spatial_BEFs,function(x) grep(paste0(x,"_"),names(lme4::fixef(object)),value=TRUE))
 	  temporal_covs <- lapply(temporal_BEFs,function(x) grep(paste0(x,"_"),names(lme4::fixef(object)),value=TRUE))
 	  spacegrids <- lapply(spatial_ics,function(x) seq(from = object@spaceranges[[x]][1],
@@ -32,18 +51,26 @@ setMethod("plot_df_mer",signature=signature("sstapMod"),
 	  timegrids <- lapply(temporal_ics,function(x) seq(from = object@timeranges[[x]][1],
 	                                                   to = object@timeranges[[x]][2],
 	                                                   by = 0.01))
-	  spacegridmats <- purrr::map(seq_along(spacegrids),function(x) cbind(1,predict(object@basis_functions[[x]](0),spacegrids[[x]])))
-	  timegridmats <- purrr::map(seq_along(timegrids),function(x) cbind(1,predict(object@basis_functions[[x]](0),timegrids[[x]])))
+	  spacegridmats <- purrr::map(seq_along(spacegrids),function(x) cbind(1,stats::predict(object@basis_functions[[x]](0),spacegrids[[x]])))
+	  timegridmats <- purrr::map(seq_along(timegrids),function(x) cbind(1,stats::predict(object@basis_functions[[x]](0),timegrids[[x]])))
       pltdf <- pltdf_helper(object,spacegrids,spacegridmats,spatial_covs,spatial_BEFs,
 	                      timegridmats,temporal_covs,temporal_BEFs)
       return(pltdf)
 })
 
 #' Method for plotting sstapMod objects
+#'
 #' @export
+#'
+#' @param object sstapMod object
+#' @param pars  optional vector of parameter strings to subset the plotting dataframe
+#' @return plotting dataframe
+#' @include AllClass.R AllMethods.R
 #' 
 setMethod("plot_effects_mer",signature = signature("sstapMod"),
 			function(object,pars= NULL){
+	  ## To pass R CMD CHECK
+				Grid <- Effect <- lower <- upper <-  BEF <- label <- NULL 
 			  pltdf <- plot_df_mer(object,pars)
 			  p <- pltdf %>% ggplot2::ggplot(ggplot2::aes(x=Grid,y=Effect)) + 
 				ggplot2::geom_line() +

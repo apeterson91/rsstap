@@ -9,6 +9,8 @@ sstap_df(stap_formula, subject_data, subject_id = NULL,
   distance_col_name = NULL, time_col_name = NULL)
 }
 \arguments{
+\item{stap_formula}{Similar as for \code{\link[rstap]{stap_lm}}.}
+
 \item{subject_data}{required data argument}
 
 \item{subject_id}{string containing the common id column in both data and distance data and/or time_data}
@@ -22,8 +24,9 @@ sstap_df(stap_formula, subject_data, subject_id = NULL,
 \item{distance_col_name}{string name of the column in the dt dataframe that contains the distance values}
 
 \item{time_col_name}{string name of the column in the dt dataframe that contains the time values}
-
-\item{formula}{Similar as for \code{\link[rstap]{stap_lm}}.}
+}
+\value{
+matrix containing the aggregated distances/times across the basis functions provided for the respective BEFs
 }
 \description{
 Built Environment Network Direct Effect Matrix

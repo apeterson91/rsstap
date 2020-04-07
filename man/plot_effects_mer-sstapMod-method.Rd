@@ -7,6 +7,14 @@
 \usage{
 \S4method{plot_effects_mer}{sstapMod}(object, pars = NULL)
 }
+\arguments{
+\item{object}{sstapMod object}
+
+\item{pars}{optional vector of parameter strings to subset the plotting dataframe}
+}
+\value{
+plotting dataframe
+}
 \description{
 Method for plotting sstapMod objects
 }
