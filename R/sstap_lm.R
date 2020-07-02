@@ -45,6 +45,13 @@ sstap_lm <- function(formula,
 	                                       centred = FALSE,
 	                                       diagonalize = FALSE)
 	                    out$name <- x
+						ix <- which(benvo@bef_names==x)
+						ranges <- list()
+						if(y=="Distance"|y=="Distance-Time")
+							ranges$Distance <- range(benvo@bef_data[[ix]]$Distance,na.rm=T)
+						if(y=="Time"|y=="Distance-Time")
+							ranges$Time = range(benvo@bef_data[[ix]]$Time,na.rm=T)
+						out$ranges <- ranges
 	                    return(out)
 	                    })
 	
@@ -94,12 +101,15 @@ sstap_lm <- function(formula,
 	                          )
 	
 	fit <- sstapreg(
-					list(stapfit = sstapfit,
+					list(stapfit = sstapfit$fit,
 						 mf = mf,
+						 smooths = lapply(jd,function(x) x$pregam$smooth),
+						 ranges = lapply(jd,function(x) x$ranges),
 						 weights = weights,
 						 benvo = benvo,
 						 stap_terms = stap_terms,
 						 stap_components = stap_components,
+						 ind = sstapfit$ind,
 						 call = call
 					 )
 					)

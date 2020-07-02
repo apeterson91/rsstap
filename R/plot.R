@@ -9,34 +9,32 @@ plot.sstapreg <- function(x,stap_term = NULL,component = NULL){
 
 	if(is.null(stap_term)){
 		ix <- 1
-		bef <- x$model$S_Xs[[ix]]
-		gd <- data.frame(var = seq(from = floor(bef$range[1]), to = ceiling(bef$range[2]), by =0.01))
-		stap_term <- x$stap_terms[1]
-		colnames(gd) <- x$stap_components[1]
+		stap_term <- x$stap_terms[ix]
+		component <- x$stap_components[ix]
+		stopifnot(x$stap_components[ix] == component)
+		stopifnot(x$stap_term[ix] == stap_term)
 	}
 	else if(stap_term %in% x$stap_terms){
 		ix <- which(stap_term == x$stap_terms)
 		ix <- intersect(ix,which(x$stap_components==component))
-		stopifnot(x$stap_components[ix] == component)
-		stopifnot(x$stap_term[ix] == stap_term)
-		bef <- x$model$S_Xs[[ix]]
-		gd <- data.frame(var = seq(from = floor(bef$range[1]), to = ceiling(bef$range[2]), by =0.01))
-		colnames(gd) <- component
 	}
 	else
 		stop("stap_term must be NULL or one of the stap terms in the model object")
+	bef <- x$model$smooths[[ix]][[1]]
+	if(x$stap_components[1] == "Distance") 
+		gd <- data.frame(Distance = seq(from = floor(x$ranges[[ix]]$Distance[1]), to = ceiling(x$ranges[[ix]]$Distance[2]), by =0.01))
+	else if(x$stap_components[1] == "Time") 
+		gd <- data.frame(Time = seq(from = floor(x$ranges[[ix]]$Time[1]), to = ceiling(x$ranges[[ix]]$Time[2]), by =0.01))
+	else if(x$stan_components[1] == "Distance-Time")
+		gd <- data.frame(Distance = seq(from = floor(bef$ranges[[ix]]$Distance[1]), to = ceiling(bef$ranges[[ix]]$Distance[2]), by =0.01),
+						 Time = seq(from = floor(bef$ranges[[ix]]$Time[1]), to = ceiling(bef$ranges[[ix]]$Time[2]), by =0.01))
 
-	sobj <- bef$smooth_obj
-	mat <- mgcv::Predict.matrix(sobj,gd)
+	mat <- mgcv::Predict.matrix(bef,gd)
 
 	beta <- as.matrix(x$stapfit)
 	betas <- grep("beta",colnames(beta))
 	beta <- beta[,betas]
-	beta <- beta[,bef$ind]
-	#if(bef$center)
-	#	mat <- mat[,2:ncol(mat)]
-	if(!is.null(bef$constmat))
-		 beta <- t(tcrossprod(x$model$S_Xs[[ix]]$constmat,beta))
+	beta <- beta[,x$ind[[ix]]]
 	eta <- tcrossprod(mat,beta)
 	dplyr::tibble(Grid = gd[,1],
 				  Lower = apply(eta,1,function(x) quantile(x,0.025)),

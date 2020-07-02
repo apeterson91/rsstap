@@ -90,7 +90,7 @@ sstap_glm.fit <- function(y,
                    R_inv = R_inv)
 
   pars <- c(
-		  "delta",
+			"delta",
 			"sstap_beta",
 			"sigma",
 			"tau",
@@ -110,6 +110,10 @@ sstap_glm.fit <- function(y,
 						...
 						) 
 
+
   fit <- do.call(sampling,sampling_args)
-  
+
+  ind <- lapply(1:nrow(beta_ix),function(x) beta_ix[i,1]:beta_ix[i,2] )
+  return(list (fit = fit, ind = ind))
+
 }
