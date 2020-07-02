@@ -2,37 +2,21 @@
 % Please edit documentation in R/sstap_lmer.R
 \name{sstap_lmer}
 \alias{sstap_lmer}
-\title{Built Environment Networks Linear Mixed Effects Regression Model}
+\title{Spline Spatial Temporal Aggregated Regression Model for Longitudinal Data}
 \usage{
-sstap_lmer(formula, stap_formula, subject_data, subject_id = NULL,
-  basis_functions = NULL, dt_data = NULL, BEF_col_name = NULL,
-  distance_col_name = NULL, time_col_name = NULL, method = "brm",
-  ...)
+sstap_lmer(formula, stap_terms, benvo, weights = NULL, ...)
 }
 \arguments{
-\item{formula}{Similar as for \code{\link[lme4]{lmer}}.}
+\item{formula}{Similar as for \code{\link[lme4]{glmer}}.}
 
-\item{stap_formula}{See \code{\link[rstap]{stap_lm}}}
+\item{stap_terms}{list of BEF terms}
 
-\item{subject_data}{required data argument containing subject level outcome and covariates}
+\item{benvo}{built environment object from the rbenvo package containing the relevant data}
 
-\item{subject_id}{string name for the common id column in both data and distance data and/or time_data}
+\item{weights}{vector of positive integer weights}
 
-\item{basis_functions}{list of basis functions for modeling the spatial (and/or) temporal exposure to BEFs}
-
-\item{dt_data}{distance dataframe containing up to four columns:
-(1) subj_ID, (2) BEF_name and (3) Distance AND/OR (4) Time between subj_ID and BEF}
-
-\item{BEF_col_name}{string name for the column containing the BEF labels in dt_data dataframe}
-
-\item{distance_col_name}{string name for the column containing the subject-BEF distances in the dt_data dataframe}
-
-\item{time_col_name}{string name for the the column containing the subject-BEF times in the dt_data dataframe}
-
-\item{method}{one of c("lmer","stan_lmer" or "brm") for frequentist or bayesian method implimentation}
-
-\item{...}{args for \code{\link[stats]{lm}}}
+\item{...}{arguments for stan sampler}
 }
 \description{
-Built Environment Networks Linear Mixed Effects Regression Model
+Spline Spatial Temporal Aggregated Regression Model for Longitudinal Data
 }

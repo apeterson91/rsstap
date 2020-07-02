@@ -2,37 +2,19 @@
 % Please edit documentation in R/sstap_lm.R
 \name{sstap_lm}
 \alias{sstap_lm}
-\title{Built Environment Networks Frequentist Linear Model}
+\title{Spline Spatial Temporal Aggregated Regression Linear Model}
 \usage{
-sstap_lm(formula, stap_formula, subject_data, subject_id = NULL,
-  basis_functions = NULL, dt_data = NULL, BEF_col_name = NULL,
-  distance_col_name = NULL, time_col_name = NULL, method = "brm",
-  ...)
+sstap_lm(formula, benvo, weights = NULL, ...)
 }
 \arguments{
-\item{formula}{Similar as for \code{\link[stats]{lm}}.}
+\item{formula}{Similar as for \code{\link[stats]{lm}} with the addition of \code{stap},\code{sap} \code{tap} terms as needed}
 
-\item{stap_formula}{See \code{\link[rstap]{stap_lm}}}
+\item{benvo}{built environment object from the rbenvo package containing the relevant data}
 
-\item{subject_data}{required data argument containing subject level outcome and covariates}
+\item{weights}{vector of positive integer weights}
 
-\item{subject_id}{string name for the common id column in both data and distance data and/or time_data}
-
-\item{basis_functions}{list of basis functions for modeling the spatial (and/or) temporal exposure to BEFs}
-
-\item{dt_data}{distance dataframe containing up to four columns:
-(1) subj_ID, (2) BEF_name and (3) Distance AND/OR (4) Time between subj_ID and BEF}
-
-\item{BEF_col_name}{string name for the column containing the BEF labels in dt_data dataframe}
-
-\item{distance_col_name}{string name for the column containing the subject-BEF distances in the dt_data dataframe}
-
-\item{time_col_name}{string name for the the column containing the subject-BEF times in the dt_data dataframe}
-
-\item{method}{one of c("lm","stan_lm" or "brm") for frequentist or bayesian method implimentation}
-
-\item{...}{args for \code{\link[stats]{lm}}}
+\item{...}{arguments for stan sampler}
 }
 \description{
-Built Environment Networks Frequentist Linear Model
+Spline Spatial Temporal Aggregated Regression Linear Model
 }

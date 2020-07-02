@@ -10,115 +10,100 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#' Built Environment Networks Frequentist Linear Model 
+#' Spline Spatial Temporal Aggregated Regression Linear Model 
 #'
 #'
 #' @export
 #'
-#' @param formula Similar as for \code{\link[stats]{lm}}. 
-#' @param stap_formula See \code{\link[rstap]{stap_lm}}
-#' @param subject_data required data argument containing subject level outcome and covariates
-#' @param subject_id string name for the common id column in both data and distance data and/or time_data
-#' @param basis_functions  list of basis functions for modeling the spatial (and/or) temporal exposure to BEFs
-#' @param dt_data distance dataframe containing up to four columns:
-#'  (1) subj_ID, (2) BEF_name and (3) Distance AND/OR (4) Time between subj_ID and BEF 
-#' @param BEF_col_name string name for the column containing the BEF labels in dt_data dataframe
-#' @param distance_col_name string name for the column containing the subject-BEF distances in the dt_data dataframe
-#' @param time_col_name string name for the the column containing the subject-BEF times in the dt_data dataframe
-#' @param method one of c("lm","stan_lm" or "brm") for frequentist or bayesian method implimentation
-#' @param ... args for \code{\link[stats]{lm}}
+#' @param formula Similar as for \code{\link[stats]{lm}} with the addition of \code{stap},\code{sap} \code{tap} terms as needed
+#' @param benvo built environment object from the rbenvo package containing the relevant data
+#' @param weights vector of positive integer weights 
+#' @param ... arguments for stan sampler
 #' 
 sstap_lm <- function(formula,
-                    stap_formula,
-                    subject_data,
-                    subject_id = NULL,
-                    basis_functions = NULL,
-                    dt_data = NULL,
-                    BEF_col_name = NULL,
-                    distance_col_name = NULL,
-                    time_col_name = NULL,
-					method = "brm",
-                     ...){
-	if(!(method %in% c('lm','stan_lm','brm')))
-		stop("method must be one of c('lm','stan_lm','brm')")
-
-	# To pass R CMD Check
-	. <- NULL
-
-  bef_df <- sstap_df(stap_formula = stap_formula,
-                     subject_data = subject_data,
-                     subject_id = subject_id,
-                     basis_functions = basis_functions,
-                     dt_data = dt_data,
-                     BEF_col_name = BEF_col_name,
-                     distance_col_name = distance_col_name,
-                     time_col_name = time_col_name)
-
-  resp <- all.vars(formula)[1]
-  covs <- all.vars(formula)[2:length(all.vars(formula))]
-  covs <- c(covs,colnames(bef_df))
-  formula <- stats::as.formula(paste(resp, " ~ ", paste(covs,collapse = " + ")))
-  subject_data <- subject_data %>% dplyr::arrange_(.dots=subject_id)
-  X <- cbind(subject_data,bef_df)
-  if(method == "lm"){
+					 benvo,
+					 weights = NULL,...){
   
-	  fit <- stats::lm(formula,data = X, ...)
-	  
-	  fit$basis_functions <- basis_functions
-	  fit$stap_data <- extract_stap_data(stap_formula)
-	  fit$BEFs <- fit$stap_data$covariates
-	  if(any(fit$stap_data$stap_code %in% c(0,2)))
-		fit$spaceranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
-							   dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
-							   dplyr::pull(!!dplyr::sym(distance_col_name)) %>%
-			range(.)
-		  })
-	  
-	  if(any(fit$stap_data$stap_code %in% c(1,2)))
-		fit$timeranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
-			dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
-			dplyr::pull(!!dplyr::sym(time_col_name)) %>% 
-			range(.)
-		  })
-	  
-	  structure(fit,class=c("lm","sstap"))
-  }else if(method == "stan_lm"){
-	  fit <- rstanarm::stan_lm(formula,data = X, ...)
-	  fit$basis_functions <- basis_functions
-	  fit$stap_data <- extract_stap_data(stap_formula)
-	  fit$BEFs <- fit$stap_data$covariates
-	  if(any(fit$stap_data$stap_code %in% c(0,2)))
-		fit$spaceranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
-							   dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
-							   dplyr::pull(!!dplyr::sym(distance_col_name)) %>%
-			range(.)
-		  })
-	  
-	  if(any(fit$stap_data$stap_code %in% c(1,2)))
-		fit$timeranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
-			dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
-			dplyr::pull(!!dplyr::sym(time_col_name)) %>% 
-			range(.)
-		  })
-	  structure(fit,class=c("stanreg","sstap"))
-  }else{
-	  fit <- brms::brm(formula,data= X,...)
-	  fit$basis_functions <- basis_functions
-	  fit$stap_data <- extract_stap_data(stap_formula)
-	  fit$BEFs <- fit$stap_data$covariates
-	  if(any(fit$stap_data$stap_code %in% c(0,2)))
-		fit$spaceranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
-							   dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
-							   dplyr::pull(!!dplyr::sym(distance_col_name)) %>%
-			range(.)
-		  })
-	  
-	  if(any(fit$stap_data$stap_code %in% c(1,2)))
-		fit$timeranges <- lapply(fit$BEFs,function(x){ dt_data %>% 
-			dplyr::filter(!!dplyr::sym(BEF_col_name) == x) %>% 
-			dplyr::pull(!!dplyr::sym(time_col_name)) %>% 
-			range(.)
-		  })
-	  structure(fit,class=c("brmsfit","sstap"))
-  }
+	foo <- get_stapless_formula(formula)
+	f <- foo$stapless_formula
+	call <- match.call(expand.dots = TRUE)
+	if(benvo@longitudinal){
+		warning("This Benvo was constructed with longitudinal data but sstap_lm does not adjust for within subject correlation. \n Be advised that parameter standard errors may be overoptimistic.")
+	}
+	mf <- rbenvo::subject_design(benvo,f)
+	stap_terms <- foo$stap_mat[,1]
+	stap_components <- foo$stap_mat[,2]
+	
+	jd <- purrr::pmap(list(stap_terms,stap_components,foo$fake_formula),
+	                  function(x,y,z) {
+	                    out <- mgcv::jagam(formula = z, family = gaussian(), 
+	                                       data = rbenvo::joinvo(benvo,x,y,
+	                                                             NA_to_zero = TRUE), 
+	                                       file = tempfile(fileext = ".jags"), 
+	                                       weights = NULL, 
+	                                       offset = NULL,
+	                                       centred = FALSE,
+	                                       diagonalize = FALSE)
+	                    out$name <- x
+	                    return(out)
+	                    })
+	
+	X <- lapply(1:length(jd),function(i){
+	  jndf <- rbenvo::joinvo(benvo,stap_terms[i],stap_components[i],NA_to_zero = TRUE)
+	  if(!benvo@longitudinal){
+	    X <- as.matrix(Matrix::fac2sparse(jndf[,rbenvo::joining_ID(benvo)]) %*% jd[[i]]$jags.data$X)
+	   }else{
+	     jndf$RSSTAP_NEW_JOINING_ID <- apply(jndf[,rbenvo::joining_ID(benvo)],1,function(x) paste0(x[1],"_",x[2]))
+	     lvls <- unique(jdf$RSSTAP_NEW_JOINING_ID)
+	     X <- as.matrix(Matrix::fac2sparse(factor(jndf$RSSTAP_NEW_JOINING_ID,levels=lvls)) %*% jd[[i]]$jags.data$X)
+			}
+			colnames(X) <- colnames(jd[[i]]$pregam$X) <- jd$pregam$term.names
+			S <- lapply(jd[[i]]$pregam$smooth, FUN = function(s) {
+			  ranks <- s$rank
+			  start <- s$first.para
+			  out <- list()
+			  for (r in seq_along(ranks)) {
+			    end <- start + ranks[r] - 1L
+			    out[[r]] <- X[, start:end, drop = FALSE]
+			    start <- end + 1L
+			  }
+			  return(out)
+			})
+			if (any(sapply(S, length) > 1)) 
+			  S <- unlist(S, recursive = FALSE)
+			names(S) <- names(jd$pregam$sp)
+			for (s in seq_along(S)) {
+			  if (is.list(S[[s]])) 
+			    S[[s]] <- do.call(cbind, S[[s]])
+			}
+			return(S)
+		})
+	## always only one smooth because jagam called for each stap term
+	S <- lapply(1:length(jd),function(i) jd[[i]]$jags.data$S1) 
+	
+
+	
+	
+
+	sstapfit <- sstap_glm.fit(
+	                          y = mf$y, 
+	                          Z = mf$X,
+	                          X = X,
+	                          S = S,
+	                          w = weights
+	                          )
+	
+	fit <- sstapreg(
+					list(stapfit = sstapfit,
+						 mf = mf,
+						 weights = weights,
+						 benvo = benvo,
+						 stap_terms = stap_terms,
+						 stap_components = stap_components,
+						 call = call
+					 )
+					)
+
+	return(fit)
+
 }

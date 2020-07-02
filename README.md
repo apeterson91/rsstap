@@ -1,8 +1,8 @@
 # rsstap: Spline Spatial Temporal Aggregated Predictors
 <!-- badges: start -->
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Travis build status](https://travis-ci.org/apeterson91/bbnet.svg?branch=master)](https://travis-ci.org/apeterson91/bbnet)
-[![Codecov test coverage](https://codecov.io/gh/apeterson91/bbnet/branch/master/graph/badge.svg)](https://codecov.io/gh/apeterson91/bbnet?branch=master)
+[![Travis build status](https://travis-ci.org/apeterson91/bbnet.svg?branch=master)](https://travis-ci.org/apeterson91/rsstap)
+[![Codecov test coverage](https://codecov.io/gh/apeterson91/bbnet/branch/master/graph/badge.svg)](https://codecov.io/gh/apeterson91/rsstap?branch=master)
 <!-- badges: end -->
 
 ## About
@@ -14,7 +14,7 @@ The primary target audience is researchers interested in the effect of built env
 
 ### Development Version
 
- Currently this package is only available via Github and is not ready for regular use. If you'd like to to install the current development software use the following 
+As this package is under active development it is currently only available via Github. If you'd like to to install the current development software use the following 
  lines of R code
 
  ```r
