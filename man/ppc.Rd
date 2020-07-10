@@ -24,3 +24,4 @@ Posterior Predictive Checks
 \item \code{sstapreg}: 
 }}
 
+\keyword{internal}

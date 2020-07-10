@@ -2,13 +2,9 @@
 % Please edit documentation in R/sstapreg-methods.R
 \name{sstapreg-methods}
 \alias{sstapreg-methods}
-\alias{VarCorr}
-\alias{fixef}
-\alias{sigma}
 \alias{coef.sstapreg}
 \alias{confint.sstapreg}
 \alias{fitted.sstapreg}
-\alias{nobs.sstapreg}
 \alias{se.sstapreg}
 \alias{vcov.sstapreg}
 \title{Methods for sstapreg objects}
@@ -18,8 +14,6 @@
 \method{confint}{sstapreg}(object, ...)
 
 \method{fitted}{sstapreg}(object, ...)
-
-\method{nobs}{sstapreg}(object, ...)
 
 \method{se}{sstapreg}(object, ...)
 
@@ -36,7 +30,7 @@ returned instead.}
 }
 \description{
 The methods documented on this page are actually some of the least important 
-methods defined for \link[=sstapreg-objects]{sstapreg} objects. The most 
+methods defined for \link[=sstapreg]{sstapreg} objects. The most 
 important methods are documented separately, each with its own page. Links to
 those pages are provided in the \strong{See Also} section, below.
 }
@@ -47,11 +41,11 @@ The methods documented on this page are similar to the methods
   
 \describe{
 \item{\code{coef}}{
-Medians are used for point estimates. See the \emph{Point estimates} section
+Medians are used for fixed effect point estimates. See the \emph{Point estimates} section
 in \code{\link{print.sstapreg}} for more details.
 }
 \item{\code{se}}{
-The \code{se} function returns standard errors based on 
+The \code{se} function returns fixed effects standard errors based on 
 \code{\link{mad}}. See the \emph{Uncertainty estimates} section in
 \code{\link{print.sstapreg}} for more details.
 }

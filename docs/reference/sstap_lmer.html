@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Built Environment Networks Linear Mixed Effects Regression Model — sstap_lmer • rsstap</title>
+<title>Spline Spatial Temporal Aggregated Regression Model for Longitudinal Data — sstap_lmer • rsstap</title>
 
 
 <!-- jquery -->
@@ -35,8 +35,8 @@
 
 
 
-<meta property="og:title" content="Built Environment Networks Linear Mixed Effects Regression Model — sstap_lmer" />
-<meta property="og:description" content="Built Environment Networks Linear Mixed Effects Regression Model" />
+<meta property="og:title" content="Spline Spatial Temporal Aggregated Regression Model for Longitudinal Data — sstap_lmer" />
+<meta property="og:description" content="Spline Spatial Temporal Aggregated Regression Model for Longitudinal Data" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -94,9 +94,6 @@
     <li>
       <a href="../articles/Introduction.html">Introduction</a>
     </li>
-    <li>
-      <a href="../articles/RepeatedMeasures.html">Repeated Measures</a>
-    </li>
   </ul>
 </li>
       </ul>
@@ -115,63 +112,39 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Built Environment Networks Linear Mixed Effects Regression Model</h1>
+    <h1>Spline Spatial Temporal Aggregated Regression Model for Longitudinal Data</h1>
     
     <div class="hidden name"><code>sstap_lmer.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Built Environment Networks Linear Mixed Effects Regression Model</p>
+    <p>Spline Spatial Temporal Aggregated Regression Model for Longitudinal Data</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sstap_lmer</span>(<span class='no'>formula</span>, <span class='no'>stap_formula</span>, <span class='no'>subject_data</span>, <span class='kw'>subject_id</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>basis_functions</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>dt_data</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>BEF_col_name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>distance_col_name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>time_col_name</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>method</span> <span class='kw'>=</span> <span class='st'>"brm"</span>,
-  <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>sstap_lmer</span>(<span class='no'>formula</span>, <span class='no'>stap_terms</span>, <span class='no'>benvo</span>, <span class='kw'>weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>formula</th>
-      <td><p>Similar as for <code><a href='https://rdrr.io/pkg/lme4/man/lmer.html'>lmer</a></code>.</p></td>
+      <td><p>Similar as for <code><a href='https://rdrr.io/pkg/lme4/man/glmer.html'>glmer</a></code>.</p></td>
     </tr>
     <tr>
-      <th>stap_formula</th>
-      <td><p>See <code><a href='https://rdrr.io/pkg/rstap/man/stap_glm.html'>stap_lm</a></code></p></td>
+      <th>stap_terms</th>
+      <td><p>list of BEF terms</p></td>
     </tr>
     <tr>
-      <th>subject_data</th>
-      <td><p>required data argument containing subject level outcome and covariates</p></td>
+      <th>benvo</th>
+      <td><p>built environment object from the rbenvo package containing the relevant data</p></td>
     </tr>
     <tr>
-      <th>subject_id</th>
-      <td><p>string name for the common id column in both data and distance data and/or time_data</p></td>
-    </tr>
-    <tr>
-      <th>dt_data</th>
-      <td><p>distance dataframe containing up to four columns:
-(1) subj_ID, (2) BEF_name and (3) Distance AND/OR (4) Time between subj_ID and BEF</p></td>
-    </tr>
-    <tr>
-      <th>BEF_col_name</th>
-      <td><p>string name for the column containing the BEF labels in dt_data dataframe</p></td>
-    </tr>
-    <tr>
-      <th>distance_col_name</th>
-      <td><p>string name for the column containing the subject-BEF distances in the dt_data dataframe</p></td>
-    </tr>
-    <tr>
-      <th>time_col_name</th>
-      <td><p>string name for the the column containing the subject-BEF times in the dt_data dataframe</p></td>
-    </tr>
-    <tr>
-      <th>method</th>
-      <td><p>one of c("lmer","stan_lmer" or "brm") for frequentist or bayesian method implimentation</p></td>
+      <th>weights</th>
+      <td><p>vector of positive integer weights</p></td>
     </tr>
     <tr>
       <th>...</th>
-      <td><p>args for <code><a href='https://rdrr.io/r/stats/lm.html'>lm</a></code></p></td>
+      <td><p>arguments for stan sampler</p></td>
     </tr>
     </table>
 

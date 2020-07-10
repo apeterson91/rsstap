@@ -41,6 +41,7 @@ sstapreg <- function(object){
         model = list(y=y,
                      Z=Z,
 					 smooths = object$smooths,
+					 Xs = object$Xs,
 					 benvo = object$benvo),
         formula = object$formula, 
         stapfit = stapfit,

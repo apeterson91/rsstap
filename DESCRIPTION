@@ -22,7 +22,10 @@ Imports:
     rstantools (>= 2.0.0.9000),
     rbenvo,
     mgcv,
-    lme4
+    lme4,
+    Matrix,
+    plotly,
+    tidyr
 LinkingTo:
     BH (>= 1.66.0),
     Rcpp (>= 0.12.0),

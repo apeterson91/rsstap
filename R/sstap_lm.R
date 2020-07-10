@@ -28,7 +28,7 @@ sstap_lm <- function(formula,
 	f <- foo$stapless_formula
 	call <- match.call(expand.dots = TRUE)
 	if(benvo@longitudinal){
-		warning("This Benvo was constructed with longitudinal data but sstap_lm does not adjust for within subject correlation. \n Be advised that parameter standard errors may be overoptimistic.")
+		warning("This Benvo was constructed with longitudinal data \n but sstap_lm does not adjust for within subject correlation. \n Be advised that parameter standard errors may be overoptimistic.")
 	}
 	mf <- rbenvo::subject_design(benvo,f)
 	stap_terms <- foo$stap_mat[,1]
@@ -56,37 +56,17 @@ sstap_lm <- function(formula,
 	                    })
 	
 	X <- lapply(1:length(jd),function(i){
-	  jndf <- rbenvo::joinvo(benvo,stap_terms[i],stap_components[i],NA_to_zero = TRUE)
-	  if(!benvo@longitudinal){
-	    X <- as.matrix(Matrix::fac2sparse(jndf[,rbenvo::joining_ID(benvo)]) %*% jd[[i]]$jags.data$X)
-	   }else{
-	     jndf$RSSTAP_NEW_JOINING_ID <- apply(jndf[,rbenvo::joining_ID(benvo)],1,function(x) paste0(x[1],"_",x[2]))
-	     lvls <- unique(jdf$RSSTAP_NEW_JOINING_ID)
-	     X <- as.matrix(Matrix::fac2sparse(factor(jndf$RSSTAP_NEW_JOINING_ID,levels=lvls)) %*% jd[[i]]$jags.data$X)
-			}
-			colnames(X) <- colnames(jd[[i]]$pregam$X) <- jd$pregam$term.names
-			S <- lapply(jd[[i]]$pregam$smooth, FUN = function(s) {
-			  ranks <- s$rank
-			  start <- s$first.para
-			  out <- list()
-			  for (r in seq_along(ranks)) {
-			    end <- start + ranks[r] - 1L
-			    out[[r]] <- X[, start:end, drop = FALSE]
-			    start <- end + 1L
-			  }
-			  return(out)
+					X <- create_X(stap_terms[i],stap_components[i],jd[[i]]$jags.data$X,benvo,jd[[1]]$pregam$term.names)
+					return(X)
 			})
-			if (any(sapply(S, length) > 1)) 
-			  S <- unlist(S, recursive = FALSE)
-			names(S) <- names(jd$pregam$sp)
-			for (s in seq_along(S)) {
-			  if (is.list(S[[s]])) 
-			    S[[s]] <- do.call(cbind, S[[s]])
-			}
-			return(S)
-		})
 	## always only one smooth because jagam called for each stap term
-	S <- lapply(1:length(jd),function(i) jd[[i]]$jags.data$S1) 
+	S <- lapply(1:length(jd),function(i){
+			s <- jd[[i]]$jags.data$S1 
+			if(!is.null(s))
+				return(s)
+			else
+				return(diag(ncol(jd[[i]]$jags.data$X)))
+			})
 	
 
 	
@@ -107,6 +87,7 @@ sstap_lm <- function(formula,
 						 ranges = lapply(jd,function(x) x$ranges),
 						 weights = weights,
 						 benvo = benvo,
+						 Xs = lapply(jd,function(x) x$jags.data$X),
 						 stap_terms = stap_terms,
 						 stap_components = stap_components,
 						 ind = sstapfit$ind,

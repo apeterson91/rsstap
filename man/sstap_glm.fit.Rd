@@ -15,6 +15,8 @@ sstap_glm.fit(y, Z, X, S, w = NULL, ...)
 
 \item{S}{list of Smooth penalty/precision matrices}
 
+\item{w}{vector of weights to apply to likelihood}
+
 \item{...}{arguments for stan sampler}
 }
 \description{

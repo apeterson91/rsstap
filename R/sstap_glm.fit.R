@@ -19,6 +19,7 @@
 #' @param Z matrix of subject level covariates
 #' @param X list of Smooth design matrices
 #' @param S list of Smooth penalty/precision matrices
+#' @param w vector of weights to apply to likelihood
 #' @param ... arguments for stan sampler
 #' 
 sstap_glm.fit <- function(y,
@@ -33,10 +34,10 @@ sstap_glm.fit <- function(y,
 	
 	K_smooth <- max(purrr::map_dbl(S,ncol))
 	num_stap <- length(X)
-	stap_penalties <- purrr::map_dbl(X,function(x) length(x))
+	stap_penalties <- purrr::map2_dbl(X,S,function(x,s) ncol(s)/ncol(x))
 	num_stap_penalties <- sum(stap_penalties)
-	X <- purrr::map(X,function(x) do.call(cbind,x))
 	stap_lengths <- purrr::map_dbl(X,function(x) ncol(x))
+	X <- do.call(cbind,X)
 	ncol_smooth <- sum(stap_lengths)
 	pen_ix <- matrix(0,nrow=num_stap_penalties,ncol=2)
 	beta_ix <- matrix(0,nrow=num_stap,ncol=2)
@@ -65,7 +66,7 @@ sstap_glm.fit <- function(y,
 	  return(out)
 	})
 	)
-	X <- cbind(Z,Reduce(cbind,X))
+	X <- cbind(Z,X)
 	qrc <- qr(X)
 	Q <- qr.Q(qrc)
 	R <- qr.R(qrc)

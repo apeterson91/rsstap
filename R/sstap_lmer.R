@@ -27,26 +27,10 @@ sstap_lmer <- function(formula,
 					 weights = NULL,
 					 ...){
 
-  call <- match.call(expand.dots = TRUE)
-  mf <- rbenvo::subject_design(benvo,formula)
+	call <- match.call(expand.dots = TRUE)
 
-  S_Xs <- lapply(stap_terms,function(x) smooth_matrix(benvo,x))
-	
-	sstapfit <- sstap_glm.fit(y = mf$y, 
-							 Z = mf$X,
-							 S_Xs = S_Xs,
-							 w = weights)
-	
-	fit <- sstapreg(
-	                list(stapfit = sstapfit,
-	                     mf = mf,
-						 weights = weights,
-	                     S_Xs = S_Xs,
-	                     benvo = benvo,
-	                     stap_terms = stap_terms,
-	                     call = call
-	                     )
-	                )
-	return(fit)
+	fit <- NULL
+
+return(fit)
 
 }

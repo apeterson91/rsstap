@@ -4,10 +4,18 @@
 \alias{plot.sstapreg}
 \title{Plot Spline Spatial Temporal Aggregated Predictors}
 \usage{
-\method{plot}{sstapreg}(x, stap_term = NULL, component = NULL)
+\method{plot}{sstapreg}(x, stap_term = NULL, component = NULL, ...)
 }
 \arguments{
 \item{x}{sstapreg object}
+
+\item{stap_term}{optional string for name of BEF smooth function to plot. 
+Alternatively plots first BEF smooth function}
+
+\item{component}{one of c("Distance","Time","Distance-Time") 
+corresponding to the smooth function domain}
+
+\item{...}{ignored}
 }
 \description{
 Plot Spline Spatial Temporal Aggregated Predictors

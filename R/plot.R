@@ -4,9 +4,15 @@
 #'
 #' @export
 #' @param x sstapreg object
+#' @param stap_term optional string for name of BEF smooth function to plot. 
+#' Alternatively plots first BEF smooth function 
+#' @param component one of c("Distance","Time","Distance-Time") 
+#' corresponding to the smooth function domain
+#' @param ... ignored
 #' 
-plot.sstapreg <- function(x,stap_term = NULL,component = NULL){
+plot.sstapreg <- function(x,stap_term = NULL,component = NULL,...){
 
+		Distance <- Time <- Median <- Grid <- Lower <- Upper <-  NULL
 	if(is.null(stap_term)){
 		ix <- 1
 		stap_term <- x$stap_terms[ix]
@@ -21,13 +27,16 @@ plot.sstapreg <- function(x,stap_term = NULL,component = NULL){
 	else
 		stop("stap_term must be NULL or one of the stap terms in the model object")
 	bef <- x$model$smooths[[ix]][[1]]
-	if(x$stap_components[1] == "Distance") 
+	if(component == "Distance") 
 		gd <- data.frame(Distance = seq(from = floor(x$ranges[[ix]]$Distance[1]), to = ceiling(x$ranges[[ix]]$Distance[2]), by =0.01))
-	else if(x$stap_components[1] == "Time") 
+	else if(component == "Time") 
 		gd <- data.frame(Time = seq(from = floor(x$ranges[[ix]]$Time[1]), to = ceiling(x$ranges[[ix]]$Time[2]), by =0.01))
-	else if(x$stan_components[1] == "Distance-Time")
-		gd <- data.frame(Distance = seq(from = floor(bef$ranges[[ix]]$Distance[1]), to = ceiling(bef$ranges[[ix]]$Distance[2]), by =0.01),
-						 Time = seq(from = floor(bef$ranges[[ix]]$Time[1]), to = ceiling(bef$ranges[[ix]]$Time[2]), by =0.01))
+	else if(component == "Distance-Time"){
+		gd <- expand.grid(Distance = seq(from = floor(x$ranges[[ix]]$Distance[1]), to = ceiling(x$ranges[[ix]]$Distance[2]), by=0.01),
+						  Time = seq(from = floor(x$ranges[[ix]]$Time[1]), to = ceiling(x$ranges[[ix]]$Time[2]), by=0.01))
+		gd <- as.data.frame(gd)
+	}
+		
 
 	mat <- mgcv::Predict.matrix(bef,gd)
 
@@ -36,25 +45,93 @@ plot.sstapreg <- function(x,stap_term = NULL,component = NULL){
 	beta <- beta[,betas]
 	beta <- beta[,x$ind[[ix]]]
 	eta <- tcrossprod(mat,beta)
-	dplyr::tibble(Grid = gd[,1],
-				  Lower = apply(eta,1,function(x) quantile(x,0.025)),
-				  Median = apply(eta,1,median),
-				  Upper = apply(eta,1,function(x) quantile(x,0.975))) -> pltdf
-
-	pltdf %>% ggplot2::ggplot(ggplot2::aes(x = Grid, y = Median )) + 
-		ggplot2::geom_line() + 
-		ggplot2::geom_ribbon(ggplot2::aes(ymin=Lower,ymax=Upper),alpha=0.3) + 
-		ggplot2::theme_bw() + ggplot2::geom_hline(ggplot2::aes(yintercept = 0),
-												  linetype=2,color='red') + 
-		ggplot2::xlab(component) + 
-		ggplot2::geom_rug(sides='b') + 
-		ggplot2::ylab("")
+	if(component %in% c("Distance","Time")){
+  	dplyr::tibble(Grid = gd[,1],
+  				  Lower = apply(eta,1,function(x) quantile(x,0.025)),
+  				  Median = apply(eta,1,median),
+  				  Upper = apply(eta,1,function(x) quantile(x,0.975))) -> pltdf
+  
+  	pltdf %>% ggplot2::ggplot(ggplot2::aes(x = Grid, y = Median )) + 
+  		ggplot2::geom_line() + 
+  		ggplot2::geom_ribbon(ggplot2::aes(ymin=Lower,ymax=Upper),alpha=0.3) + 
+  		ggplot2::theme_bw() + ggplot2::geom_hline(ggplot2::aes(yintercept = 0),
+  												  linetype=2,color='red') + 
+  		ggplot2::xlab(component) + 
+  		ggplot2::ylab("") ->pl
+	}else{
+	  dplyr::tibble(Distance = gd$Distance,
+	                Time = gd$Time,
+	                Median = apply(eta,1,median)) -> pltdf
+	  pltdf %>% ggplot2::ggplot(ggplot2::aes(x=Distance,y=Time,z=Median)) + 
+	    ggplot2::geom_contour()  ->pl
+	}
 	
+	return(pl)
+}
+
+
+#' 3D plots for rsstap models
+#'
+#' @export
+#' @keywords internal
+#' @param x sstapreg object
+#' @param stap_term string argument for which bef term to plot
+#'
+plot3D <- function(x,stap_term = NULL)
+	UseMethod("plot3D")
+
+#' 3D plot for sstapreg objects
+#'
+#' @describeIn 3Dplot
+#' @export 
+#' @param x sstapreg object
+#' @param stap_term string argument for which bef term to plot
+#'
+plot3D.sstapreg <- function(x,stap_term = NULL){
+
+	if(is.null(stap_term)){
+		ix <- which(x$stap_components == "Distance-Time")
+		stopifnot(length(ix)>0)
+		ix <- ix[1]
+		stap_term <- x$stap_terms[ix]
+		component <- x$stap_components[ix]
+		stopifnot(x$stap_components[ix] == component)
+		stopifnot(x$stap_term[ix] == stap_term)
+	}
+	else if(stap_term %in% x$stap_terms){
+		ix <- which(stap_term == x$stap_terms)
+		ix <- intersect(ix,which(x$stap_components==component))
+	}
+	bef <- x$model$smooths[[ix]][[1]]
+
+	gd <- expand.grid(Distance = seq(from = floor(x$ranges[[ix]]$Distance[1]), 
+									 to = ceiling(x$ranges[[ix]]$Distance[2]), by=0.01),
+					  Time = seq(from = floor(x$ranges[[ix]]$Time[1]),
+								 to = ceiling(x$ranges[[ix]]$Time[2]), by=0.01))
+	gd <- as.data.frame(gd)
+		
+
+	mat <- mgcv::Predict.matrix(bef,gd)
+
+	beta <- as.matrix(x$stapfit)
+	betas <- grep("beta",colnames(beta))
+	beta <- beta[,betas]
+	beta <- beta[,x$ind[[ix]]]
+	eta <- tcrossprod(mat,beta)
+  	dplyr::tibble(Distance = gd$Distance,
+				  Time = gd$Time,
+  				  Lower = apply(eta,1,function(x) quantile(x,0.025)),
+  				  Exposure = apply(eta,1,median),
+  				  Upper = apply(eta,1,function(x) quantile(x,0.975))) -> pltdf
+  
+	plotly::plot_ly(pltdf, x= ~Distance, y = ~Time, z = ~Exposure, trace="scatter3d",opacity=.7) -> pl
+	return(pl)
 }
 
 #' Posterior Predictive Checks 
 #'
 #' @export
+#' @keywords internal
 #' @param x a sstapreg object
 #' @param num_reps number of yhat samples to plot
 #'
@@ -75,7 +152,7 @@ ppc.sstapreg <- function(x,num_reps = 20){
 	yhats <- grep("yhat",colnames(yhatmat))
 	yhatmat <- yhatmat[samp,yhats]
 	pltdf <- suppressMessages(dplyr::as_tibble(yhatmat)) %>% dplyr::mutate(iteration_ix = 1:dplyr::n()) %>%
-						  tidyr::gather(contains('yhat'),key="Parameter",value="Samples") %>% 
+						  tidyr::gather(dplyr::contains('yhat'),key="Parameter",value="Samples") %>% 
 						  dplyr::mutate(Parameter = 'yrep')
 	pltdf <- rbind(pltdf,
 				   dplyr::tibble(iteration_ix = 0, Parameter='y',Samples= x$model$y ))
@@ -84,7 +161,7 @@ ppc.sstapreg <- function(x,num_reps = 20){
 		ggplot2::ggplot(ggplot2::aes(x=Samples,color=Parameter,group=iteration_ix)) + 
 		ggplot2::geom_density() + ggplot2::theme_bw()+ ggplot2::theme(legend.title=ggplot2::element_blank()) +   
 		ggplot2::scale_colour_manual(values=c("black","grey")) + 
-		xlab("y") + ylab("")
+		ggplot2::xlab("y") + ggplot2::ylab("")
 
 	return(p)
 }

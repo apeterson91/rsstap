@@ -29,31 +29,30 @@ data("example_benvo")
 
 # Introduction and Motivation
 
-The [`rstap` package](https://biostatistics4socialimpact.github.io/rstap) introduced Spatial Temporal Aggregated Predictor or STAP models, as a method by which the effect of [Built Environment](https://en.wikipedia.org/wiki/Built_environment) Features (BEFs) measured as a point pattern could be incorporated into pre-existing regression methods. The `rsstap` package builds on this framework by modifying the way in which the spatial temporal exposure effect is estimated *and* allows for incorporation of between BEF distances as a potential component of the model. The former allows for faster estimation of the spatio-temporal exposure effect while the latter identifies how the BEF effect could be augmented or weakened by being near other BEFs of similar or different types. 
+The [`rstap` package](https://biostatistics4socialimpact.github.io/rstap) introduced Spatial Temporal Aggregated Predictor or STAP models, as a method by which the effect of [Built Environment](https://en.wikipedia.org/wiki/Built_environment) Features (BEFs) measured as a point pattern could be incorporated into pre-existing regression methods. The `rsstap` package builds on this framework by modifying the way in which the spatial temporal exposure effect is estimated.
 
 # Model Specification
 
-Restricting our attention to only spatial exposure for the following illustrative example, the spatial aggregated predictor was modeled in the following manner in `rstap`:
+Restricting our attention to only spatial exposure for the following illustrative example, the spatial aggregated predictor both `rstap` and `rsstap` fit models of the following form:
 
 $$
-E[Y_i] = Z_i^{T}\delta + \beta X_i(\theta) \tag{1}\\
-X_i(\theta) = \sum_{d \in \mathcal{D}_i} \mathcal{K}_s(d,\theta)
+E[g(\mu_i)] = Z_i^{T}\delta + f(\mathcal{D}_i) \tag{1}\\
 $$
-While continuous outcome $Y_i$, and covariates $Z_i$ for subject $i=1,...,n$ are identified from a typical regression model, the covariate $X_i(\theta)$ novelly represented the $i$th subject's cumulative exposure across space. This was accomplished by incorporating distances, $d$ through a spatial exposure function $\mathcal{K}_s(d,\theta)$ - typically some exponential decay function, like $\exp(-\frac{d}{\theta})$ or $\exp(-(\frac{d}{\theta})^{\eta})$. Unfortunately, estimating this model through typical methods (e.g. MCMC) requires numerous evaluations of the kernel function summed across the, again typically numerous, distances in the set $\mathcal{D}_i$, of subject-BEF distances.
+While link function $g(\cdot)$, univariate mean $\mu_i$ and covariates $Z_i$ for subject $i=1,...,n$ are identified from a typical regression model, the function $f(\mathcal{D})$ novelly represents the $i$th subject's cumulative exposure across space. In `rstap` This was accomplished by incorporating distances, $d$ through a spatial exposure function $f(\mathcal{D}_i) = \sum_{d \in \mathcal{D}_i} \mathcal{K}_s(d,\theta)$ - typically some exponential decay function, like $\exp(-\frac{d}{\theta})$ or $\exp(-(\frac{d}{\theta})^{\eta})$. Unfortunately, estimating this model through typical methods (e.g. MCMC) requires numerous evaluations of the kernel function summed across the, again typically numerous, distances in the set $\mathcal{D}_i$, of subject-BEF distances.
 
-To remedy this situation, the `rsstap` package adopts a regression spline basis representation, $\phi(d)$, of the spatial exposure effect, removing the kernel and allowing for estimation on a sum of the function of the distances:
+To remedy this situation, the `rsstap` package adopts a regression spline basis representation, $f(d) = \sum_{j=0}^{J} \beta_j\phi_j(d)$, of the spatial exposure effect, removing the kernel and allowing for estimation on a sum of the function of the distances:
 
 $$
-E[Y_i] = Z_i^{T}\delta + \sum_{d \in \mathcal{D}_i}\beta_0 + \sum_{j=1}^{J}\beta_j\phi_j(d)\\
-E[Y_i] = Z_i^{T}\delta +   \sum_{j=1}^{J}\sum_{d \in \mathcal{D}_i}\beta_j\phi_j(d) \tag{2}
+E[Y_i] = Z_i^{T}\delta +   \sum_{j=0}^{J}\sum_{d \in \mathcal{D}_i}\beta_j\phi_j(d) \tag{2}
 $$
 
 Since the sum across distances, $\sum_{d\in \mathcal{D}_i} \phi_j(d)$ can be done prior to model fitting, standard methods (e.g. a bayesian equivalent to `mgcv::gam`) can be used, dramatically decreasing computational complexity. 
 
-We'll now demonstrate this model specification as implimented in the `rsstap` package using simulated data that only considers the direct effect of distances between subjects and proximal BEFs, saving the previously mentioned distances between BEFs for another vignette.
+## Illustration
+
+
 
 ```{r auxiliary,echo=F}
-options(mc.cores=4)
 truth <- geom_line(aes(x=x,y=y),
             ## True generating function
             data=tibble(x=seq(from=0,to=1,by=0.01),
@@ -64,9 +63,9 @@ truth <- geom_line(aes(x=x,y=y),
             color='red')
 ```
 
-```{r model_fit,message=F}
+```{r model_fit,message=F,results='hide'}
 fit <- sstap_lm(BMI ~ sex + sap(FFR),
-                example_benvo,cores = 4)
+                example_benvo)
 ```
 
 
@@ -78,7 +77,7 @@ plot(fit) + truth
 ppc(fit)
 ```
 
-## Longitudinal example
+## Longitudinal Spatio-Temporal example
 
 
 ```{r long_data,echo=F}
@@ -90,12 +89,12 @@ bdf2 <- longitudinal_HFS
 bdf2
 ```
 
-```{r}
+```{r,results='hide'}
 fit <- sstap_lm(BMI ~ sex + stap(HFS) ,benvo = bdf2)
 ```
 
 ```{r,echo=F}
-truth <- geom_line(aes(x=x,y=y),
+truth <- geom_contour(aes(x=x,y=y),
             ## True generating function
             data=tibble(x=seq(from=0,to=1,by=0.01),
                         y=-1*pweibull(seq(from=0,to=1,by=0.01),
@@ -105,24 +104,14 @@ truth <- geom_line(aes(x=x,y=y),
             color='red')
 ```
 
-```{r}
-plot(fit)  + truth
-```
-
-```{r,echo=F}
-truth <- geom_line(aes(x=x,y=y),
-            ## True generating function
-            data=tibble(x=seq(from=0,to=5,by=0.01),
-                        y=-1*pweibull(seq(from=0,to=5,by=0.01),
-                                     shape = 1,
-                                     scale = 1.3,
-                                     lower.tail = T)),
-            color='red')
+```{r,messages=F,warning=F}
+plot(fit)
 ```
 
 ```{r}
-plot(fit,"HFS","Time") + truth
+plot3D(fit)
 ```
+
 
 ```{r}
 ppc(fit)

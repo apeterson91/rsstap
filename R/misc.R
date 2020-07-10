@@ -76,7 +76,7 @@ get_stapless_formula <- function(f){
 
 	str <- purrr::map(stap_mat[,2],function(x) {
 	  switch(x,
-	         "Distance-Time"= "te(Distance, Time,bs='ps')",
+	         "Distance-Time"= "t2(Distance, Time,bs='ps')", ## change back to t2
 	         "Distance" = "s(Distance,bs='ps')",
 	         "Time"= "s(Time,bs='ps')")
 	  })
@@ -92,10 +92,18 @@ get_stapless_formula <- function(f){
 }
 
 
-create_X <- function(Z,S_Xs){
+create_X <- function(stap_term,stap_component,raw_X,benvo,lbls = NULL){
 
+	jndf <- rbenvo::joinvo(benvo,stap_term,stap_component,NA_to_zero = TRUE)
+	if(!benvo@longitudinal){
+		X <- as.matrix(Matrix::fac2sparse(jndf[,rbenvo::joining_ID(benvo)])) %*% raw_X
+	}else{
+	 jndf$RSSTAP_NEW_JOINING_ID <- apply(jndf[,rbenvo::joining_ID(benvo)],1,function(x) paste0(x[1],"_",x[2]))
+	 lvls <- unique(jndf$RSSTAP_NEW_JOINING_ID)
+	 X <- as.matrix(Matrix::fac2sparse(factor(jndf$RSSTAP_NEW_JOINING_ID,levels=lvls))) %*% raw_X
+	}
+	if(!is.null(lbls))
+		colnames(X) <- lbls 
 
-	SmoothX <- Reduce(cbind,lapply(S_Xs,function(x) x$X))
-	X <- cbind(Z,SmoothX)
-	
+	return(X)
 }
