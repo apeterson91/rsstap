@@ -10,6 +10,7 @@
 #' @param object sstapreg object
 #' @param ... Ignored
 #' 
+#' @importFrom stats coef nobs formula family
 #' @details The methods documented on this page are similar to the methods 
 #'   defined for objects of class 'lm', 'glm', 'glmer', etc. However there are a
 #'   few key differences:
@@ -38,14 +39,14 @@ NULL
 #' @rdname sstapreg-methods
 #' @export
 coef.sstapreg <- function(object, ...) {
- object$Z_coefs
+ object$coefficients
 }
 
 #' @rdname sstapreg-methods
 #' @export
 #'
 confint.sstapreg <- function(object, ...) {
-    stop("Please use posterior_interval() to obtain", 
+    stop("Please use posterior_interval() to obtain ", 
          "Bayesian interval estimates.", 
          call. = FALSE)
 }
@@ -61,6 +62,8 @@ fitted.sstapreg <- function(object, ...)
 #' 
 #' @export
 #' @keywords internal
+#' @param object a Fitted sstapreg model object
+#' @param ... argument to method
 #' @return Standard errors of model parameters.
 #' @seealso \code{\link{se.sstapreg}}
 #' 
@@ -70,6 +73,13 @@ se <- function(object, ...) UseMethod("se")
 #' @export
 se.sstapreg <- function(object, ...) {
   object$ses
+}
+
+
+#' @rdname sstapreg-methods
+#' @export
+nobs.sstapreg <- function(object, ...){
+	length(object$fitted.values)
 }
 
 
@@ -85,6 +95,35 @@ vcov.sstapreg <- function(object, correlation = FALSE, ...) {
   out <- object$covmat
   if (!correlation) return(out)
   cov2cor(out)
+}
+
+#' @rdname sstapreg-methods
+#' @export
+#' @export nsamples
+#' @importFrom rstantools nsamples
+nsamples.sstapreg <- function(object, ...) {
+  posterior_sample_size(object)
+}
+
+# Exported but doc kept internal ----------------------------------------------
+
+#' family method for sstapreg objects
+#' 
+#' @keywords internal
+#' @export 
+#' @param object,... See \code{\link[stats]{family}}
+family.sstapreg <- function(object,...) object$family
+
+
+
+#' Formula method for sstapreg objects
+#'
+#' @keywords internal
+#' @export
+#' @param x a sstapreg object
+#' @param ... ignored currently
+formula.sstapreg <- function(x,...){
+	x$formula
 }
 
 

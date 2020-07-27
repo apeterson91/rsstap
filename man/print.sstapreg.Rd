@@ -10,9 +10,10 @@
 \item{x}{sstapreg object}
 
 \item{digits}{number of digits to round to}
+
+\item{...}{ignored}
 }
 \description{
 The \code{print} method for stanreg objects displays a compact summary of the
-fitted model. See the \strong{Details} section below for descriptions of the
-different components of the printed output.
+fitted model.
 }

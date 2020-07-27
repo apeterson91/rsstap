@@ -6,6 +6,11 @@
 \usage{
 se(object, ...)
 }
+\arguments{
+\item{object}{a Fitted sstapreg model object}
+
+\item{...}{argument to method}
+}
 \value{
 Standard errors of model parameters.
 }

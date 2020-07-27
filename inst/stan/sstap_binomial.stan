@@ -1,8 +1,10 @@
-// GLM for a Gaussian outcome with smooth terms
+// GLM for a Binomial outcome with smooth terms
 functions {
 }
 data{ 
 	int<lower=1> N;
+	int<lower=1> num_trials[N];
+	int<lower=0> y[N];
 	int<lower=1> ncol_Z;
 	int<lower=1> ncol_smooth;
 	int<lower=1> K_smooth;
@@ -14,7 +16,6 @@ data{
 	int<lower=1> pen_ix[num_stap_penalties,2];
 	int<lower=1> beta_ix[num_stap,2];
 	int<lower=1> P;
-	vector[N] y;
 	matrix[N,P] Q;
 	matrix[P,P] R_inv;
 	matrix[ncol_smooth,K_smooth] S;
@@ -22,16 +23,15 @@ data{
 parameters{
 	vector[P] beta_tilde;
 	vector<lower=0>[num_stap_penalties] tau;
-	real<lower=0> sigma;
 }
 transformed parameters{
 	vector[P] beta = R_inv * beta_tilde;
 	vector[ncol_smooth] sstap_beta = beta[(ncol_Z+1):P];
+	vector[N] eta = Q * beta_tilde;
 }
 model{
-	sigma ~ cauchy(0,5);
 	tau ~ exponential(1);
-	y ~ normal( Q * beta_tilde ,sigma);
+	y ~ binomial_logit(num_trials,eta);
 
 
 	for(i in 1:num_stap){
@@ -46,6 +46,7 @@ model{
 
 }
 generated quantities {
-	vector[N] yhat =  Q * beta_tilde ;
+	int<lower=0> yhat[N];
 	vector[ncol_Z] delta = beta[1:ncol_Z];
+	yhat = binomial_rng(num_trials,exp(eta) ./ (1+exp(eta)));
 }

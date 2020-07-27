@@ -4,7 +4,7 @@
 # Prepare a list of arguments to use with \code{rstan::sampling} via
 # \code{do.call}.
 #
-# @param object The stanfit object to use for sampling.
+# @param object The sstapfit object to use for sampling.
 # @param user_dots The contents of \code{...} from the user's call to
 #   the \code{stan_*} modeling function.
 # @param user_adapt_delta The value for \code{adapt_delta} specified by the
@@ -38,23 +38,27 @@ get_stapless_formula <- function(f){
     
     with_bars <- f
     f <- lme4::nobars(f)
-    stap_ics <- which(all.names(f)%in% c("stap","stap_dnd_bar",
-                                         "stap_dnd","stap_bar_dnd"))
-    sap_ics <- which(all.names(f) %in% c("sap","sap_dnd_bar",
-                                         "sap_dnd","sap_bar_dnd"))
-    tap_ics <- which(all.names(f) %in% c("tap","tap_dnd_bar",
-                                         "tap_dnd","tap_bar_dnd"))
+	get_ics <- function(f,vec_var){
+		which(all.names(f) %in% vec_var)
+	}
+    stap_ics <- get_ics(f, c("stap","stap_bw"))
+    sap_ics <- get_ics(f,c("sap","sap_bw"))
+    tap_ics <- get_ics(f,c("tap","tap_bw"))
     if(!length(stap_ics) & !length(sap_ics) & !length(tap_ics))
         stop("No covariates designated as 'stap','sap',or 'tap'  in formula", .call = F)
     stap_nms <- all.names(f)[stap_ics + 1]
+	stap_bw <- (all.names(f)[stap_ics] %in% c("stap_bw"))*1
     sap_nms <- all.names(f)[sap_ics + 1]
+	sap_bw <- (all.names(f)[sap_ics] %in% c("sap_bw"))*1
     tap_nms <- all.names(f)[tap_ics + 1]
-	if(length(stap_nms)>0)
-		stap_nms <- cbind(stap_nms,"Distance-Time")
+	tap_bw <- (all.names(f)[tap_ics] %in% c("tap_bw"))*1
+	if(length(stap_nms)>0){
+		stap_nms <- cbind(stap_nms,"Distance-Time",stap_bw)
+	}
 	if(length(sap_nms)>0)
-		sap_nms <- cbind(sap_nms,"Distance")
+		sap_nms <- cbind(sap_nms,"Distance",sap_bw)
 	if(length(tap_nms)>0)
-		tap_nms <- cbind(tap_nms,"Time")
+		tap_nms <- cbind(tap_nms,"Time",tap_bw)
 
 	stap_mat <-rbind(stap_nms,sap_nms,tap_nms)
 
@@ -76,7 +80,7 @@ get_stapless_formula <- function(f){
 
 	str <- purrr::map(stap_mat[,2],function(x) {
 	  switch(x,
-	         "Distance-Time"= "t2(Distance, Time,bs='ps')", ## change back to t2
+	         "Distance-Time"= "t2(Distance,Time,bs='ps')", 
 	         "Distance" = "s(Distance,bs='ps')",
 	         "Time"= "s(Time,bs='ps')")
 	  })
@@ -92,18 +96,55 @@ get_stapless_formula <- function(f){
 }
 
 
-create_X <- function(stap_term,stap_component,raw_X,benvo,lbls = NULL){
+create_X <- function(stap_term,stap_component,calc_bw,raw_X,benvo,lbls = NULL){
 
-	jndf <- rbenvo::joinvo(benvo,stap_term,stap_component,NA_to_zero = TRUE)
-	if(!benvo@longitudinal){
-		X <- as.matrix(Matrix::fac2sparse(jndf[,rbenvo::joining_ID(benvo)])) %*% raw_X
-	}else{
-	 jndf$RSSTAP_NEW_JOINING_ID <- apply(jndf[,rbenvo::joining_ID(benvo)],1,function(x) paste0(x[1],"_",x[2]))
-	 lvls <- unique(jndf$RSSTAP_NEW_JOINING_ID)
-	 X <- as.matrix(Matrix::fac2sparse(factor(jndf$RSSTAP_NEW_JOINING_ID,levels=lvls))) %*% raw_X
-	}
+
+	X <- rbenvo::aggrenvo(benvo,raw_X,stap_term,stap_component)
 	if(!is.null(lbls))
 		colnames(X) <- lbls 
 
 	return(X)
 }
+# Get the posterior sample size
+#
+# @param x A stanreg object
+# @return the posterior sample size (or size of sample from approximate posterior)
+posterior_sample_size <- function(x) {
+  pss <- x$stapfit@sim$n_save
+  sum(pss - x$stapfit@sim$warmup2)
+}
+
+
+# Checks to see if benvo is longitudinal for _lm functions
+# Prints warning message accordingly
+#
+# @param x benvo
+# @return warning message if appropriate
+check_for_longitudinal_benvo <- function(benvo){
+	if(benvo@longitudinal){
+		warning("This Benvo was constructed with longitudinal data \n but sstap_lm does not adjust for within subject correlation. \n Be advised that parameter standard errors may be overoptimistic.")
+	}
+}
+
+# validates family is in list of reccomended families
+validate_family <- function(family){
+	if(!(family$family %in% c("gaussian","poisson","binomial")))
+		stop("family must be in one of c('gaussian','poisson','binomial')")
+	if(family$family =="gaussian" & family$link != "identity")
+		warning("Currently only identity link supported for gaussian family")
+	if(family$family =="binomial" & family$link != "logit")
+		warning("Currently only logit link supported for binomial family")
+	if(family$family =="poisson" & family$link != "log")
+		warning("Currently only log link supported for binomial family")
+}
+
+pick_stanmodel <- function(family){
+	if(family == "gaussian")
+		return(stanmodels$sstap_continuous)
+	else if(family == "binomial")
+		return(stanmodels$sstap_binomial)
+	else
+		return(stanmodels$sstap_count)
+}
+
+

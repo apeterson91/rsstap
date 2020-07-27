@@ -2,9 +2,12 @@
 % Please edit documentation in R/plot.R
 \name{plot3D}
 \alias{plot3D}
+\alias{plot3D.sstapreg}
 \title{3D plots for rsstap models}
 \usage{
 plot3D(x, stap_term = NULL)
+
+\method{plot3D}{sstapreg}(x, stap_term = NULL)
 }
 \arguments{
 \item{x}{sstapreg object}
@@ -14,4 +17,8 @@ plot3D(x, stap_term = NULL)
 \description{
 3D plots for rsstap models
 }
-\keyword{internal}
+\section{Methods (by class)}{
+\itemize{
+\item \code{sstapreg}: 3d stap plot
+}}
+

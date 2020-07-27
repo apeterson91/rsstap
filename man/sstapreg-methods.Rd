@@ -6,7 +6,9 @@
 \alias{confint.sstapreg}
 \alias{fitted.sstapreg}
 \alias{se.sstapreg}
+\alias{nobs.sstapreg}
 \alias{vcov.sstapreg}
+\alias{nsamples.sstapreg}
 \title{Methods for sstapreg objects}
 \usage{
 \method{coef}{sstapreg}(object, ...)
@@ -17,7 +19,11 @@
 
 \method{se}{sstapreg}(object, ...)
 
+\method{nobs}{sstapreg}(object, ...)
+
 \method{vcov}{sstapreg}(object, correlation = FALSE, ...)
+
+\method{nsamples}{sstapreg}(object, ...)
 }
 \arguments{
 \item{object}{sstapreg object}

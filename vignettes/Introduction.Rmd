@@ -10,15 +10,16 @@ vignette: >
   %\VignetteDepends{rbenvo}
 ---
 
-```{r, include = FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = T
 )
 ```
 
 
-```{r setup,message=F,results='hide'}
+```{r libraries,message=F,results='hide'}
 library(rsstap)
 library(rbenvo)
 library(dplyr)
@@ -43,7 +44,7 @@ While link function $g(\cdot)$, univariate mean $\mu_i$ and covariates $Z_i$ for
 To remedy this situation, the `rsstap` package adopts a regression spline basis representation, $f(d) = \sum_{j=0}^{J} \beta_j\phi_j(d)$, of the spatial exposure effect, removing the kernel and allowing for estimation on a sum of the function of the distances:
 
 $$
-E[Y_i] = Z_i^{T}\delta +   \sum_{j=0}^{J}\sum_{d \in \mathcal{D}_i}\beta_j\phi_j(d) \tag{2}
+E[g(\mu_i)] = Z_i^{T}\delta +   \sum_{j=0}^{J}\sum_{d \in \mathcal{D}_i}\beta_j\phi_j(d) \tag{2}
 $$
 
 Since the sum across distances, $\sum_{d\in \mathcal{D}_i} \phi_j(d)$ can be done prior to model fitting, standard methods (e.g. a bayesian equivalent to `mgcv::gam`) can be used, dramatically decreasing computational complexity. 
@@ -68,30 +69,53 @@ fit <- sstap_lm(BMI ~ sex + sap(FFR),
                 example_benvo)
 ```
 
+We'll examine the model fit by first looking at a print out summary of the model followed by the posterior predictive checks - a basic model check tool.
 
-```{r plot_results}
-plot(fit) + truth
+```{r printfit}
+fit
 ```
+
 
 ```{r ppcs}
 ppc(fit)
 ```
 
+Next we'll take a look at the spatial effect of one single FFR on the expected BMI of subjects as a function of space. We'll overlay the true function (since this is simulated data) in red on top.
+
+
+```{r plot_results}
+plot(fit) + truth
+```
+
+
+While the curves won't always be so well defined, this more or less defines the basics of fitting stap models using the spline implimentation via rsstap. The next section will go through the basics of spatial-temporal estimation *without* adjusting for within subject correlation.
+
+
 ## Longitudinal Spatio-Temporal example
 
+In this quick example, we'll briefly run through the same function calls as before, now using a longitudinal simulated dataset that contains both spatial and temporal data. Let's first load and look at the `longitudinal_HFS` data that comes with the `rsstap package`.
 
 ```{r long_data,echo=F}
 data("longitudinal_HFS")
 bdf2 <- longitudinal_HFS
 ```
 
-```{r}
+```{r bdf_print}
 bdf2
 ```
+
+Looks like this data contains 300 subjects with both distances and times measured for the subjects. In order to fit the same kind of model as before, but now taking into account both space and time, we'll use the `stap` designation in the model formula. This is equivalent to using the `t2` formula from `mgcv`.
 
 ```{r,results='hide'}
 fit <- sstap_lm(BMI ~ sex + stap(HFS) ,benvo = bdf2)
 ```
+
+We'll examine the posterior predictive checks first to verify that indeed the model can recover the true simulated parameters.
+
+```{r ppc_plot}
+ppc(fit)
+```
+
 
 ```{r,echo=F}
 truth <- geom_contour(aes(x=x,y=y),
@@ -104,15 +128,17 @@ truth <- geom_contour(aes(x=x,y=y),
             color='red')
 ```
 
+Then, onto the spatio-temporal effects. Calling the plot method on this fitted object will produce a contour plot. `rsstap` also provides a `plot3D` function via `plotly`'s graphics that can plot the surface in 3 dimensions.
+
 ```{r,messages=F,warning=F}
 plot(fit)
 ```
 
-```{r}
+```{r 3dplot}
 plot3D(fit)
 ```
 
+## Future work
 
-```{r}
-ppc(fit)
-```
+This concludes the introductory vignette. Future vignettes will elaborate on the spline implementation of spatial temporal aggregated predictors in a longitudinal context, wherein subject specific and between/within effects are estimated, network effects of BEFs and spatio-temporal interaction effects.
+

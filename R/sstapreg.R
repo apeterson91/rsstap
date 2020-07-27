@@ -36,7 +36,7 @@ sstapreg <- function(object){
     out <- list(
         coefficients = Z_coefs, 
         ses = ses,
-        fitted.values = apply(stanmat[,ynames],1,median),
+        fitted.values = apply(stanmat[,ynames],2,median),
         covmat = covmat,
         model = list(y=y,
                      Z=Z,
@@ -44,6 +44,7 @@ sstapreg <- function(object){
 					 Xs = object$Xs,
 					 benvo = object$benvo),
         formula = object$formula, 
+		family = object$family,
         stapfit = stapfit,
         stap_terms = stap_terms,
 		ind = object$ind,
@@ -51,9 +52,6 @@ sstapreg <- function(object){
 		stap_components = object$stap_components,
         rstan_version = utils::packageVersion("rstan"),
         call = object$call, 
-        # sometimes 'call' is no good (e.g. if using do.call(stap_glm, args)) so
-        # also include the name of the modeling function (for use when printing,
-        # etc.)
         stan_function = object$stan_function
       )
 	if(!is.null(object$weights))

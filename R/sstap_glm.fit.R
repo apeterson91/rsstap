@@ -10,26 +10,29 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#' Spline Spatial Temporal Aggregated Regression Linear Model Fit 
+#' Spline Spatial Temporal Aggregated Regression Generalized Linear Model Fit 
 #'
 #'
 #' @export
 #'
-#' @param y vector of outcomes
+#' @param y vector/matrix of outcomes
 #' @param Z matrix of subject level covariates
 #' @param X list of Smooth design matrices
 #' @param S list of Smooth penalty/precision matrices
-#' @param w vector of weights to apply to likelihood
+#' @param family One of \code{\link[stats]{family}}  currently gaussian, binomial and poisson are implimented with identity, logistic and  log links currently.
 #' @param ... arguments for stan sampler
 #' 
 sstap_glm.fit <- function(y,
 						  Z,
 						  X,
 						  S,
-						  w = NULL,
+						  family,
 						  ...){
   
-	N <- length(y)
+	if(is.matrix(y))
+		N <- nrow(y)
+	else
+		N <- length(y)
 	ncol_Z <- ncol(Z)
 	
 	K_smooth <- max(purrr::map_dbl(S,ncol))
@@ -41,19 +44,19 @@ sstap_glm.fit <- function(y,
 	ncol_smooth <- sum(stap_lengths)
 	pen_ix <- matrix(0,nrow=num_stap_penalties,ncol=2)
 	beta_ix <- matrix(0,nrow=num_stap,ncol=2)
-	stap_pen_map <- matrix(0,nrow=num_stap,ncol=num_stap_penalties)
+	stap_pen_map <- matrix(0,nrow=num_stap,ncol=max(stap_penalties))
 	startb <- 1
-	startp <- 1
 	cntr <- 1
 	for(i in 1:num_stap){
+	  startp <- 1
 	  end <- startb + stap_lengths[i] - 1L
 	  beta_ix[i,1] <- startb
 	  beta_ix[i,2] <- end
 	  startb <- beta_ix[1,2] + 1L
-	  for(j in 1:num_stap_penalties[i]){
+	  for(j in 1: stap_penalties[i]){
 	    stap_pen_map[i,j] <- cntr
 	    cntr <- cntr + 1
-	    ncol_S <- ncol(S[[i]])/num_stap_penalties[i]
+	    ncol_S <- ncol(S[[i]])/stap_penalties[i]
 	    end <- startp + ncol_S - 1L
 	    pen_ix[stap_pen_map[i,j],1] <- startp
 	    pen_ix[stap_pen_map[i,j],2] <- end
@@ -70,7 +73,7 @@ sstap_glm.fit <- function(y,
 	qrc <- qr(X)
 	Q <- qr.Q(qrc)
 	R <- qr.R(qrc)
-	R_inv <- solve(R)
+	R_inv <- qr.solve(qrc,Q)
 	P <- ncol(Q)
 
 		
@@ -83,22 +86,31 @@ sstap_glm.fit <- function(y,
                    stap_lengths = array(stap_lengths),
                    stap_penalties = array(stap_penalties),
                    num_stap_penalties = num_stap_penalties,
+                   stap_pen_map = stap_pen_map,
                    pen_ix = pen_ix,
                    beta_ix = beta_ix,
                    P = P,
                    y = y, 
                    Q = Q,
                    R_inv = R_inv)
+  if(is.matrix(y)){
+	  standata$y <- y[,1]
+	  standata$num_trials <- rowSums(y) 
+  }
 
   pars <- c(
 			"delta",
 			"sstap_beta",
-			"sigma",
+			if(family$family=="gaussian") "sigma",
 			"tau",
 			"yhat"
 		  )
 
-  stanfit <- stanmodels$sstap_continuous
+  stanfit <- pick_stanmodel(family$family)
+  if(family$family=="binomial" && !is.matrix(y)){
+	  standata$num_trials <- rep(1,N)
+  }
+
 
   sampling_args <- set_sampling_args(
 						object = stanfit,
@@ -114,7 +126,7 @@ sstap_glm.fit <- function(y,
 
   fit <- do.call(sampling,sampling_args)
 
-  ind <- lapply(1:nrow(beta_ix),function(x) beta_ix[i,1]:beta_ix[i,2] )
+  ind <- lapply(1:nrow(beta_ix),function(i) beta_ix[i,1]:beta_ix[i,2] )
   return(list (fit = fit, ind = ind))
 
 }

@@ -10,19 +10,24 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#' Spline Spatial Temporal Aggregated Regression Linear Model 
+#' Spline Spatial Temporal Aggregated Predictor General Linear Model 
 #'
 #'
 #' @export
 #'
-#' @param formula Similar as for \code{\link[stats]{lm}} with the addition of \code{stap},\code{sap} \code{tap} terms as needed
-#' @param benvo built environment object from the rbenvo package containing the relevant data
+#' @param formula Similar as for \code{\link[stats]{glm}} with the addition of \code{stap},\code{sap} \code{tap} terms as needed
+#' @param benvo built environment \code{\link[rbenvo]{Benvo}} object from the \code{rbenvo} package containing the relevant subject-BEF data
+#' @param family One of \code{\link[stats]{family}}  currently gaussian, binomial and poisson are implimented with identity, logistic and  log links currently.
+#' @param weights vector of positive integer weights 
 #' @param ... arguments for stan sampler
 #' 
-sstap_lm <- function(formula,
+sstap_glm <- function(formula,
 					  benvo,
+					  weights = NULL,
+					  family = gaussian(),
 					   ...){
   
+	validate_family(family)
 	foo <- get_stapless_formula(formula)
 	f <- foo$stapless_formula
 	call <- match.call(expand.dots = TRUE)
@@ -38,6 +43,7 @@ sstap_lm <- function(formula,
 	                                       data = rbenvo::joinvo(benvo,x,y,
 	                                                             NA_to_zero = TRUE), 
 	                                       file = tempfile(fileext = ".jags"), 
+	                                       weights = NULL, 
 	                                       offset = NULL,
 	                                       centred = FALSE,
 	                                       diagonalize = FALSE)
@@ -70,7 +76,7 @@ sstap_lm <- function(formula,
 	                          Z = mf$X,
 	                          X = X,
 	                          S = S,
-	                          family = gaussian(),
+							  family = family,
 	                          ...
 	                          )
 	
@@ -79,14 +85,15 @@ sstap_lm <- function(formula,
 						 mf = mf,
 						 smooths = lapply(jd,function(x) x$pregam$smooth),
 						 ranges = lapply(jd,function(x) x$ranges),
+						 weights = weights,
 						 benvo = benvo,
 						 Xs = lapply(jd,function(x) x$jags.data$X),
 						 stap_terms = stap_terms,
 						 stap_components = stap_components,
 						 ind = sstapfit$ind,
 						 call = call,
-						 formula = formula,
-						 family = gaussian()
+						 formula=formula,
+						 family = family
 					 )
 					)
 

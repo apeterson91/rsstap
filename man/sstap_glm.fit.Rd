@@ -2,12 +2,12 @@
 % Please edit documentation in R/sstap_glm.fit.R
 \name{sstap_glm.fit}
 \alias{sstap_glm.fit}
-\title{Spline Spatial Temporal Aggregated Regression Linear Model Fit}
+\title{Spline Spatial Temporal Aggregated Regression Generalized Linear Model Fit}
 \usage{
-sstap_glm.fit(y, Z, X, S, w = NULL, ...)
+sstap_glm.fit(y, Z, X, S, family, ...)
 }
 \arguments{
-\item{y}{vector of outcomes}
+\item{y}{vector/matrix of outcomes}
 
 \item{Z}{matrix of subject level covariates}
 
@@ -15,10 +15,10 @@ sstap_glm.fit(y, Z, X, S, w = NULL, ...)
 
 \item{S}{list of Smooth penalty/precision matrices}
 
-\item{w}{vector of weights to apply to likelihood}
+\item{family}{One of \code{\link[stats]{family}}  currently gaussian, binomial and poisson are implimented with identity, logistic and  log links currently.}
 
 \item{...}{arguments for stan sampler}
 }
 \description{
-Spline Spatial Temporal Aggregated Regression Linear Model Fit
+Spline Spatial Temporal Aggregated Regression Generalized Linear Model Fit
 }

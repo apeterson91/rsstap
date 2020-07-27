@@ -73,25 +73,22 @@ plot.sstapreg <- function(x,stap_term = NULL,component = NULL,...){
 #' 3D plots for rsstap models
 #'
 #' @export
-#' @keywords internal
 #' @param x sstapreg object
 #' @param stap_term string argument for which bef term to plot
 #'
 plot3D <- function(x,stap_term = NULL)
 	UseMethod("plot3D")
 
-#' 3D plot for sstapreg objects
 #'
-#' @describeIn 3Dplot
+#' @describeIn plot3D 3d stap plot
 #' @export 
-#' @param x sstapreg object
-#' @param stap_term string argument for which bef term to plot
 #'
 plot3D.sstapreg <- function(x,stap_term = NULL){
 
 	if(is.null(stap_term)){
 		ix <- which(x$stap_components == "Distance-Time")
-		stopifnot(length(ix)>0)
+		if(length(ix)<=0)
+			stop("No Tensor-Spatial Temporal Terms included in Model")
 		ix <- ix[1]
 		stap_term <- x$stap_terms[ix]
 		component <- x$stap_components[ix]
@@ -101,6 +98,8 @@ plot3D.sstapreg <- function(x,stap_term = NULL){
 	else if(stap_term %in% x$stap_terms){
 		ix <- which(stap_term == x$stap_terms)
 		ix <- intersect(ix,which(x$stap_components==component))
+		if(length(ix)<=0)
+			stop("No Tensor-Spatial Temporal Terms included in Model")
 	}
 	bef <- x$model$smooths[[ix]][[1]]
 
@@ -124,7 +123,10 @@ plot3D.sstapreg <- function(x,stap_term = NULL){
   				  Exposure = apply(eta,1,median),
   				  Upper = apply(eta,1,function(x) quantile(x,0.975))) -> pltdf
   
-	plotly::plot_ly(pltdf, x= ~Distance, y = ~Time, z = ~Exposure, trace="scatter3d",opacity=.7) -> pl
+	pl <- plotly::plot_ly(pltdf,x = ~Distance, y = ~Time, z = ~Exposure,
+						  mode = "markers", 
+						  type='scatter3d') 
+
 	return(pl)
 }
 
@@ -154,8 +156,13 @@ ppc.sstapreg <- function(x,num_reps = 20){
 	pltdf <- suppressMessages(dplyr::as_tibble(yhatmat)) %>% dplyr::mutate(iteration_ix = 1:dplyr::n()) %>%
 						  tidyr::gather(dplyr::contains('yhat'),key="Parameter",value="Samples") %>% 
 						  dplyr::mutate(Parameter = 'yrep')
+	if(is.matrix(x$model$y))
+	  y <- x$model$y[,1]
+	else
+	  y <- x$model$y
+	
 	pltdf <- rbind(pltdf,
-				   dplyr::tibble(iteration_ix = 0, Parameter='y',Samples= x$model$y ))
+				   dplyr::tibble(iteration_ix = 0, Parameter='y',Samples= y ))
 	
 	p <- pltdf %>% 
 		ggplot2::ggplot(ggplot2::aes(x=Samples,color=Parameter,group=iteration_ix)) + 

@@ -4,14 +4,12 @@
 \alias{sstap_lm}
 \title{Spline Spatial Temporal Aggregated Regression Linear Model}
 \usage{
-sstap_lm(formula, benvo, weights = NULL, ...)
+sstap_lm(formula, benvo, ...)
 }
 \arguments{
 \item{formula}{Similar as for \code{\link[stats]{lm}} with the addition of \code{stap},\code{sap} \code{tap} terms as needed}
 
 \item{benvo}{built environment object from the rbenvo package containing the relevant data}
-
-\item{weights}{vector of positive integer weights}
 
 \item{...}{arguments for stan sampler}
 }
