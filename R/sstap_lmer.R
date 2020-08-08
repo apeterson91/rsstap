@@ -1,36 +1,59 @@
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 3 # of the License, or (at your option) any later version.
+# This software is part of the rsstap package
+# Copyright (C) 2020 Adam Peterson
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#' Spline Spatial Temporal Aggregated Regression Model for Longitudinal Data 
+#' Spline Spatial Temporal Aggregated Mixed Effects Regression Model 
 #'
 #'
 #' @export
 #'
 #' @param formula Similar as for \code{\link[lme4]{glmer}}. 
-#' @param stap_terms list of BEF terms
 #' @param benvo built environment object from the rbenvo package containing the relevant data
-#' @param weights vector of positive integer weights 
-#' @param ... arguments for stan sampler
+#' @param ... optional arguments for stan sampler
 #' 
 sstap_lmer <- function(formula,
-					 stap_terms,
-					 benvo,
-					 weights = NULL,
-					 ...){
+					   benvo,
+					   ...){
 
 	call <- match.call(expand.dots = TRUE)
+	spec <- get_sstapspec(formula,benvo)
+	f <- spec$stapless_formula
+	mf <- rbenvo::longitudinal_design(benvo,f)
+	
+	sstapfit <- sstap_glm.fit(
+	                          y = mf$y, 
+	                          Z = mf$X,
+	                          X = spec$X,
+	                          S = spec$S,
+	                          family = gaussian(),
+	                          group = mf$glmod$reTrms,
+							  ...
+	                          )
 
-	fit <- NULL
+	fit <- sstapreg(
+					list(stapfit = sstapfit,
+						 mf = mf,
+						 benvo = benvo,
+						 specification = spec,
+						 call = call,
+						 glmod = mf$glmod,
+						 formula = formula,
+						 family = gaussian()
+					 )
+					)
 
-return(fit)
 
+	return(fit)
 }

@@ -12,7 +12,7 @@ plot3D(x, stap_term = NULL)
 \arguments{
 \item{x}{sstapreg object}
 
-\item{stap_term}{string argument for which bef term to plot}
+\item{stap_term}{string argument for which \code{stap()} bef term to plot}
 }
 \description{
 3D plots for rsstap models

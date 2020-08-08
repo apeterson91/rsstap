@@ -4,7 +4,7 @@
 \alias{sstap_glm.fit}
 \title{Spline Spatial Temporal Aggregated Regression Generalized Linear Model Fit}
 \usage{
-sstap_glm.fit(y, Z, X, S, family, ...)
+sstap_glm.fit(y, Z, X, S, family, group = list(), ...)
 }
 \arguments{
 \item{y}{vector/matrix of outcomes}
@@ -16,6 +16,10 @@ sstap_glm.fit(y, Z, X, S, family, ...)
 \item{S}{list of Smooth penalty/precision matrices}
 
 \item{family}{One of \code{\link[stats]{family}}  currently gaussian, binomial and poisson are implimented with identity, logistic and  log links currently.}
+
+\item{group}{A list, possibly of length zero (the default), but otherwise
+having the structure of that produced by \code{\link[lme4]{mkReTrms}} to
+indicate the group-specific part of the model.}
 
 \item{...}{arguments for stan sampler}
 }

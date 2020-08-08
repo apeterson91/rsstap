@@ -1,0 +1,183 @@
+---
+title: "Longitudinal Models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Longitudinal Models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+references:
+- id: kalbfleisch
+  title: Between-and within-cluster covariate effects in the analysis of clustered data
+  author:
+  - family: Nehaus
+    given: John
+  - family: Kalbfleisch
+    given: Jack
+  container-title: Biometrics
+  DOI: 10.2307/3109770
+  publisher: JSTOR
+  page: 638--645
+  type: article-journal
+  issued:
+    year: 1998
+    month: 6
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = T
+)
+```
+
+
+
+# Motivation
+
+In the `rsstap` Introductory [vignette](https://apeterson91.github.io/rsstap/articles/Introduction.html), we introduced the STAP formulation of models implimented using splines 
+and demonstrated how the `rsstap` package uses [`rstan`](https://mc-stan.org/users/interfaces/rstan) and [`mgcv`](https://cran.r-project.org/web/packages/mgcv/index.html) to fit these models in a context where observations are modeled independent of one another. 
+In this vignette I'll introduce the longitudinal modeling framework in `rsstap` that incorporates the familiar [`lme4`](https://github.com/lme4/lme4) model formula syntax in addition to 
+the between-within decomposition parameterization and syntax used to estimate between-within subject effect estimates of built environment exposure.
+
+##  Simple Model
+
+We'll start by loading the relevant libraries and examining the included longitudinal dataset which consists of measurements on subjects "BMI" (outcome) as a function of simulated nearby "healthy food stores" (HFS) over time, similar to the longitudinal data used in the Introductory vignette:
+
+```{r setup}
+library(rbenvo)
+library(rsstap)
+```
+
+```{r datasetup,echo=F}
+data(complex_longitudinal)
+bdf <- complex_longitudinal
+```
+
+```{r,bdf_descriptive}
+bdf
+```
+Looking at descriptives of this exposure over time, we can see that there is a meaningful change in the number of distances across the measurement visits. (Foreshadowing)  This will be an important fact to consider in our modeling approach going forward.
+```{r bdf_descriptive2}
+bef_summary(bdf)
+```
+
+
+We'll fit this model using the included sex and year information, modeling the spatial temporal exposure to HFS' through a tensor spline basis function expansion and two subject specific terms accounting for within subject outcome correlation. 
+
+
+$$
+E[BMI_{ij}|b_{i1},b_{i2}] = \alpha + I(Female_i)\delta_1 + (\text{year}_{ij})\delta_2 + f(\text{HFS Exposure}_{ij}) + b_{i1} + (\text{year}_{ij})b_{i2} \\\quad i = 1,...,N ; j= 1,...,n_i,
+$$
+Where
+$$
+(b_{i1},b_{i2}) = \mathbf{b}_i \sim N(0,\Sigma),
+$$
+
+akin to the standard formulation as in the `lme4` package and 
+
+$$
+f(\text{HFS Exposure}_i) = \sum_{l=1}^{L}\sum_{(d,t) \in\mathcal{S}} \beta_l\phi_l(d,t),
+$$
+
+with $\phi_l(\cdot)$ the basis function evaluation.
+
+In order to fit this model in `rsstap` we can use the code below, setting the optional sampler arguments for `stan` similar to how was demonstrated in the Introductory vignette.
+
+
+```{r model_fit1,message=F,results='hide',warning=FALSE}
+fit <- sstap_lmer(BMI ~ sex + year + stap(HFS) + (year|ID), benvo = bdf)
+```
+
+Examining the model output, we'll first print the model quick summary followed by a graph of the posterior predictive checks to check model fit.
+
+```{r modelfit1print}
+fit
+```
+
+
+```{r modelfit1ppc}
+ppc(fit)
+```
+
+Finally we'll look at a 3d plot and 2d plot cross sections of the HFS effect across space and time. This will allow us
+to establish whether there is any effect at all, and what it looks like (as a median estimate).
+
+```{r modelfit1_3dplot,warning=F}
+plot3D(fit)
+```
+
+```{r xsection1}
+plot_xsection(fit,fixed_val=5)
+```
+
+```{r xsection2}
+plot_xsection(fit,component = "Time",fixed_val=0)
+```
+
+The model ran and converged successfully and the output looks meaningfully interesting! But there's something important we forgot to take into account: With time-varying covariates, such as age, income, etc. It is important to *decompose* the measure into the baseline or between-subject effect and the change, or within-subject effect. Failing to do so can result in bias![@kalbfleisch]
+
+## Between-Within Decomposition, Interpretation
+
+There are a number of ways this decomposition could be be obtained. In the `rsstap` model the decomposition takes the following form (keeping all other components the same as in the previous model):
+
+$$
+E[BMI_{ij}|b_{i1},b_{i2}] = \alpha + I(Female_i)\delta_1 + (\text{year}_{ij})\delta_2 + \Delta f(\text{HFS Exposure}_{ij}) + \bar{f}(\text{HFS Exposure}_{i}) + b_{i1} + (\text{year}_{ij})b_{i2} \\\quad i = 1,...,N ; j= 1,...,n_i,
+$$
+Where
+$$
+\bar{f}(HFS_i) = \sum_{j=1}^{n_i} \sum_{(d,t) \in \mathcal{S}} \sum_{l=1}^{L} \beta_l \phi_l(d,t)\\
+\Delta f(HFS_i) = \sum_{(d,t) \in \mathcal{S}} \sum_{l=1}^{L} \beta_l \phi_l(d,t) - \bar{f}(HFS_i). \\
+$$
+
+ This allows our spatial-temporal effect estimate of HFS exposure to be separated into an *average* exposure (between subject) effect  and a *deviation* from average (within subject) effect. The latter of these two is a difference in difference estimator, which - through its differencing - controls for unobserved time-invariant confounders. If we included the relevant time varying confounders in our model, e.g. Age, income, education, etc. and the usual causal inference identifiability conditions hold, then our estimate $\Delta f(\cdot)$ has  a causal interpretation!
+ 
+ We'll fit this model below, using the `rsstap` syntax that requires a `_bw` after the usual `stap`,`sap`, or `tap` function designation and running the same model diagnostics as before.
+
+
+```{r model_fit2,message=F,results='hide',warning=FALSE}
+bw_fit <- sstap_lmer(BMI ~ sex + stap_bw(HFS) + (year|ID), benvo = bdf)
+```
+
+
+```{r bw_ppc}
+ppc(bw_fit)
+```
+
+Now that we're estimating two effects, we can look at two different 3D plots of the HFS effect. These are contained in a list from the `plot3D` output, labeled intuitively as you'll see.
+
+```{r plotcall,warning=F}
+plts <- plot3D(bw_fit)
+```
+
+```{r plotbetween}
+plts$Between
+```
+
+In the between-subject effect plot, we see that for an increase in average exposure to HFS', we would expect an appreciable decrease in the average BMI.
+
+```{r plotwithin}
+plts$Within
+```
+
+In the above plot, we can see that for changes in an individual subject's average exposure to HFS, their BMI decreases - not as much as it does for an average increase in exposure, as in the previous plot, but a negative effect all the same.
+
+Similarly, and perhaps more easily to visualize, we can plot cross sections of the functions, fixing the maximum (minimum) time (distance) and plotting the corresponding spatial (temporal) function.
+
+```{r xsections1}
+plot_xsection(bw_fit,fixed_val=5)
+```
+
+```{r xsections2}
+plot_xsection(bw_fit,component="Time",fixed_val=0)
+```
+
+As all these plots show, we observe two, *different* effects from HFS exposure over time! In a real world scenario this difference will be important for the substantive understanding of the HFS impact on subject health.
+
+
+## Summary
+
+In summary, a scientist interested in examine the built environment needs longitudinal data gathered over time to really get a greater sense of whether or not exposure to the built environment feature (BEF) of interest has any meaningful effect on subjects' health. In constructing those models it is important to do so with a decomposition of the non-linear BEF exposure effect into between-within components, both to avoid bias and improve understanding!
+
+
+# References 

@@ -20,13 +20,18 @@
 #' @param X list of Smooth design matrices
 #' @param S list of Smooth penalty/precision matrices
 #' @param family One of \code{\link[stats]{family}}  currently gaussian, binomial and poisson are implimented with identity, logistic and  log links currently.
+#' @param group A list, possibly of length zero (the default), but otherwise
+#'   having the structure of that produced by \code{\link[lme4]{mkReTrms}} to
+#'   indicate the group-specific part of the model. 
 #' @param ... arguments for stan sampler
+#' @importFrom Matrix t
 #' 
 sstap_glm.fit <- function(y,
 						  Z,
 						  X,
 						  S,
 						  family,
+						  group = list(),
 						  ...){
   
 	if(is.matrix(y))
@@ -75,9 +80,6 @@ sstap_glm.fit <- function(y,
 	R <- qr.R(qrc)
 	R_inv <- qr.solve(qrc,Q)
 	P <- ncol(Q)
-
-		
-
   
   standata <- list(N = N,
                    ncol_Z = ncol_Z,
@@ -98,13 +100,67 @@ sstap_glm.fit <- function(y,
 	  standata$num_trials <- rowSums(y) 
   }
 
+  if(length(group)){
+	## Code in this section has been largely adapted from
+	## the rstanarm package. See github.com/stan-dev/rstanarm for more.
+    check_reTrms(group)                                 
+	Z <- t(group$Zt)                                     
+	group <-
+		pad_reTrms(Ztlist = group$Ztlist,
+				   cnms = group$cnms,
+				   flist = group$flist)
+	Z <- group$Z
+	p <- sapply(group$cnms,FUN = length)
+	l <- sapply(attr(group$flist,"assign"), function(i) nlevels(group$flist[[i]]))
+	t <- length(l)
+	b_nms <- make_b_nms(group)
+	g_nms <- unlist(lapply(1:t, FUN = function(i) {
+				paste(group$cnms[[i]], names(group$cnms[i]), sep = "|")
+	}))
+	standata$t <- t
+	standata$p <- as.array(p)
+	standata$l <- as.array(l)
+	standata$q <- ncol(Z)
+	standata$len_theta_L <- sum(choose(p,2),p)
+	parts <- rstan::extract_sparse_parts(Z)
+	standata$num_non_zero <- length(parts$w)
+	standata$w <- parts$w
+	standata$v <- parts$v 
+	standata$u <- parts$u
+	standata$shape <- as.array(maybe_broadcast(1,t))
+	standata$scale <- as.array(maybe_broadcast(1, t))
+	standata$len_concentration <- sum(p[p > 1])
+	standata$concentration <-as.array(maybe_broadcast(1,sum(p[p > 1])))
+    standata$len_regularization <- sum(p > 1)
+	standata$regularization <- as.array(maybe_broadcast(1,sum(p>1)))
+	standata$special_case <- all(sapply(group$cnms, FUN = function(x) {length(x) == 1 && x == "(Intercept)"}))
+  }else{
+    standata$num_non_zero <- 0L
+	standata$w <- double(0)
+	standata$v <- integer(0)
+	standata$u <- integer(0)
+    standata$t <- 0L
+    standata$p <- integer(0)
+    standata$l <- integer(0)
+    standata$q <- 0L
+    standata$len_theta_L <- 0L
+    standata$special_case <- 0L
+    standata$shape <- standata$scale <- standata$concentration <-
+      standata$regularization <- rep(0, 0)
+    standata$len_concentration <- 0L
+    standata$len_regularization <- 0L
+  }
+
+
   pars <- c(
-			"delta",
+			"delta_coef",
 			"sstap_beta",
 			if(family$family=="gaussian") "sigma",
 			"tau",
+			if(length(group)) "b",
+		    if(standata$len_theta_L) "theta_L",
 			"yhat"
-		  )
+			)
 
   stanfit <- pick_stanmodel(family$family)
   if(family$family=="binomial" && !is.matrix(y)){
@@ -114,7 +170,7 @@ sstap_glm.fit <- function(y,
 
   sampling_args <- set_sampling_args(
 						object = stanfit,
-						control = list(adapt_delta = 0.8,
+						control = list(adapt_delta = 0.85,
 						               max_treedepth = 10),
 						pars = pars,
 						data = standata,
@@ -124,9 +180,108 @@ sstap_glm.fit <- function(y,
 						) 
 
 
-  fit <- do.call(sampling,sampling_args)
+	fit <- do.call(sampling,sampling_args)
 
-  ind <- lapply(1:nrow(beta_ix),function(i) beta_ix[i,1]:beta_ix[i,2] )
-  return(list (fit = fit, ind = ind))
+	if(standata$len_theta_L){
+		thetas_ref <- rstan::extract(fit,
+									 pars = "theta_L", 
+									 inc_warmup = FALSE,
+									 permuted = FALSE)
+		cnms <- group$cnms
+		nc <- sapply(cnms, FUN = length)
+		nms <- names(cnms)
+		Sigma <- apply(thetas_ref, 1:2, FUN = function(theta) {
+						   Sigma <- lme4::mkVarCorr(sc = 1, cnms, nc, theta, nms)
+						   unlist(sapply(Sigma, simplify = FALSE,
+										 FUN = function(x) x[lower.tri(x,TRUE)]))
+							  })
+		l <- length(dim(Sigma))
+		end <- utils::tail(dim(Sigma), 1L)
+		shift <- grep("^theta_L", names(fit@sim$samples[[1]]))[1] - 1L
+		if(l==3) for (chain in 1:end) for (param in 1:nrow(Sigma)) {
+			fit@sim$samples[[chain]][[shift + param]] <- Sigma[param, , chain]
+		}
+		else for (chain in 1:end) {
+			fit@sim$samples[[chain]][[shift + 1]] <- Sigma[, chain]
+		}
+		Sigma_nms <- lapply(cnms, FUN = function(grp) {
+								nm <- outer(grp, grp, FUN = paste, sep = ",")
+								nm[lower.tri (nm , diag = TRUE)]
+							  })
+		for(j in seq_along(Sigma_nms)){
+			Sigma_nms[[j]] <- paste0(nms[j], ":", Sigma_nms[[j]])
+		}
+		Sigma_nms <- unlist(Sigma_nms)
+	}
 
+	new_names <- c(colnames(X),
+					if(family$family=="gaussian") "sigma",
+					Reduce(c,sapply(stap_penalties,function(x) paste0("smooth_precision[",1:x,"]"))),
+                   if (length(group) && length(group$flist)) c(paste0("b[", b_nms, "]")),
+                   if (standata$len_theta_L) paste0("Sigma[", Sigma_nms, "]"),
+				   paste0("yhat[",1:N,"]"),
+				   "log-posterior"
+					)
+
+    fit@sim$fnames_oi <- new_names
+
+
+  return(fit)
+
+}
+
+make_b_nms <- function(group, m = NULL, stub = "Long") {
+  group_nms <- names(group$cnms)
+  b_nms <- character()
+  m_stub <- NULL
+  for (i in seq_along(group$cnms)) {
+    nm <- group_nms[i]
+    nms_i <- paste(group$cnms[[i]], nm)
+    levels(group$flist[[nm]]) <- gsub(" ", "_", levels(group$flist[[nm]]))
+    if (length(nms_i) == 1) {
+      b_nms <- c(b_nms, paste0(m_stub, nms_i, ":", levels(group$flist[[nm]])))
+    } else {
+      b_nms <- c(b_nms, c(t(sapply(paste0(m_stub, nms_i), paste0, ":", 
+                                   levels(group$flist[[nm]])))))
+    }
+  }
+  return(b_nms)  
+}
+
+# Add extra level _NEW_ to each group
+# 
+# @param Ztlist ranef indicator matrices
+# @param cnms group$cnms
+# @param flist group$flist
+pad_reTrms <- function(Ztlist, cnms, flist) {
+  stopifnot(is.list(Ztlist))
+  l <- sapply(attr(flist, "assign"), function(i) nlevels(flist[[i]]))
+  p <- sapply(cnms, FUN = length)
+  n <- ncol(Ztlist[[1]])
+  for (i in attr(flist, "assign")) {
+    levels(flist[[i]]) <- c(gsub(" ", "_", levels(flist[[i]])), 
+                            paste0("_NEW_", names(flist)[i]))
+  }
+  for (i in 1:length(p)) {
+    Ztlist[[i]] <- rbind(Ztlist[[i]], Matrix::Matrix(0, nrow = p[i], ncol = n, sparse = TRUE))
+  }
+  Z <- t(do.call(rbind, args = Ztlist))
+  return(list(Z = Z,cnms = cnms, flist = flist))
+}
+
+check_reTrms <- function(reTrms) {
+  stopifnot(is.list(reTrms))
+  nms <- names(reTrms$cnms)
+  dupes <- duplicated(nms)
+  for (i in which(dupes)) {
+    original <- reTrms$cnms[[nms[i]]]
+    dupe <- reTrms$cnms[[i]]
+    overlap <- dupe %in% original
+    if (any(overlap))
+      stop("Similar to rstanarm, rsstap does not permit formulas with duplicate group-specific terms.\n", 
+           "In this case ", nms[i], " is used as a grouping factor multiple times and\n",
+           dupe[overlap], " is included multiple times.\n", 
+           "Consider using || or -1 in your formulas to prevent this from happening.")
+  }
+  return(invisible(NULL))
 }

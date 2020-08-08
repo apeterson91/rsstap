@@ -2,11 +2,18 @@
 % Please edit documentation in R/sstapreg-methods.R
 \name{sstapreg-methods}
 \alias{sstapreg-methods}
+\alias{VarCorr}
+\alias{fixef}
+\alias{ngrps}
+\alias{sigma}
+\alias{nsamples}
 \alias{coef.sstapreg}
 \alias{confint.sstapreg}
 \alias{fitted.sstapreg}
 \alias{se.sstapreg}
 \alias{nobs.sstapreg}
+\alias{VarCorr.sstapreg}
+\alias{ngrps.sstapreg}
 \alias{vcov.sstapreg}
 \alias{nsamples.sstapreg}
 \title{Methods for sstapreg objects}
@@ -21,6 +28,10 @@
 
 \method{nobs}{sstapreg}(object, ...)
 
+\method{VarCorr}{sstapreg}(x)
+
+\method{ngrps}{sstapreg}(object, ...)
+
 \method{vcov}{sstapreg}(object, correlation = FALSE, ...)
 
 \method{nsamples}{sstapreg}(object, ...)
@@ -29,6 +40,8 @@
 \item{object}{sstapreg object}
 
 \item{...}{Ignored}
+
+\item{x}{sstapreg object}
 
 \item{correlation}{For \code{vcov}, if \code{FALSE} (the default) the
 covariance matrix is returned. If \code{TRUE}, the correlation matrix is

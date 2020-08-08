@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/sandstone/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/sandstone/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/all.min.css" integrity="sha256-PbSmjxuVAzJ6FPvNYsrXygfGhNJYyZ2GktDbkMBqQZg=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.1/css/v4-shims.min.css" integrity="sha256-A6jcAdwFD48VMjlI3GDxUd+eCQa7/KWy6G9oe/ovaPA=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -37,7 +41,6 @@
 
 <meta property="og:title" content="The 'rsstap' package. — rsstap-package" />
 <meta property="og:description" content="Spline implimentation of Spatial Temporal Aggregated Predictors" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -55,7 +58,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -69,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rsstap</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0</span>
       </span>
     </div>
 
@@ -94,11 +97,19 @@
     <li>
       <a href="../articles/Introduction.html">Introduction</a>
     </li>
+    <li>
+      <a href="../articles/Longitudinal_Models.html">Longitudinal Models</a>
+    </li>
   </ul>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        
+        <li>
+  <a href="https://github.com/apeterson91/rsstap/">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
       
     </div><!--/.nav-collapse -->
@@ -113,7 +124,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>The 'rsstap' package.</h1>
-    
+    <small class="dont-index">Source: <a href='https://github.com/apeterson91/rsstap/blob/master/R/rsstap-package.R'><code>R/rsstap-package.R</code></a></small>
     <div class="hidden name"><code>rsstap-package.Rd</code></div>
     </div>
 
@@ -123,17 +134,63 @@
 
 
 
+    <h2 class="hasAnchor" id="stap-models"><a class="anchor" href="#stap-models"></a>STAP models</h2>
+
+    
+
+<p>For link function \(g()\), outcome \(\mu_i\),  \(i=1,...,n\), STAP Models are 
+defined by aggregating exposure to nearby built environment features (BEFs) through 
+either measured space or time.</p>
+<p>$$ g(\mu_i) = Z_i^T \beta + \sum f(d) $$</p>
+
+<p>$$ g(\mu_i) = Z_i^T \beta + \sum f(t) $$</p>
+
+<p>$$ g(\mu_i) = Z_i^T \beta + \sum f(d,t) $$</p>
+<p>Incorporating these models into a standard regression framework is accomplished in this package
+via a generalized additive approach, using aggregated smooth terms via the <code><a href='https://rdrr.io/pkg/mgcv/man/jagam.html'>jagam</a></code> function.</p>
+    <h2 class="hasAnchor" id="basic-use"><a class="anchor" href="#basic-use"></a>Basic Use</h2>
+
+    
+
+<p>Inspired by the <span class="pkg">mgcv</span> package, <span class="pkg">rsstap</span> incorporates STAP terms in the model via the use of a coded
+term in the standard model formula. For example to fit a model with continuous outcome BMI, covariate sex, and 
+include distances to FFR as a measure of <em>spatial</em>  exposure (not temporal) one would use the following 
+model formula in (say) the sstap_lm function:</p>
+<p><code>sstap_lm(BMI ~ sex + sap(FFR),benvo = FFR_benvo).</code></p>
+<p>If aggregating (only) temporal exposure one would use the keyword <code>tap</code> and if both space and 
+time are measured, one could use the keyword <code>stap</code>. The dimension of the basis function expansion
+can be set familiarly, as a possible option: <code>sap(FFR, k = 5)</code>. For now the choice of splines is 
+fixed within this package to be penalized b-splines. This may change in the future.</p>
+<p>Note that these terms are parsed using regex style functions and so care must be taken not to misspell terms.
+Any use outside of what is defined here will likely result in erroneous behavior.</p>
+    <h2 class="hasAnchor" id="mgcv-translation"><a class="anchor" href="#mgcv-translation"></a>mgcv translation</h2>
+
+    
+
+
+<p>A table showing the exact rsstap's mgcv counterparts are shown below:</p><table class='table'>
+<tr><td>rsstap</td><td>mgcv</td><td>sap(foo,k=1)</td><td>s(Distance,k=1,bs='ps')</td><td>sap(foo)</td></tr>
+<tr><td>s(Distance,bs='ps')</td><td>tap(foo)</td><td>s(Time,bs='ps')</td><td>stap(foo)</td><td>t2(Distance,Time,bs='ps'))</td></tr>
+</table>
+
+
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Stan Development Team (2020). RStan: the R interface to Stan. R package version 2.19.3. https://mc-stan.org</p>
+    
+<ol>
+<li><p>Stan Development Team (2020). RStan: the R interface to Stan. R package version 2.19.3. https://mc-stan.org</p></li>
+<li><p>Wood, S.N. (2017) Generalized Additive Models: An Introduction with R (2nd edition).Chapman and Hall/CRC.</p></li>
+</ol>
+
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><a href='https://apeterson91.github.io/rsstap/articles/Introduction.html'>Introductory Vignette</a></p></div>
 
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#references">References</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -144,7 +201,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

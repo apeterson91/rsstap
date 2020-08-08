@@ -1,69 +1,76 @@
 
 
 #' Plot Spline Spatial Temporal Aggregated Predictors
-#'
+#' 
+#' Plots the smooth curve on a grid over the range of the stap smooth predictor
+#' If no stap term is selected, the first stap component is plotted by default.
 #' @export
 #' @param x sstapreg object
 #' @param stap_term optional string for name of BEF smooth function to plot. 
 #' Alternatively plots first BEF smooth function 
-#' @param component one of c("Distance","Time","Distance-Time") 
-#' corresponding to the smooth function domain
 #' @param ... ignored
 #' 
-plot.sstapreg <- function(x,stap_term = NULL,component = NULL,...){
+plot.sstapreg <- function(x,stap_term = NULL,...){
 
-		Distance <- Time <- Median <- Grid <- Lower <- Upper <-  NULL
+	# to pass R CMD Check
+	Distance <- Time <- Median <- Grid <- Lower <- Upper <-  . <- NULL
+	spec <- x$specification
+
 	if(is.null(stap_term)){
 		ix <- 1
-		stap_term <- x$stap_terms[ix]
-		component <- x$stap_components[ix]
-		stopifnot(x$stap_components[ix] == component)
-		stopifnot(x$stap_term[ix] == stap_term)
+		stap_term <- spec$term[ix]
+		component <- get_component(spec,stap_term)
 	}
-	else if(stap_term %in% x$stap_terms){
-		ix <- which(stap_term == x$stap_terms)
-		ix <- intersect(ix,which(x$stap_components==component))
+	else if(stap_term %in% spec$term){
+		ix <- which(spec$term==stap_term)
+		component <- get_component(spec,stap_term)
 	}
 	else
 		stop("stap_term must be NULL or one of the stap terms in the model object")
-	bef <- x$model$smooths[[ix]][[1]]
-	if(component == "Distance") 
-		gd <- data.frame(Distance = seq(from = floor(x$ranges[[ix]]$Distance[1]), to = ceiling(x$ranges[[ix]]$Distance[2]), by =0.01))
-	else if(component == "Time") 
-		gd <- data.frame(Time = seq(from = floor(x$ranges[[ix]]$Time[1]), to = ceiling(x$ranges[[ix]]$Time[2]), by =0.01))
-	else if(component == "Distance-Time"){
-		gd <- expand.grid(Distance = seq(from = floor(x$ranges[[ix]]$Distance[1]), to = ceiling(x$ranges[[ix]]$Distance[2]), by=0.01),
-						  Time = seq(from = floor(x$ranges[[ix]]$Time[1]), to = ceiling(x$ranges[[ix]]$Time[2]), by=0.01))
-		gd <- as.data.frame(gd)
-	}
-		
-
-	mat <- mgcv::Predict.matrix(bef,gd)
 
 	beta <- as.matrix(x$stapfit)
-	betas <- grep("beta",colnames(beta))
-	beta <- beta[,betas]
-	beta <- beta[,x$ind[[ix]]]
-	eta <- tcrossprod(mat,beta)
+	gd_eta <- get_stap(spec,stap_term,component,beta,x$family)
+	gd <- gd_eta$grid
+	eta <- gd_eta$eta
+
+
 	if(component %in% c("Distance","Time")){
-  	dplyr::tibble(Grid = gd[,1],
-  				  Lower = apply(eta,1,function(x) quantile(x,0.025)),
-  				  Median = apply(eta,1,median),
-  				  Upper = apply(eta,1,function(x) quantile(x,0.975))) -> pltdf
-  
-  	pltdf %>% ggplot2::ggplot(ggplot2::aes(x = Grid, y = Median )) + 
-  		ggplot2::geom_line() + 
-  		ggplot2::geom_ribbon(ggplot2::aes(ymin=Lower,ymax=Upper),alpha=0.3) + 
-  		ggplot2::theme_bw() + ggplot2::geom_hline(ggplot2::aes(yintercept = 0),
-  												  linetype=2,color='red') + 
-  		ggplot2::xlab(component) + 
-  		ggplot2::ylab("") ->pl
+		dplyr::tibble(Grid = gd[,1],
+					  Lower = apply(eta,1,function(x) quantile(x,0.025)),
+					  Median = apply(eta,1,median),
+					  Upper = apply(eta,1,function(x) quantile(x,0.975))) -> pltdf
+	  
+		pltdf %>% ggplot2::ggplot(ggplot2::aes(x = Grid, y = Median )) + 
+			ggplot2::geom_line() + 
+			ggplot2::geom_ribbon(ggplot2::aes(ymin=Lower,ymax=Upper),alpha=0.3) + 
+			ggplot2::theme_bw() + ggplot2::geom_hline(ggplot2::aes(yintercept = 0),
+													  linetype=2,color='red') + 
+			ggplot2::xlab(component) + 
+			ggplot2::ylab("") ->pl
 	}else{
 	  dplyr::tibble(Distance = gd$Distance,
 	                Time = gd$Time,
 	                Median = apply(eta,1,median)) -> pltdf
 	  pltdf %>% ggplot2::ggplot(ggplot2::aes(x=Distance,y=Time,z=Median)) + 
+		  ggplot2::theme_bw() + 
 	    ggplot2::geom_contour()  ->pl
+	}
+
+	if(has_bw(spec,stap_term)){
+
+	  dplyr::tibble(Distance = gd$Distance,
+	                Time = gd$Time,
+	                Median = apply(gd_eta$eta_within,1,median),
+					Parameters = "within") -> pltdf2
+
+	pltdf %>% dplyr::mutate(Parameters = "between") %>% rbind(.,pltdf2) -> pltdf
+
+	pltdf %>% ggplot2::ggplot(ggplot2::aes(x=Distance,y=Time,z=Median)) + 
+		ggplot2::geom_contour()  + ggplot2::theme_bw() + 
+		ggplot2::theme(strip.background=ggplot2::element_blank()) + 
+		ggplot2::facet_wrap(~Parameters) -> pl2
+
+	return(pl2)
 	}
 	
 	return(pl)
@@ -74,7 +81,7 @@ plot.sstapreg <- function(x,stap_term = NULL,component = NULL,...){
 #'
 #' @export
 #' @param x sstapreg object
-#' @param stap_term string argument for which bef term to plot
+#' @param stap_term string argument for which \code{stap()} bef term to plot
 #'
 plot3D <- function(x,stap_term = NULL)
 	UseMethod("plot3D")
@@ -85,47 +92,51 @@ plot3D <- function(x,stap_term = NULL)
 #'
 plot3D.sstapreg <- function(x,stap_term = NULL){
 
+	spec <- x$specification
+	if(!has_any_staps(spec))
+		stop("Model has no stap terms specified")
+
 	if(is.null(stap_term)){
-		ix <- which(x$stap_components == "Distance-Time")
-		if(length(ix)<=0)
-			stop("No Tensor-Spatial Temporal Terms included in Model")
-		ix <- ix[1]
-		stap_term <- x$stap_terms[ix]
-		component <- x$stap_components[ix]
-		stopifnot(x$stap_components[ix] == component)
-		stopifnot(x$stap_term[ix] == stap_term)
+		ix <- which(spec$component=="Distance-Time")[1]
+		stap_term <- spec$term[ix]
 	}
-	else if(stap_term %in% x$stap_terms){
-		ix <- which(stap_term == x$stap_terms)
-		ix <- intersect(ix,which(x$stap_components==component))
-		if(length(ix)<=0)
-			stop("No Tensor-Spatial Temporal Terms included in Model")
+	else if(stap_term %in% spec$term){
+		## check term is a stap_term
+		stopifnot(get_component(spec,stap_term)=="Distance-Time")
+	}else{
+		stop("Term specified is not included in model")
 	}
-	bef <- x$model$smooths[[ix]][[1]]
-
-	gd <- expand.grid(Distance = seq(from = floor(x$ranges[[ix]]$Distance[1]), 
-									 to = ceiling(x$ranges[[ix]]$Distance[2]), by=0.01),
-					  Time = seq(from = floor(x$ranges[[ix]]$Time[1]),
-								 to = ceiling(x$ranges[[ix]]$Time[2]), by=0.01))
-	gd <- as.data.frame(gd)
-		
-
-	mat <- mgcv::Predict.matrix(bef,gd)
 
 	beta <- as.matrix(x$stapfit)
-	betas <- grep("beta",colnames(beta))
-	beta <- beta[,betas]
-	beta <- beta[,x$ind[[ix]]]
-	eta <- tcrossprod(mat,beta)
+
+	gd_eta <- get_stap(spec,stap_term,"Distance-Time",beta,x$family)
+	gd <- gd_eta$grid
+	eta <- gd_eta$eta
+
   	dplyr::tibble(Distance = gd$Distance,
 				  Time = gd$Time,
   				  Lower = apply(eta,1,function(x) quantile(x,0.025)),
   				  Exposure = apply(eta,1,median),
-  				  Upper = apply(eta,1,function(x) quantile(x,0.975))) -> pltdf
+  				  Upper = apply(eta,1,function(x) quantile(x,0.975))
+				  ) -> pltdf
   
 	pl <- plotly::plot_ly(pltdf,x = ~Distance, y = ~Time, z = ~Exposure,
 						  mode = "markers", 
-						  type='scatter3d') 
+						  type ='scatter3d') 
+	if(has_bw(spec,stap_term)){
+		dplyr::tibble(Distance = gd$Distance,
+					  Time = gd$Time,
+					  Lower = apply(gd_eta$eta_within,1,function(x) quantile(x,0.025)),
+					  Exposure = apply(gd_eta$eta_within,1,median),
+					  Upper = apply(gd_eta$eta_within,1,function(x) quantile(x,0.975))
+					  ) -> pltdf
+	  
+		pl2 <- plotly::plot_ly(pltdf,x = ~Distance, y = ~Time, z = ~Exposure,
+							  mode = "markers", 
+							  type ='scatter3d') 
+
+		return((list(Between=pl,Within=pl2)))
+	}
 
 	return(pl)
 }
@@ -172,3 +183,107 @@ ppc.sstapreg <- function(x,num_reps = 20){
 
 	return(p)
 }
+
+#' Plot Cross-Sections
+#'
+#' @export
+#' @keywords internal
+#' @param x a sstapreg object
+#' @param stap_term name of stap term to plot
+#' @param component one of c("Distance","Time")
+#' @param fixed_val vector that contains fixed values for whichever component was not specified
+#' @param p probability_interval
+#'
+plot_xsection <- function(x,stap_term = NULL, component = "Distance",fixed_val = 1, p = 0.95)
+	UseMethod("plot_xsection")
+
+#' Plot Cross-Sections
+#'
+#' @export
+#' @describeIn plot_xsection
+#'
+plot_xsection.sstapreg <- function(x,stap_term = NULL, component = "Distance",fixed_val =1 , p = 0.95){
+
+	Distance <- Time <- Median <- Grid <- Lower <- Upper <-  . <- .data <-  NULL
+	check_p(p)
+	spec <- x$specification
+	if(!has_any_staps(spec))
+		stop("Model has no stap terms specified")
+
+	if(is.null(stap_term)){
+		ix <- which(spec$component=="Distance-Time")[1]
+		stap_term <- spec$term[ix]
+	}
+	else if(stap_term %in% spec$term){
+		## check term is a stap_term
+		stopifnot(get_component(spec,stap_term)=="Distance-Time")
+	}else{
+		stop("Term specified is not included in model")
+	}
+
+	beta <- as.matrix(x$stapfit)
+
+	gd_eta <- get_stap(spec,stap_term,"Distance-Time",beta,x$family)
+	gd <- gd_eta$grid
+	eta <- gd_eta$eta
+	
+	l <-  .5 - p/2
+	u <- .5 + p/2
+	
+	ocomp <- switch(component,
+	                "Distance"="Time",
+	                "Time"="Distance")
+	lbl <- paste0(ocomp, " fixed at ", fixed_val)
+	
+	ics <- which(gd[,ocomp]==fixed_val)
+	gd <- gd[ics,]
+	eta <- eta[ics,]
+
+  	dplyr::tibble(Distance = gd$Distance,
+				  Time = gd$Time,
+  				  Lower = apply(eta,1,function(x) quantile(x,l)),
+  				  Median = apply(eta,1,median),
+  				  Upper = apply(eta,1,function(x) quantile(x,u))
+				  ) -> pltdf
+
+
+	if(has_bw(spec,stap_term)){
+
+		dplyr::tibble(Distance = gd$Distance,
+				Time = gd$Time,
+				Lower = apply(gd_eta$eta_within[ics,],1,function(x) quantile(x,l)),
+				Median = apply(gd_eta$eta_within[ics,],1,median),
+				Upper = apply(gd_eta$eta_within[ics,],1,function(x) quantile(x,u)),
+				Parameters = "within") -> pltdf2
+
+		pltdf %>% dplyr::mutate(Parameters = "between") %>% rbind(.,pltdf2) -> pltdf
+
+		pltdf %>% ggplot2::ggplot(ggplot2::aes(x=.data[[component]],y=Median)) + 
+			ggplot2::geom_line()  + 
+			ggplot2::geom_ribbon(ggplot2::aes(ymin=Lower,ymax=Upper),alpha=0.3) + 
+			ggplot2::theme_bw() + 
+			ggplot2::theme(strip.background=ggplot2::element_blank()) + 
+			ggplot2::labs(subtitle = lbl) + 
+			ggplot2::facet_wrap(~Parameters) -> pl2
+
+		return(pl2)
+	}
+
+	pltdf %>% ggplot2::ggplot(ggplot2::aes(x = .data[[component]], y = Median )) + 
+	ggplot2::geom_line() + 
+	ggplot2::geom_ribbon(ggplot2::aes(ymin=Lower,ymax=Upper),alpha=0.3) + 
+	ggplot2::theme_bw() + 
+	ggplot2::geom_hline(ggplot2::aes(yintercept = 0),
+						linetype=2,color='red') + 
+	ggplot2::xlab(component) + 
+	ggplot2::labs(subtitle = lbl) +
+	ggplot2::ylab("") ->pl
+
+	return(pl)
+
+}
+
+check_p <- function(p){
+	stopifnot(p<1 && p>0)
+}
+

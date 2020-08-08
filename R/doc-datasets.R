@@ -28,3 +28,26 @@
 #' 
 "poisson_benvo"
 
+
+#' Complex longitudinal benvo for use in \pkg{rsstap} examples and vignettes
+#'
+#' @name complex_longitudinal
+#'
+#' @format a benvo with 600 subjects, continuous outcome simulated using subject specific effect and temporal slope and between/within subject exposure effects from nearby "Healthy Food Stores"(HFS)
+#' \describe{
+#' \item{\code{subject_data}}{Includes pseudo Obesity outcome along with simulated exposure effects}
+#' \item{ HFS data  }{ distances and times that subjects spend near HFS }
+#' }
+#'
+#' @seealso The data generation code on \href{github}{https://github.com/apeterson91/rsstap/tree/master/R/data-raw/complex_longitudinal.R}
+"complex_longitudinal"
+
+
+#' Network Built Environment Feature Effects  dataset
+#'
+#' @name network_benvo
+#' 
+#' @format a benvo with 500 subjects, a pseudo BMI continuous outcome, pseudo continuous income and binary sex covariate measures with Fast Food Restaurant (FFR)
+#' direct exposure effects and "indirect" network effects.
+#' 
+"network_benvo"

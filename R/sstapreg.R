@@ -1,3 +1,19 @@
+# This software is part of the rsstap package
+# Copyright (C) 2020 Adam Peterson
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 #' Create a sstapreg object
 #'
 #' @param object A list provided by one of the \code{sstap_*} modeling functions.
@@ -8,54 +24,42 @@ sstapreg <- function(object){
 
 	stapfit <- object$stapfit
 	stanmat <- as.matrix(stapfit)
-	del_names <- grep("delta",colnames(stanmat))
+	stap_terms <- object$specification$term
 	ynames <- grep("yhat",colnames(stanmat))
-	Z_coefs <- apply(stanmat[,del_names],2,median)
-	Z_names <- colnames(object$mf$X)
-	names(Z_coefs) <- Z_names
-	covmat <- cov(stanmat[,del_names])
-	colnames(covmat) <- Z_names
-	stap_terms <- object$stap_terms
-	ses <- apply(stanmat[,del_names],2,mad)
-	names(ses) <- Z_names
+	nms <- colnames(object$mf$X)
+	nms <- union(nms,Reduce(union,lapply(stap_terms,function(x) grep(x,colnames(stanmat),value=T))))
+	coefs <- apply(stanmat[,nms],2,median)
+	covmat <- cov(stanmat[,nms])
+	colnames(covmat) <-nms 
+	ses <- apply(stanmat[,nms],2,mad)
+	names(ses) <-nms 
 	Nobs <- nrow((object$mf$X))
 	
-	if(!is.null(object$weights)){
-		L <- sqrt(diag(object$weights))
-		Z <- L %*% (object$mf$X)
-		y <- L %*% object$mf$y
-	}
-	else{
-		y <- object$mf$y
-		Z <- object$mf$X
-	}
+	y <- object$mf$y
+	Z <- object$mf$X
 
-
-    
 
     out <- list(
-        coefficients = Z_coefs, 
-        ses = ses,
-        fitted.values = apply(stanmat[,ynames],2,median),
-        covmat = covmat,
-        model = list(y=y,
-                     Z=Z,
-					 smooths = object$smooths,
-					 Xs = object$Xs,
-					 benvo = object$benvo),
-        formula = object$formula, 
-		family = object$family,
-        stapfit = stapfit,
-        stap_terms = stap_terms,
-		ind = object$ind,
-		ranges = object$ranges,
-		stap_components = object$stap_components,
-        rstan_version = utils::packageVersion("rstan"),
-        call = object$call, 
-        stan_function = object$stan_function
-      )
-	if(!is.null(object$weights))
-		out$model$weights <- object$weights
+				coefficients = coefs, 
+				ses = ses,
+				fitted.values = apply(stanmat[,ynames],2,median),
+				covmat = covmat,
+				model = list(y=y,
+							 Z=Z,
+							 smooths = object$smooths,
+							 Xs = object$Xs,
+							 benvo = object$benvo),
+				specification = object$specification,
+				formula = object$formula, 
+				family = object$family,
+				stapfit = stapfit,
+				rstan_version = utils::packageVersion("rstan"),
+				call = object$call, 
+				stan_function = object$stan_function
+		  )
+
+	if(!is.null(object$glmod))
+		out$glmod <- object$glmod
 
     structure(out, class = c("sstapreg"))
 

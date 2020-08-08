@@ -2,4 +2,8 @@
 
 language: R
 cache: packages
-
+addons:
+  apt:
+    packages: libnode-dev
+r_build_args: '--no-build-vignettes'
+r_check_args: '--ignore-vignettes'

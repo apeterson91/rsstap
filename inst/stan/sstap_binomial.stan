@@ -1,5 +1,6 @@
 // GLM for a Binomial outcome with smooth terms
 functions {
+#include functions/common_functions.stan
 }
 data{ 
 	int<lower=1> N;
@@ -19,21 +20,39 @@ data{
 	matrix[N,P] Q;
 	matrix[P,P] R_inv;
 	matrix[ncol_smooth,K_smooth] S;
+	//data for glmer
+#include data/glmer_stuff.stan
+#include data/glmer_stuff2.stan
+}
+transformed data{
+  int<lower=1> V[special_case ? t : 0, N] = make_V(N, special_case ? t : 0, v);
+#include tdata/tdata_glmer.stan
 }
 parameters{
 	vector[P] beta_tilde;
 	vector<lower=0>[num_stap_penalties] tau;
+#include parameters/parameters_glmer.stan
 }
 transformed parameters{
 	vector[P] beta = R_inv * beta_tilde;
 	vector[ncol_smooth] sstap_beta = beta[(ncol_Z+1):P];
 	vector[N] eta = Q * beta_tilde;
+	//merModels
+
+	// construct L, b
+#include tparameters/tparameters_glmer_noaux.stan
+
+	if(t>0){
+		if (special_case) for (i in 1:t) eta += b[V[i]];
+		else eta += csr_matrix_times_vector(N, q, w, v, u, b);
+	}
 }
 model{
 	tau ~ exponential(1);
 	y ~ binomial_logit(num_trials,eta);
 
 
+	// add penalty
 	for(i in 1:num_stap){
 		matrix[stap_lengths[i],stap_lengths[i]] K = rep_matrix(0,stap_lengths[i],stap_lengths[i]);
 		for(j in 1:stap_penalties[i]){
@@ -43,10 +62,15 @@ model{
 		target += multi_normal_prec_lpdf(sstap_beta[ beta_ix[i,1]:beta_ix[i,2]  ]|  rep_vector(0,stap_lengths[i]),K );
 	}
 
+  if (t > 0) {
+    real dummy = decov_lp(z_b, z_T, rho, zeta, tau_b, 
+                          regularization, delta, shape, t, p);
+  }
+
 
 }
 generated quantities {
 	int<lower=0> yhat[N];
-	vector[ncol_Z] delta = beta[1:ncol_Z];
+	vector[ncol_Z] delta_coef = beta[1:ncol_Z];
 	yhat = binomial_rng(num_trials,exp(eta) ./ (1+exp(eta)));
 }

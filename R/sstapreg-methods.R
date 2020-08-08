@@ -6,6 +6,7 @@
 #' those pages are provided in the \strong{See Also} section, below.
 #' 
 #' @name sstapreg-methods
+#' @aliases VarCorr fixef ngrps sigma nsamples
 #' 
 #' @param object sstapreg object
 #' @param ... Ignored
@@ -77,9 +78,65 @@ se.sstapreg <- function(object, ...) {
 
 
 #' @rdname sstapreg-methods
+#'
 #' @export
 nobs.sstapreg <- function(object, ...){
 	length(object$fitted.values)
+}
+
+#' @rdname sstapreg-methods
+#'
+#' @param x sstapreg object
+#' @export
+#' @importFrom nlme VarCorr
+#'
+VarCorr.sstapreg <- function(x){
+
+	mat <- as.matrix(x)
+	cnms <- .cnms(x)
+	useSc <- "sigma" %in% colnames(mat)
+    if (useSc) sc <- mat[,"sigma"] else sc <- 1
+	Sigma <- colMeans(mat[,grepl("^Sigma\\[", colnames(mat)), drop = FALSE])
+	nc <- vapply(cnms, FUN = length, FUN.VALUE = 1L)
+	nms <- names(cnms)
+	ncseq <- seq_along(nc)
+	if (length(Sigma) == sum(nc * nc)) { # stanfit contains all Sigma entries
+	spt <- split(Sigma, rep.int(ncseq, nc * nc))
+	ans <- lapply(ncseq, function(i) {
+	  Sigma <- matrix(0, nc[i], nc[i])
+	  Sigma[,] <- spt[[i]]
+	  rownames(Sigma) <- colnames(Sigma) <- cnms[[i]]
+	  stddev <- sqrt(diag(Sigma))
+	  corr <- cov2cor(Sigma)
+	  structure(Sigma, stddev = stddev, correlation = corr)
+	})       
+	} else {  
+	spt <- split(Sigma, rep.int(ncseq, (nc * (nc + 1)) / 2))
+	ans <- lapply(ncseq, function(i) {
+	  Sigma <- matrix(0, nc[i], nc[i])
+	  Sigma[lower.tri(Sigma, diag = TRUE)] <- spt[[i]]
+	  Sigma <- Sigma + t(Sigma)
+	  diag(Sigma) <- diag(Sigma) / 2
+	  rownames(Sigma) <- colnames(Sigma) <- cnms[[i]]
+	  stddev <- sqrt(diag(Sigma))
+	  corr <- cov2cor(Sigma)
+	  structure(Sigma, stddev = stddev, correlation = corr)
+	})    
+	}
+	names(ans) <- nms
+	structure(ans, sc = mean(sc), useSc = useSc, class = "VarCorr.merMod")
+
+}
+
+#'
+#' @rdname sstapreg-methods
+#'
+#' @export
+#' @export ngrps
+#' @importFrom lme4 ngrps
+#' 
+ngrps.sstapreg <- function(object, ...) {
+  vapply(.flist(object), nlevels, 1)  
 }
 
 
@@ -97,13 +154,55 @@ vcov.sstapreg <- function(object, correlation = FALSE, ...) {
   cov2cor(out)
 }
 
+#'
 #' @rdname sstapreg-methods
 #' @export
-#' @export nsamples
 #' @importFrom rstantools nsamples
 nsamples.sstapreg <- function(object, ...) {
   posterior_sample_size(object)
 }
+
+
+#' Calculate WAIC
+#' 
+#' @export
+#' @param x sstapreg object
+#'
+waic <- function(x)
+	UseMethod("waic")
+
+#' Calculate WAIC
+#'
+#' @describeIn waic calculate waic
+#' @export
+#' @importFrom stats dbinom dnorm dpois
+#'
+waic.sstapreg <- function(x){
+
+	yhatmat <- as.matrix(x$stapfit)
+	yhats <- grep("yhat",colnames(yhatmat))
+	yhatmat <- t(yhatmat[,yhats])
+	
+	if(x$family$family=="binomial"){
+	  if(is.matrix(x$model$y)){
+		  nt <- rowSums(x$model$y)
+		  y_ <- x$model$y[,1]
+		  out <- LaplacesDemon::WAIC(t(apply(yhatmat,2,function(z) dbinom(x = y_, size = nt, prob = z,log = TRUE ))))
+	  }else{
+	    nt <- rep(1,length(x$model$y))
+	    y_ <- x$model$y
+	    out <- LaplacesDemon::WAIC(t(apply(yhatmat,2,function(z) dbinom(x = y_, size = nt, prob = z,log = TRUE ))))
+	  }
+	}else if(x$family$family=="gaussian"){
+		sig <- as.matrix(x$stapfit)[,'sigma']
+		out <- LaplacesDemon::WAIC(t(apply(yhatmat,2,function(z) dnorm(x = x$model$y,mean = z,sd = sig,log = TRUE ))))
+	}else{
+		##poisson
+		out <- LaplacesDemon::WAIC(t(apply(yhatmat,2,function(z) dpois(x = x$model$y,lambda = z, log = TRUE))))
+	}
+	return(out)
+}
+
 
 # Exported but doc kept internal ----------------------------------------------
 
@@ -126,4 +225,20 @@ formula.sstapreg <- function(x,...){
 	x$formula
 }
 
+.cnms <- function(object, ...) UseMethod(".cnms")
+.cnms.sstapreg <- function(object, ...) {
+  .glmer_check(object)
+  object$glmod$reTrms$cnms
+}
 
+.flist <- function(object, ...) UseMethod(".flist")
+.flist.sstapreg <- function(object, ...) {
+  .glmer_check(object)
+  as.list(object$glmod$reTrms$flist)
+}
+
+.glmer_check <- function(object) {
+  if (!is.mer(object))
+    stop("This method is for sstap_(g)lmer models only.", 
+         call. = FALSE)
+}

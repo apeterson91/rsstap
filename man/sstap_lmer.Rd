@@ -2,21 +2,17 @@
 % Please edit documentation in R/sstap_lmer.R
 \name{sstap_lmer}
 \alias{sstap_lmer}
-\title{Spline Spatial Temporal Aggregated Regression Model for Longitudinal Data}
+\title{Spline Spatial Temporal Aggregated Mixed Effects Regression Model}
 \usage{
-sstap_lmer(formula, stap_terms, benvo, weights = NULL, ...)
+sstap_lmer(formula, benvo, ...)
 }
 \arguments{
 \item{formula}{Similar as for \code{\link[lme4]{glmer}}.}
 
-\item{stap_terms}{list of BEF terms}
-
 \item{benvo}{built environment object from the rbenvo package containing the relevant data}
 
-\item{weights}{vector of positive integer weights}
-
-\item{...}{arguments for stan sampler}
+\item{...}{optional arguments for stan sampler}
 }
 \description{
-Spline Spatial Temporal Aggregated Regression Model for Longitudinal Data
+Spline Spatial Temporal Aggregated Mixed Effects Regression Model
 }

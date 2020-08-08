@@ -26,8 +26,26 @@ print.sstapreg <- function(x, digits = 1, ...) {
 
 	mat <- cbind(coef(x),se(x))
 	colnames(mat) <- c("Median","MAD")
-	
+
 	.printfr(mat,digits)
+
+    mat <- as.matrix(x$stapfit) # don't used as.matrix.stanreg method b/c want access to mean_PPD
+
+	smooth_nms <- grep("^smooth_precision\\[", colnames(mat), value = TRUE)
+	smooth_mat <- mat[,smooth_nms,drop=F]
+	smooth_ests <- .median_and_madsd(smooth_mat)
+
+      cat("\nSmoothing terms:\n")
+	.printfr(smooth_ests,digits)
+    if (is.mer(x)) {
+      cat("\nError terms:\n")
+      foo <- VarCorr(x)
+	  print(foo)
+      cat("Num. levels:", 
+          paste(names(ngrps(x)), unname(ngrps(x)), collapse = ", "), "\n")
+    }
+
+
 
 }
 

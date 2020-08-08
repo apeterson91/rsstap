@@ -1,5 +1,6 @@
 // GLM for a Poisson outcome with smooth terms
 functions {
+#include functions/common_functions.stan
 }
 data{ 
 	int<lower=1> N;
@@ -18,15 +19,34 @@ data{
 	matrix[N,P] Q;
 	matrix[P,P] R_inv;
 	matrix[ncol_smooth,K_smooth] S;
+	//data for glmer
+#include data/glmer_stuff.stan
+#include data/glmer_stuff2.stan
+}
+transformed data{
+  int<lower=1> V[special_case ? t : 0, N] = make_V(N, special_case ? t : 0, v);
+#include tdata/tdata_glmer.stan
 }
 parameters{
 	vector[P] beta_tilde;
 	vector<lower=0>[num_stap_penalties] tau;
+#include parameters/parameters_glmer.stan
 }
 transformed parameters{
 	vector[P] beta = R_inv * beta_tilde;
 	vector[ncol_smooth] sstap_beta = beta[(ncol_Z+1):P];
-	vector[N] eta = exp(Q * beta_tilde);
+	vector[N] eta;
+	//merModels
+	// construct L, b
+#include tparameters/tparameters_glmer_noaux.stan
+	if(t>0){
+		if (special_case) for (i in 1:t) eta += b[V[i]];
+		else eta += csr_matrix_times_vector(N, q, w, v, u, b);
+	}
+
+	eta = Q * beta_tilde;
+	eta = exp(eta);
+
 }
 model{
 	tau ~ exponential(1);
@@ -46,6 +66,6 @@ model{
 }
 generated quantities {
 	int<lower=0> yhat[N];
-	vector[ncol_Z] delta = beta[1:ncol_Z];
+	vector[ncol_Z] delta_coef = beta[1:ncol_Z];
 	yhat = poisson_rng(eta);
 }

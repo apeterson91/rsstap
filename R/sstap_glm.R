@@ -28,71 +28,30 @@ sstap_glm <- function(formula,
 					   ...){
   
 	validate_family(family)
-	foo <- get_stapless_formula(formula)
-	f <- foo$stapless_formula
+	spec <- get_sstapspec(formula,benvo)
+	f <- spec$stapless_formula
 	call <- match.call(expand.dots = TRUE)
 	mf <- rbenvo::subject_design(benvo,f)
-	stap_terms <- foo$stap_mat[,1]
-	stap_components <- foo$stap_mat[,2]
-	bw <- as.integer(foo$stap_mat[,3])
 	check_for_longitudinal_benvo(benvo)
 	
-	jd <- purrr::pmap(list(stap_terms,stap_components,foo$fake_formula),
-	                  function(x,y,z) {
-	                    out <- mgcv::jagam(formula = z, family = gaussian(), 
-	                                       data = rbenvo::joinvo(benvo,x,y,
-	                                                             NA_to_zero = TRUE), 
-	                                       file = tempfile(fileext = ".jags"), 
-	                                       weights = NULL, 
-	                                       offset = NULL,
-	                                       centred = FALSE,
-	                                       diagonalize = FALSE)
-	                    out$name <- x
-						ix <- which(benvo@bef_names==x)
-						ranges <- list()
-						if(y=="Distance"|y=="Distance-Time")
-							ranges$Distance <- range(benvo@bef_data[[ix]]$Distance,na.rm=T)
-						if(y=="Time"|y=="Distance-Time")
-							ranges$Time = range(benvo@bef_data[[ix]]$Time,na.rm=T)
-						out$ranges <- ranges
-	                    return(out)
-	                    })
-	
-	X <- lapply(1:length(jd),function(i){
-					X <- create_X(stap_terms[i],stap_components[i],bw[i],jd[[i]]$jags.data$X,benvo,jd[[1]]$pregam$term.names)
-					return(X)
-			})
-	## always only one smooth because jagam called for each stap term
-	S <- lapply(1:length(jd),function(i){
-			s <- jd[[i]]$jags.data$S1 
-			if(!is.null(s))
-				return(s)
-			else
-				return(diag(ncol(jd[[i]]$jags.data$X)))
-			})
 
 	sstapfit <- sstap_glm.fit(
 	                          y = mf$y, 
 	                          Z = mf$X,
-	                          X = X,
-	                          S = S,
+	                          X = spec$X,
+	                          S = spec$S,
 							  family = family,
 	                          ...
 	                          )
 	
 	fit <- sstapreg(
-					list(stapfit = sstapfit$fit,
+					list(stapfit = sstapfit,
 						 mf = mf,
-						 smooths = lapply(jd,function(x) x$pregam$smooth),
-						 ranges = lapply(jd,function(x) x$ranges),
 						 weights = weights,
 						 benvo = benvo,
-						 Xs = lapply(jd,function(x) x$jags.data$X),
-						 stap_terms = stap_terms,
-						 stap_components = stap_components,
-						 ind = sstapfit$ind,
+						 specification = spec,
 						 call = call,
-						 formula=formula,
+						 formula = formula,
 						 family = family
 					 )
 					)

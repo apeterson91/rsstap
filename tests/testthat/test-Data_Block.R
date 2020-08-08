@@ -1,6 +1,11 @@
-test_that("Extract Stap Formula works", {
-  expect_equal(BMI ~ sex,get_stapless_formula(BMI ~ sex + stap(HFS))$stapless_formula)
-  expect_equivalent(c("0"),get_stapless_formula(BMI ~ sex + stap(HFS))$stap_mat[,3])
-  expect_equivalent(c("1"),get_stapless_formula(BMI ~ sex + stap_bw(HFS))$stap_mat[,3])
-  expect_error(get_stapless_formula(BMI ~ sex)$stapless_formula,regexp="No covariates")
+bdf <- rbenvo::longitudinal_HFS
+test_that("sstapspec object and methods work correctly", {
+  expect_equal(BMI ~ sex,get_sstapspec(BMI ~ sex + stap(HFS),
+                                       benvo = bdf)$stapless_formula)
+  expect_equivalent(0L,has_bw(get_sstapspec(BMI ~ sex + stap(HFS),
+                                                benvo = bdf)))
+  expect_equivalent(1,has_bw(get_sstapspec(BMI ~ sex + stap_bw(HFS),
+                                           benvo = bdf)))
+  expect_error(get_sstapspec(BMI ~ sex,
+                             benvo=bdf),regexp="No covariates")
 })

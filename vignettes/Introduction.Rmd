@@ -14,7 +14,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  eval = T
+  eval = TRUE
 )
 ```
 
@@ -93,7 +93,7 @@ While the curves won't always be so well defined, this more or less defines the 
 
 ## Longitudinal Spatio-Temporal example
 
-In this quick example, we'll briefly run through the same function calls as before, now using a longitudinal simulated dataset that contains both spatial and temporal data. Let's first load and look at the `longitudinal_HFS` data that comes with the `rsstap package`.
+In this quick example, we'll briefly run through the same function calls as before, now using a longitudinal simulated dataset that contains both spatial and temporal data. Note that while a longitudinal model *should* take into account correlation across a given subject's measurements, we'll stick to the simpler model now for exposition (see the longitudinal vignette for how to account for these terms).  Let's first look at the `longitudinal_HFS` data that comes with the `rsstap package`, renamed here as `bdf2` for brevity.
 
 ```{r long_data,echo=F}
 data("longitudinal_HFS")
@@ -107,7 +107,7 @@ bdf2
 Looks like this data contains 300 subjects with both distances and times measured for the subjects. In order to fit the same kind of model as before, but now taking into account both space and time, we'll use the `stap` designation in the model formula. This is equivalent to using the `t2` formula from `mgcv`.
 
 ```{r,results='hide'}
-fit <- sstap_lm(BMI ~ sex + stap(HFS) ,benvo = bdf2)
+fit <- sstap_lm(BMI ~ sex + stap(HFS), benvo = bdf2)
 ```
 
 We'll examine the posterior predictive checks first to verify that indeed the model can recover the true simulated parameters.
@@ -128,17 +128,24 @@ truth <- geom_contour(aes(x=x,y=y),
             color='red')
 ```
 
-Then, onto the spatio-temporal effects. Calling the plot method on this fitted object will produce a contour plot. `rsstap` also provides a `plot3D` function via `plotly`'s graphics that can plot the surface in 3 dimensions.
+Then, onto the spatio-temporal effects. Calling the plot method on this fitted object will produce a contour plot. `rsstap` also provides a `plot_xsection` which plots the cross section of the surface at a fixed value and a `plot3D` function via the `rplotly` package that can plot the surface in 3 dimensions.
 
 ```{r,messages=F,warning=F}
 plot(fit)
 ```
 
-```{r 3dplot}
+```{r xsection}
+plot_xsection(fit,fixed_val=5)
+```
+
+
+```{r 3dplot,warning=FALSE}
 plot3D(fit)
 ```
 
 ## Future work
 
-This concludes the introductory vignette. Future vignettes will elaborate on the spline implementation of spatial temporal aggregated predictors in a longitudinal context, wherein subject specific and between/within effects are estimated, network effects of BEFs and spatio-temporal interaction effects.
+This concludes the introductory vignette. With built environment - subject data, the `rsstap` package can be used to estimate how nearby built environment features may effect the outcome of interest via the STAP modeling framework.
+
+Future vignettes will elaborate on the spline implementation of spatial temporal aggregated predictors in a longitudinal context, wherein subject specific and between/within effects are estimated, network effects of BEFs and spatio-temporal interaction effects.
 

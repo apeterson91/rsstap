@@ -1,11 +1,15 @@
 Package: rsstap
 Type: Package
 Title: Spline Spatial Temporal Aggregated Predictors in R
-Version: 0.1.0
+Version: 0.0.0
 Date: 2020-01-16
-Authors@R: person("Adam", "Peterson", , "atpvyc@umich.edu", c("aut", "cre"))
+Authors@R: person(given = "Adam", 
+				  family = "Peterson", 
+				  email ="atpvyc@umich.edu", 
+				  role = c("aut", "cre"),
+				  comment = c(ORCID = 0000-0001-7071-7873))
 BugReports: https://github.com/apeterson91/rsstap/issues
-Description: This package offers a spline implementation of the previous kernel spatial temporal aggregated predictors implimented in rstap. 
+Description: This package offers a spline implementation of Spatial Temporal Aggregated Predictors. 
 License: GPL-3
 Encoding: UTF-8
 Biarch: true
@@ -20,12 +24,14 @@ Imports:
     Rcpp (>= 0.12.0),
     rstan (>= 2.18.1),
     rstantools (>= 2.0.0.9000),
-    rbenvo,
+    rbenvo (>= 0.1.1.9000),
     mgcv,
     lme4,
     Matrix,
     plotly,
-    tidyr
+    tidyr,
+    nlme,
+    LaplacesDemon
 LinkingTo:
     BH (>= 1.66.0),
     Rcpp (>= 0.12.0),
@@ -39,6 +45,9 @@ Suggests:
     covr,
     testthat (>= 2.1.0)
 VignetteBuilder: knitr
+LazyData: true
 Depends: 
     R (>= 3.4)
 SystemRequirements: GNU make
+Remotes: 
+    apeterson91/rbenvo
