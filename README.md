@@ -2,7 +2,6 @@
 <!-- badges: start -->
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Travis build status](https://travis-ci.org/apeterson91/bbnet.svg?branch=master)](https://travis-ci.org/apeterson91/rsstap)
-[![Codecov test coverage](https://codecov.io/gh/apeterson91/bbnet/branch/master/graph/badge.svg)](https://codecov.io/gh/apeterson91/rsstap?branch=master)
 <!-- badges: end -->
 
 ## About

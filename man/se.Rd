@@ -17,7 +17,4 @@ Standard errors of model parameters.
 \description{
 Generic function for extracting standard errors from fitted models.
 }
-\seealso{
-\code{\link{se.sstapreg}}
-}
 \keyword{internal}

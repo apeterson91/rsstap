@@ -13,6 +13,9 @@ capture_output(
                        benvo = poisson_benvo,
                        family = poisson(),iter=500,chains=1))
 )
+capture_output(
+  lmer1 <- SW(sstap_lmer(BMI ~ sex + year + stap(HFS) + (year|ID), benvo = complex_longitudinal,iter=200,chains=1))
+)
 
 test_that("Methods work on example models", {
   expect_equal(1000,nobs(lm1))
@@ -20,7 +23,10 @@ test_that("Methods work on example models", {
   expect_equal(c(12,12),dim(vcov(lm1)))
   expect_equal(300,nobs(glm1))
   expect_equal(300,nobs(glm2))
+  expect_equal(c(15,2),dim(posterior_interval(lm1)))
+  expect_equal(1171,nobs(lmer1))
 })
+
 # 
 test_that("Sample glm with multiple predictors works",{
   

@@ -43,31 +43,24 @@ set_sampling_args <- function(object, user_dots = list(),
 
 
 
-create_S <- function(jg,bw,stapi){
-	if(stapi){
-		## not implemented yet
-	  S <- list(jg$jags.data$S1,
-	            jg$jags.data$S2,
-	            jg$jags.data$S3)
-	  if(bw)
-	    stop("stapi_bw() not implemented yet")
+create_S <- function(jg,bw){
+
+	if(is.null(jg$jags.data$S1)){
+		## t2(Distance,Time)
+		S <- Reduce(cbind,lapply(jg$pregam$S,function(x){
+				   ix_nonzero <- which(diag(x)!=0)
+				   out <- matrix(0,nrow = ncol(jg$jags.data$X),
+								 ncol = ncol(jg$jags.data$X))
+				   diag(out)[ix_nonzero] <- 1
+				   return(out)
+		   }))
 	}else{
-		if(is.null(jg$jags.data$S1)){
-			## t2(Distance,Time)
-			S <- Reduce(cbind,lapply(jg$pregam$S,function(x){
-					   ix_nonzero <- which(diag(x)!=0)
-					   out <- matrix(0,nrow = ncol(jg$jags.data$X),
-									 ncol = ncol(jg$jags.data$X))
-					   diag(out)[ix_nonzero] <- 1
-					   return(out)
-			   }))
-		}else{
-			##s(Distance) or s(Time)
-			S <- jg$jags.data$S1
-		}
-		if(bw)
-			return(list(S,S))
+		##s(Distance) or s(Time)
+		S <- jg$jags.data$S1
 	}
+	if(bw)
+		return(list(S,S))
+
 	return(S)
 }
 

@@ -1,22 +1,31 @@
 ---
-title: "Introduction"
+title: "Introduction to `rsstap`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Introduction}
+  %\VignetteIndexEntry{Introduction to `rsstap`}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   %\VignetteDepends{dplyr}
   %\VignetteDepends{ggplot2}
   %\VignetteDepends{rbenvo}
+  
 ---
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  eval = TRUE
+  eval = T
 )
 ```
+
+
+
+##  Motivation
+
+The [`rstap` package](https://biostatistics4socialimpact.github.io/rstap) introduced Spatial Temporal Aggregated Predictor or STAP models, 
+as a method by which the effect of [Built Environment](https://en.wikipedia.org/wiki/Built_environment) Features (BEFs) measured as a point pattern
+could be incorporated into pre-existing regression methods. The `rsstap` package builds on this framework by modifying the way in which the spatial temporal exposure effect is estimated. We'll begin this demonstration by loading the relevant libraries, before getting into the modelling notation and code examples. 
 
 
 ```{r libraries,message=F,results='hide'}
@@ -27,19 +36,16 @@ library(ggplot2)
 theme_set(theme_bw())
 data("example_benvo")
 ```
-
-# Introduction and Motivation
-
-The [`rstap` package](https://biostatistics4socialimpact.github.io/rstap) introduced Spatial Temporal Aggregated Predictor or STAP models, as a method by which the effect of [Built Environment](https://en.wikipedia.org/wiki/Built_environment) Features (BEFs) measured as a point pattern could be incorporated into pre-existing regression methods. The `rsstap` package builds on this framework by modifying the way in which the spatial temporal exposure effect is estimated.
-
 # Model Specification
 
 Restricting our attention to only spatial exposure for the following illustrative example, the spatial aggregated predictor both `rstap` and `rsstap` fit models of the following form:
 
 $$
-E[g(\mu_i)] = Z_i^{T}\delta + f(\mathcal{D}_i) \tag{1}\\
+E[g(\mu_i)] = Z_i^{T}\delta + f(\mathcal{D}_i) \quad i=1,...,n \tag{1}
 $$
-While link function $g(\cdot)$, univariate mean $\mu_i$ and covariates $Z_i$ for subject $i=1,...,n$ are identified from a typical regression model, the function $f(\mathcal{D})$ novelly represents the $i$th subject's cumulative exposure across space. In `rstap` This was accomplished by incorporating distances, $d$ through a spatial exposure function $f(\mathcal{D}_i) = \sum_{d \in \mathcal{D}_i} \mathcal{K}_s(d,\theta)$ - typically some exponential decay function, like $\exp(-\frac{d}{\theta})$ or $\exp(-(\frac{d}{\theta})^{\eta})$. Unfortunately, estimating this model through typical methods (e.g. MCMC) requires numerous evaluations of the kernel function summed across the, again typically numerous, distances in the set $\mathcal{D}_i$, of subject-BEF distances.
+
+While link function $g(\cdot)$, univariate mean $\mu_i$ and covariates $Z_i$ for subject $i=1,...,n$ are identified from a typical regression model, the function $f(\mathcal{D}_i)$ novelly
+represents the $i$th subject's cumulative exposure across space. In `rstap` This was accomplished by incorporating distances, $d$ through a spatial exposure function $f(\mathcal{D}_i) = \sum_{d \in \mathcal{D}_i} \mathcal{K}_s(d,\theta)$ - typically some exponential decay function, like $\exp(-\frac{d}{\theta})$ or $\exp(-(\frac{d}{\theta})^{\eta})$. Unfortunately, estimating this model through standard methods (e.g. MCMC) requires numerous evaluations of the kernel function summed across the, again typically numerous, distances in the sets $\mathcal{D}_i$ , of subject-BEF distances.
 
 To remedy this situation, the `rsstap` package adopts a regression spline basis representation, $f(d) = \sum_{j=0}^{J} \beta_j\phi_j(d)$, of the spatial exposure effect, removing the kernel and allowing for estimation on a sum of the function of the distances:
 
@@ -47,10 +53,11 @@ $$
 E[g(\mu_i)] = Z_i^{T}\delta +   \sum_{j=0}^{J}\sum_{d \in \mathcal{D}_i}\beta_j\phi_j(d) \tag{2}
 $$
 
-Since the sum across distances, $\sum_{d\in \mathcal{D}_i} \phi_j(d)$ can be done prior to model fitting, standard methods (e.g. a bayesian equivalent to `mgcv::gam`) can be used, dramatically decreasing computational complexity. 
+Since the sum across distances, $\sum_{d\in \mathcal{D}_i} \phi_j(d)$ can be done prior to model fitting, standard methods (essentially a bayesian equivalent to `mgcv::gam`) can be used, dramatically decreasing computational complexity. Specifically, we use the No U-Turn sampler variant available via `rstan` for full bayesian inference of the posterior distribution of these functional terms. Finally, information about priors for `rsstap` models can be found [here](https:://apeterson91.github.io/references/priors.html). 
 
 ## Illustration
 
+We'll illustrate this using a simple dataset that contains outcome `BMI` as a function of a binary covariate `sex` and simulated fast food restaurant (FFR) exposure. These data are contained in the [`benvo` package](https://apeterson91.github.io/rbenvo/).
 
 
 ```{r auxiliary,echo=F}
@@ -63,6 +70,8 @@ truth <- geom_line(aes(x=x,y=y),
                                      lower.tail = F)),
             color='red')
 ```
+
+As can be seen below, the model formula and syntax are akin to the typical `lm` function, with the addition of a `sap(FFR)` term to represent the fact that we'll be modelling FFR exposure as a spatial aggregated predictor. Let's fit this model using the standard sampling defaults of 2000 samples drawn from 4 independent chains, using the first 1000 from each as burn-in.
 
 ```{r model_fit,message=F,results='hide'}
 fit <- sstap_lm(BMI ~ sex + sap(FFR),
@@ -88,12 +97,12 @@ plot(fit) + truth
 ```
 
 
-While the curves won't always be so well defined, this more or less defines the basics of fitting stap models using the spline implimentation via rsstap. The next section will go through the basics of spatial-temporal estimation *without* adjusting for within subject correlation.
+While the curves won't always be so well defined, this example illustrates the basics of fitting stap models using the spline implimentation via rsstap.  The next section will go through the basics of spatial-temporal estimation *without* adjusting for within subject correlation.
 
 
 ## Longitudinal Spatio-Temporal example
 
-In this quick example, we'll briefly run through the same function calls as before, now using a longitudinal simulated dataset that contains both spatial and temporal data. Note that while a longitudinal model *should* take into account correlation across a given subject's measurements, we'll stick to the simpler model now for exposition (see the longitudinal vignette for how to account for these terms).  Let's first look at the `longitudinal_HFS` data that comes with the `rsstap package`, renamed here as `bdf2` for brevity.
+In this quick example, we'll briefly run through the same function calls as before, now using a longitudinal simulated dataset that contains both spatial and temporal data. Note that while a longitudinal model *should* take into account correlation across a given subject's measurements, we'll stick to the simpler model now for exposition (see the [longitudinal](https://apeterson91.github.io/rsstap/articles/Longitudinal_Models.html) vignette for how to account for these terms).  Let's first look at the `longitudinal_HFS` data that comes with the `rsstap package`, renamed here as `bdf2` for brevity.
 
 ```{r long_data,echo=F}
 data("longitudinal_HFS")
@@ -104,7 +113,7 @@ bdf2 <- longitudinal_HFS
 bdf2
 ```
 
-Looks like this data contains 300 subjects with both distances and times measured for the subjects. In order to fit the same kind of model as before, but now taking into account both space and time, we'll use the `stap` designation in the model formula. This is equivalent to using the `t2` formula from `mgcv`.
+Looks like this data contains 300 subjects with both distances and times measured for the subjects. In order to fit the same kind of model as before, but now taking into account both space and time, we'll use the `stap` designation in the model formula. This is equivalent to using the `t2` spline basis expansion from `mgcv`.
 
 ```{r,results='hide'}
 fit <- sstap_lm(BMI ~ sex + stap(HFS), benvo = bdf2)
@@ -143,9 +152,11 @@ plot_xsection(fit,fixed_val=5)
 plot3D(fit)
 ```
 
-## Future work
+With both spatial and spatio-temporal model-fitting now demonstrated, it is our hope that you have a greater familiarity of some of the basics of `rsstap` and the STAP modeling framework.
+
+## Advanced Topics
 
 This concludes the introductory vignette. With built environment - subject data, the `rsstap` package can be used to estimate how nearby built environment features may effect the outcome of interest via the STAP modeling framework.
 
-Future vignettes will elaborate on the spline implementation of spatial temporal aggregated predictors in a longitudinal context, wherein subject specific and between/within effects are estimated, network effects of BEFs and spatio-temporal interaction effects.
+See the other vignettes for elaborations on the spline implementation of spatial temporal aggregated predictors in a [longitudinal](https://apeterson91.github.io/rsstap/articles/Longitudinal_Models.html) context, wherein subject specific and between/within effects are estimated as well as so-called ["network effects"](https://apeterson91.github.io/rsstap/articles/Network_Effects.html) of BEFs .
 

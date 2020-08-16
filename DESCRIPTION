@@ -1,7 +1,7 @@
 Package: rsstap
 Type: Package
 Title: Spline Spatial Temporal Aggregated Predictors in R
-Version: 0.0.0
+Version: 0.1.0
 Date: 2020-01-16
 Authors@R: person(given = "Adam", 
 				  family = "Peterson", 
@@ -24,7 +24,7 @@ Imports:
     Rcpp (>= 0.12.0),
     rstan (>= 2.18.1),
     rstantools (>= 2.0.0.9000),
-    rbenvo (>= 0.1.1.9000),
+    rbenvo (>= 0.1.0),
     mgcv,
     lme4,
     Matrix,

@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rsstap</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -95,7 +95,10 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/Introduction.html">Introduction</a>
+      <a href="../articles/BEF_Networks.html">Network Effects</a>
+    </li>
+    <li>
+      <a href="../articles/Introduction.html">Introduction to `rsstap`</a>
     </li>
     <li>
       <a href="../articles/Longitudinal_Models.html">Longitudinal Models</a>
@@ -132,7 +135,7 @@
     <p>Spline Spatial Temporal Aggregated Generalized Mixed Effects Regression Model</p>
     </div>
 
-    <pre class="usage"><span class='fu'>sstap_glmer</span>(<span class='no'>formula</span>, <span class='no'>benvo</span>, <span class='kw'>family</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/family.html'>gaussian</a></span>(), <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>sstap_glmer</span>(<span class='no'>formula</span>, <span class='no'>benvo</span>, <span class='kw'>family</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/family.html'>gaussian</a></span>(), <span class='kw'>QR</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='no'>...</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -148,6 +151,10 @@
     <tr>
       <th>family</th>
       <td><p>One of <code><a href='https://rdrr.io/r/stats/family.html'>family</a></code>  currently gaussian, binomial and poisson are implimented with identity, logistic and  log links currently.</p></td>
+    </tr>
+    <tr>
+      <th>QR</th>
+      <td><p>boolean denoting whether or not to perform a QR decomposition on the design matrix, note that this is an experimental feature and bugs are still being worked out.</p></td>
     </tr>
     <tr>
       <th>...</th>

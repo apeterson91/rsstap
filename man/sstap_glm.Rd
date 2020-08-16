@@ -4,7 +4,7 @@
 \alias{sstap_glm}
 \title{Spline Spatial Temporal Aggregated Predictor General Linear Model}
 \usage{
-sstap_glm(formula, benvo, weights = NULL, family = gaussian(), ...)
+sstap_glm(formula, benvo, weights = NULL, family = gaussian(), QR = TRUE, ...)
 }
 \arguments{
 \item{formula}{Similar as for \code{\link[stats]{glm}} with the addition of \code{stap},\code{sap} \code{tap} terms as needed}
@@ -14,6 +14,8 @@ sstap_glm(formula, benvo, weights = NULL, family = gaussian(), ...)
 \item{weights}{vector of positive integer weights}
 
 \item{family}{One of \code{\link[stats]{family}}  currently gaussian, binomial and poisson are implimented with identity, logistic and  log links currently.}
+
+\item{QR}{boolean denoting whether or not to perform a QR decomposition on the design matrix.}
 
 \item{...}{arguments for stan sampler}
 }

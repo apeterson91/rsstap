@@ -13,5 +13,7 @@ sstapreg(object)
 A sstapreg object
 }
 \description{
-Create a sstapreg object
+The returned model object from the \pkg{rsstap} functions - methods can be 
+called on this to identify STAP effects and any problems with model convergence 
+or other diagnostics.
 }

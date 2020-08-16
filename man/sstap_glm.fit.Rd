@@ -4,7 +4,7 @@
 \alias{sstap_glm.fit}
 \title{Spline Spatial Temporal Aggregated Regression Generalized Linear Model Fit}
 \usage{
-sstap_glm.fit(y, Z, X, S, family, group = list(), ...)
+sstap_glm.fit(y, Z, X, S, family, group = list(), QR = F, ...)
 }
 \arguments{
 \item{y}{vector/matrix of outcomes}
@@ -20,6 +20,8 @@ sstap_glm.fit(y, Z, X, S, family, group = list(), ...)
 \item{group}{A list, possibly of length zero (the default), but otherwise
 having the structure of that produced by \code{\link[lme4]{mkReTrms}} to
 indicate the group-specific part of the model.}
+
+\item{QR}{boolean denoting whether or not to perform a QR decomposition on the design matrix, note that this is an experimental feature and bugs are still being worked out.}
 
 \item{...}{arguments for stan sampler}
 }

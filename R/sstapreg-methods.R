@@ -6,7 +6,7 @@
 #' those pages are provided in the \strong{See Also} section, below.
 #' 
 #' @name sstapreg-methods
-#' @aliases VarCorr fixef ngrps sigma nsamples
+#' @aliases VarCorr ngrps sigma nsamples
 #' 
 #' @param object sstapreg object
 #' @param ... Ignored
@@ -66,7 +66,6 @@ fitted.sstapreg <- function(object, ...)
 #' @param object a Fitted sstapreg model object
 #' @param ... argument to method
 #' @return Standard errors of model parameters.
-#' @seealso \code{\link{se.sstapreg}}
 #' 
 se <- function(object, ...) UseMethod("se")
 

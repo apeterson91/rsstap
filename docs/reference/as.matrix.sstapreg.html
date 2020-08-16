@@ -73,7 +73,7 @@ matrix data structure" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rsstap</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -96,7 +96,10 @@ matrix data structure" />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/Introduction.html">Introduction</a>
+      <a href="../articles/BEF_Networks.html">Network Effects</a>
+    </li>
+    <li>
+      <a href="../articles/Introduction.html">Introduction to `rsstap`</a>
     </li>
     <li>
       <a href="../articles/Longitudinal_Models.html">Longitudinal Models</a>
@@ -156,8 +159,8 @@ matrix data structure</p>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A matrix  the dimensions of which depend on
-  <code>pars</code> and <code>regex_pars</code>..</p>
+    <p>A matrix of parameter samples. The dimensions/content of which depend on
+  <code>pars</code>.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='sstapreg-methods.html'>sstapreg-methods</a></code></p></div>
@@ -198,14 +201,12 @@ matrix data structure</p>
 #&gt; s(FFR).10    0.7    0.8
 #&gt; 
 #&gt; Smoothing terms:
-#&gt;                     Median MAD_SD
-#&gt; smooth_precision[1] 4.0    1.7   
-#&gt; smooth_precision[2] 0.1    0.0   </div><div class='input'><span class='co'># Extract posterior sample after MCMC</span>
+#&gt;                           Median MAD_SD
+#&gt; smooth_precision[s(FFR)1] 4.0    1.7   
+#&gt; smooth_precision[s(FFR)2] 0.1    0.0   </div><div class='input'><span class='co'># Extract posterior sample after MCMC</span>
 <span class='no'>draws</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>example_model</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/dim.html'>dim</a></span>(<span class='no'>draws</span>))</div><div class='output co'>#&gt; [1] 250  16</div><div class='input'>
-<span class='co'># For example, we can see that the median of the draws for the intercept </span>
-<span class='co'># is the same as the point estimate rstanarm uses</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/median.html'>median</a></span>(<span class='no'>draws</span>[, <span class='st'>"(Intercept)"</span>]))</div><div class='output co'>#&gt; [1] 25.93849</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>example_model</span>$<span class='no'>coefficients</span><span class='kw'>[[</span><span class='st'>"(Intercept)"</span>]])</div><div class='output co'>#&gt; [1] 25.93849</div><div class='input'># }
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/dim.html'>dim</a></span>(<span class='no'>draws</span>))</div><div class='output co'>#&gt; [1] 250  15</div><div class='input'>
+# }
 
 </div></pre>
   </div>

@@ -42,20 +42,19 @@ get_sstapspec <- function(f,benvo){
 	get_indicator <- function(f,ics,vec_var){
 		(all.names(f)[ics] %in% vec_var)*1
 	}
-    stap_ics <- get_ics(f, c("stap","stap_bw","stapi","stapi_bw"))
+    stap_ics <- get_ics(f, c("stap","stap_bw"))
     sap_ics <- get_ics(f,c("sap","sap_bw"))
     tap_ics <- get_ics(f,c("tap","tap_bw"))
     if(!length(stap_ics) & !length(sap_ics) & !length(tap_ics))
         stop("No covariates designated as 'stap','sap',or 'tap'  in formula", .call = F)
 	stap_nms <- get_names(f,stap_ics)
 	stap_bw <- get_indicator(f,stap_ics, c("stap_bw"))
-	stap_i <- get_indicator(f,stap_ics,c("stapi_bw","stapi"))
 	sap_nms <- get_names(f,sap_ics)
 	sap_bw <- get_indicator(f,sap_ics,c("sap_bw"))
     tap_nms <- get_names(f,tap_ics)
 	tap_bw <- get_indicator(f,tap_ics,c("tap_bw")) 
 	tms <- attr(terms(f),"term.labels")
-	stap_tms <- tms[stringr::str_detect(tms,"(^stap\\()|(^stap_bw\\()|^(stapi\\()|(^stapi_bw\\()")]
+	stap_tms <- tms[stringr::str_detect(tms,"(^stap\\()|(^stap_bw\\()")]
 	tap_tms <- tms[stringr::str_detect(tms,"^tap\\(")]
 	sap_tms <- tms[stringr::str_detect(tms,"^sap\\(")]
 	stap_k <- get_k(stap_tms)
@@ -63,12 +62,12 @@ get_sstapspec <- function(f,benvo){
 	sap_k <- get_k(sap_tms)
 	
 	if(length(stap_nms)>0){
-		stap_nms <- cbind(stap_nms,"Distance-Time",stap_bw,stap_k,stap_i)
+		stap_nms <- cbind(stap_nms,"Distance-Time",stap_bw,stap_k)
 	}
 	if(length(sap_nms)>0)
-		sap_nms <- cbind(sap_nms,"Distance",sap_bw,sap_k,0)
+		sap_nms <- cbind(sap_nms,"Distance",sap_bw,sap_k)
 	if(length(tap_nms)>0)
-		tap_nms <- cbind(tap_nms,"Time",tap_bw,tap_k,0)
+		tap_nms <- cbind(tap_nms,"Time",tap_bw,tap_k)
 
 	stap_mat <-rbind(stap_nms,sap_nms,tap_nms)
 
@@ -127,7 +126,6 @@ sstapspec <- function(stapless_formula,fake_formula,stap_mat,benvo){
 	component <- stap_mat[,2]
 	between_within <- as.integer(stap_mat[,3])
 	dimension <- as.integer(stringr::str_replace(stap_mat[,4],"\\)","-1"))
-	interaction <- as.integer(stap_mat[,5])
 	if(!(all(unique(term)==term)))
 		stop("Only one BEF name may be assigned to a stap term e.g. no sap(foo) + tap(foo)\n
 			 If you wish to model components this way create a different name e.g. sap(foo) + tap(foo_bar)")
@@ -161,7 +159,8 @@ sstapspec <- function(stapless_formula,fake_formula,stap_mat,benvo){
 			              jdi$pregam$term.names)
 						})
 
-	S <- purrr::pmap(list(1:length(jd),between_within,interaction),function(ix,bw_,i){create_S(jd[[ix]],bw_,0)})
+	S <- purrr::pmap(list(1:length(jd),between_within),function(ix,bw_){create_S(jd[[ix]],bw_)})
+	names(S) <- create_S_nms(term,component)
 
 	combine_list_entries <- function(l){
 		if(any(sapply(l,is.list)))
@@ -181,7 +180,6 @@ sstapspec <- function(stapless_formula,fake_formula,stap_mat,benvo){
 				component = component,
 				between_within = between_within,
 				dimension = dimension,
-				interaction = interaction,
 				ranges = lapply(jd,function(x) x$ranges),
 				X = X,
 				S = S,
@@ -191,3 +189,13 @@ sstapspec <- function(stapless_formula,fake_formula,stap_mat,benvo){
 	structure(out,class=c("sstapspec"))
 }
 
+
+create_S_nms <- function(term,component){
+
+	first <- sapply(component,function(x) 
+	switch(x,"Distance"="s(",
+		   "Time"="s(",
+		   "Distance-Time"="t2("))
+	out <- paste0(first,term,")")
+	return(out)
+}

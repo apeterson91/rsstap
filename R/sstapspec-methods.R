@@ -18,7 +18,7 @@
 #' \code{sstapspec} Methods
 #'
 #' @name sstapspec-methods
-#' @aliases get_k get_terms_ix get_component has_bw has_interaction get_smooth_obj 
+#' @aliases get_k get_terms_ix get_component has_bw get_smooth_obj 
 #'
 #' @param x sstapspec object
 #' @template args-term
@@ -94,17 +94,6 @@ has_bw.sstapspec <- function(x,term = NULL){
 	x$between_within[get_terms_ix(x,term)]
 }
 
-#' @rdname sstapspec-methods
-#' @export 
-has_interaction <- function(x,term = NULL)
-	UseMethod("has_interaction")
-
-#'
-#' @export
-#' @describeIn has_interaction has stap-interaction
-has_interaction.sstapspec <- function(x,term = NULL){
-	x$interaction[get_terms_ix(x,term)]
-}
 
 # Returns labels for given stap term, and vector of colnames
 #
@@ -115,15 +104,12 @@ get_lbls <- function(x,term,colnms)
 get_lbls.sstapspec <- function(x,term,colnms){
 
 	comp <- get_component(x,term)
-	i <- has_interaction(x,term) 
 	bw <- has_bw(x,term)
 	patrn <- switch(comp,
 		"Distance-Time"= "t2",
 		"Distance" = "s",
 		"Time" = "s"
 	)
-	if(i)
-		patrn <- paste0("ti")
 	if(bw)
 		term <- paste0(term,"_(bw|wi)")
 	patrn <- paste0(patrn,"\\(",term,"\\)\\.([1-9]$|[1-9][0-9]$)")

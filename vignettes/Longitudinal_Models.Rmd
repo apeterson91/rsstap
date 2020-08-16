@@ -5,6 +5,7 @@ vignette: >
   %\VignetteIndexEntry{Longitudinal Models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{rbenvo}
 references:
 - id: kalbfleisch
   title: Between-and within-cluster covariate effects in the analysis of clustered data
@@ -33,14 +34,14 @@ knitr::opts_chunk$set(
 
 
 
-# Motivation
+## Motivation
 
-In the `rsstap` Introductory [vignette](https://apeterson91.github.io/rsstap/articles/Introduction.html), we introduced the STAP formulation of models implimented using splines 
-and demonstrated how the `rsstap` package uses [`rstan`](https://mc-stan.org/users/interfaces/rstan) and [`mgcv`](https://cran.r-project.org/web/packages/mgcv/index.html) to fit these models in a context where observations are modeled independent of one another. 
-In this vignette I'll introduce the longitudinal modeling framework in `rsstap` that incorporates the familiar [`lme4`](https://github.com/lme4/lme4) model formula syntax in addition to 
+In the `rsstap` Introductory [vignette](https://apeterson91.github.io/rsstap/articles/Introduction.html), we introduced the STAP formulation of models implemented using splines 
+and demonstrated how the `rsstap` package uses [`rstan`](https://mc-stan.org/users/interfaces/rstan) and [`mgcv`](https://cran.r-project.org/web/packages/mgcv/index.html) to fit these models in a context where observations are modeled as independent of one another. 
+In this vignette We'll introduce the longitudinal modeling framework in `rsstap` that incorporates the familiar [`lme4`](https://github.com/lme4/lme4) model formula syntax in addition to 
 the between-within decomposition parameterization and syntax used to estimate between-within subject effect estimates of built environment exposure.
 
-##  Simple Model
+#  Simple Model
 
 We'll start by loading the relevant libraries and examining the included longitudinal dataset which consists of measurements on subjects "BMI" (outcome) as a function of simulated nearby "healthy food stores" (HFS) over time, similar to the longitudinal data used in the Introductory vignette:
 
@@ -57,13 +58,12 @@ bdf <- complex_longitudinal
 ```{r,bdf_descriptive}
 bdf
 ```
-Looking at descriptives of this exposure over time, we can see that there is a meaningful change in the number of distances across the measurement visits. (Foreshadowing)  This will be an important fact to consider in our modeling approach going forward.
+
 ```{r bdf_descriptive2}
 bef_summary(bdf)
 ```
 
-
-We'll fit this model using the included sex and year information, modeling the spatial temporal exposure to HFS' through a tensor spline basis function expansion and two subject specific terms accounting for within subject outcome correlation. 
+We'll fit this model using the included sex and year covariate information, modeling the spatial temporal exposure to HFS' through a tensor spline basis function expansion and two subject specific terms - accounting for within subject outcome correlation:
 
 
 $$
@@ -74,15 +74,16 @@ $$
 (b_{i1},b_{i2}) = \mathbf{b}_i \sim N(0,\Sigma),
 $$
 
-akin to the standard formulation as in the `lme4` package and 
+akin to the standard mixed effects regression formulation as in the `lme4` package and 
 
 $$
-f(\text{HFS Exposure}_i) = \sum_{l=1}^{L}\sum_{(d,t) \in\mathcal{S}} \beta_l\phi_l(d,t),
+f(\text{HFS Exposure}_{ij}) = \sum_{l=1}^{L}\sum_{(d,t) \in\mathcal{S}_{ij}} \beta_l\phi_l(d,t),
 $$
 
-with $\phi_l(\cdot)$ the basis function evaluation.
+with $\phi_l(\cdot)$ the basis function evaluation of all relevant subject-HFS distances and times at measurement $j$.  
 
-In order to fit this model in `rsstap` we can use the code below, setting the optional sampler arguments for `stan` similar to how was demonstrated in the Introductory vignette.
+
+In order to fit this model in `rsstap` we can use the code below, setting the optional sampler arguments for `rstan` similar to how was demonstrated in the Introductory vignette. 
 
 
 ```{r model_fit1,message=F,results='hide',warning=FALSE}
@@ -100,8 +101,7 @@ fit
 ppc(fit)
 ```
 
-Finally we'll look at a 3d plot and 2d plot cross sections of the HFS effect across space and time. This will allow us
-to establish whether there is any effect at all, and what it looks like (as a median estimate).
+Finally we'll look at a 3d plot and 2d plot cross sections of the HFS effect across space and time. This will allow us to establish whether there is any effect at all, and what it looks like.
 
 ```{r modelfit1_3dplot,warning=F}
 plot3D(fit)
@@ -115,9 +115,10 @@ plot_xsection(fit,fixed_val=5)
 plot_xsection(fit,component = "Time",fixed_val=0)
 ```
 
-The model ran and converged successfully and the output looks meaningfully interesting! But there's something important we forgot to take into account: With time-varying covariates, such as age, income, etc. It is important to *decompose* the measure into the baseline or between-subject effect and the change, or within-subject effect. Failing to do so can result in bias![@kalbfleisch]
+## The Missing Piece
+The model ran and converged successfully and the output looks meaningfully interesting! But there's something important we forgot to take into account. With time-varying covariates, such as age, income, etc. It is important to *decompose* the measure into the baseline or between-subject effect and the change, or within-subject effect as these each represent two different effects. Failing to decompose these time-varying measures can result in invalid inference![@kalbfleisch]
 
-## Between-Within Decomposition, Interpretation
+# Between-Within Decomposition, Interpretation
 
 There are a number of ways this decomposition could be be obtained. In the `rsstap` model the decomposition takes the following form (keeping all other components the same as in the previous model):
 

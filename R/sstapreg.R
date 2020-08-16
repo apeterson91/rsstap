@@ -16,6 +16,10 @@
 
 #' Create a sstapreg object
 #'
+#' The returned model object from the \pkg{rsstap} functions - methods can be 
+#' called on this to identify STAP effects and any problems with model convergence 
+#' or other diagnostics.
+#' 
 #' @param object A list provided by one of the \code{sstap_*} modeling functions.
 #' @return A sstapreg object
 #' @importFrom stats median mad
@@ -27,7 +31,7 @@ sstapreg <- function(object){
 	stap_terms <- object$specification$term
 	ynames <- grep("yhat",colnames(stanmat))
 	nms <- colnames(object$mf$X)
-	nms <- union(nms,Reduce(union,lapply(stap_terms,function(x) grep(x,colnames(stanmat),value=T))))
+	nms <- union(nms,Reduce(union,lapply(stap_terms,function(x) grep(paste0("^(s\\(|t2\\()",x),colnames(stanmat),value=T))))
 	coefs <- apply(stanmat[,nms],2,median)
 	covmat <- cov(stanmat[,nms])
 	colnames(covmat) <-nms 

@@ -22,11 +22,13 @@
 #' @param formula Similar as for \code{\link[lme4]{glmer}}. 
 #' @param benvo built environment object from the rbenvo package containing the relevant data
 #' @param family One of \code{\link[stats]{family}}  currently gaussian, binomial and poisson are implimented with identity, logistic and  log links currently.
+#' @param QR boolean denoting whether or not to perform a QR decomposition on the design matrix, note that this is an experimental feature and bugs are still being worked out.
 #' @param ... optional arguments for stan sampler
 #' 
 sstap_glmer <- function(formula,
 					   benvo,
 					   family = gaussian(),
+					   QR = TRUE,
 					   ...){
 
 	call <- match.call(expand.dots = TRUE)
@@ -41,6 +43,7 @@ sstap_glmer <- function(formula,
 	                          S = spec$S,
 	                          family = family,
 	                          group = mf$glmod$reTrms,
+							  QR = QR,
 							  ...
 	                          )
 

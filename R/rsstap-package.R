@@ -46,13 +46,12 @@
 #' @section mgcv translation:
 #'
 #' A table showing the exact rsstap's mgcv counterparts are shown below:
-#' \tabular{rrrrr}{
+#' \tabular{rr}{
 #'   rsstap  \tab mgcv \cr
 #'   sap(foo,k=1) \tab s(Distance,k=1,bs='ps')  \cr
 #'   sap(foo) \tab s(Distance,bs='ps')  \cr
 #'   tap(foo) \tab s(Time,bs='ps')  \cr
-#'   stap(foo) \tab t2(Distance,Time,bs='ps')) \cr 
-#'   stapti(foo) \tab ti(Distance,bs='ps') + ti(Time,bs='ps') + ti(Distance,Time,bs='ps') 
+#'   stap(foo) \tab t2(Distance,Time,bs='ps') \cr 
 #' }
 #' 
 #' 

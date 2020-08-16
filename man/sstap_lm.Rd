@@ -4,12 +4,14 @@
 \alias{sstap_lm}
 \title{Spline Spatial Temporal Aggregated Regression Linear Model}
 \usage{
-sstap_lm(formula, benvo, ...)
+sstap_lm(formula, benvo, QR = TRUE, ...)
 }
 \arguments{
 \item{formula}{Similar as for \code{\link[stats]{lm}} with the addition of \code{stap},\code{sap} \code{tap} terms as needed}
 
 \item{benvo}{built environment object from the rbenvo package containing the relevant data}
+
+\item{QR}{boolean denoting whether or not to perform a QR decomposition on the design matrix.}
 
 \item{...}{arguments for stan sampler}
 }

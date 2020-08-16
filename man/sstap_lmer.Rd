@@ -4,12 +4,14 @@
 \alias{sstap_lmer}
 \title{Spline Spatial Temporal Aggregated Mixed Effects Regression Model}
 \usage{
-sstap_lmer(formula, benvo, ...)
+sstap_lmer(formula, benvo, QR = TRUE, ...)
 }
 \arguments{
 \item{formula}{Similar as for \code{\link[lme4]{glmer}}.}
 
 \item{benvo}{built environment object from the rbenvo package containing the relevant data}
+
+\item{QR}{boolean denoting whether or not to perform a QR decomposition on the design matrix.}
 
 \item{...}{optional arguments for stan sampler}
 }

@@ -6,7 +6,6 @@
 \alias{get_terms_ix}
 \alias{get_component}
 \alias{has_bw}
-\alias{has_interaction}
 \alias{get_smooth_obj}
 \title{\code{sstapspec} Methods}
 \usage{
@@ -17,8 +16,6 @@ get_terms_ix(x, term = NULL)
 get_component(x, term = NULL)
 
 has_bw(x, term = NULL)
-
-has_interaction(x, term = NULL)
 
 get_smooth_obj(x, term = NULL)
 }

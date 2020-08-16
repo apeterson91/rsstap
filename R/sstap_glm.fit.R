@@ -23,6 +23,7 @@
 #' @param group A list, possibly of length zero (the default), but otherwise
 #'   having the structure of that produced by \code{\link[lme4]{mkReTrms}} to
 #'   indicate the group-specific part of the model. 
+#' @param QR boolean denoting whether or not to perform a QR decomposition on the design matrix, note that this is an experimental feature and bugs are still being worked out.
 #' @param ... arguments for stan sampler
 #' @importFrom Matrix t
 #' 
@@ -32,6 +33,7 @@ sstap_glm.fit <- function(y,
 						  S,
 						  family,
 						  group = list(),
+						  QR = F,
 						  ...){
   
 	if(is.matrix(y))
@@ -40,6 +42,10 @@ sstap_glm.fit <- function(y,
 		N <- length(y)
 	ncol_Z <- ncol(Z)
 	
+	if(!is.null(names(S)))
+		S_nms <- names(S)
+	else
+		S_nms <-rep("",length(S))
 	K_smooth <- max(purrr::map_dbl(S,ncol))
 	num_stap <- length(X)
 	stap_penalties <- purrr::map2_dbl(X,S,function(x,s) ncol(s)/ncol(x))
@@ -75,10 +81,15 @@ sstap_glm.fit <- function(y,
 	})
 	)
 	X <- cbind(Z,X)
-	qrc <- qr(X)
-	Q <- qr.Q(qrc)
-	R <- qr.R(qrc)
-	R_inv <- qr.solve(qrc,Q)
+	if(QR){
+		qrc <- qr(X)
+		Q <- qr.Q(qrc)
+		R <- qr.R(qrc)
+		R_inv <- qr.solve(qrc,Q)
+	}else{
+		Q <- X
+		R_inv <- diag(ncol(X))
+	}
 	P <- ncol(Q)
   
   standata <- list(N = N,
@@ -216,7 +227,7 @@ sstap_glm.fit <- function(y,
 
 	new_names <- c(colnames(X),
 					if(family$family=="gaussian") "sigma",
-					Reduce(c,sapply(stap_penalties,function(x) paste0("smooth_precision[",1:x,"]"))),
+					Reduce(c,purrr::map2(1:length(stap_penalties),stap_penalties,function(x,y) paste0("smooth_precision[",S_nms[x],1:y,"]"))),
                    if (length(group) && length(group$flist)) c(paste0("b[", b_nms, "]")),
                    if (standata$len_theta_L) paste0("Sigma[", Sigma_nms, "]"),
 				   paste0("yhat[",1:N,"]"),

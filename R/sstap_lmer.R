@@ -21,10 +21,12 @@
 #'
 #' @param formula Similar as for \code{\link[lme4]{glmer}}. 
 #' @param benvo built environment object from the rbenvo package containing the relevant data
+#' @param QR boolean denoting whether or not to perform a QR decomposition on the design matrix.
 #' @param ... optional arguments for stan sampler
 #' 
 sstap_lmer <- function(formula,
 					   benvo,
+					   QR = TRUE,
 					   ...){
 
 	call <- match.call(expand.dots = TRUE)
@@ -39,6 +41,7 @@ sstap_lmer <- function(formula,
 	                          S = spec$S,
 	                          family = gaussian(),
 	                          group = mf$glmod$reTrms,
+							  QR = QR,
 							  ...
 	                          )
 

@@ -3,7 +3,6 @@
 \name{sstapreg-methods}
 \alias{sstapreg-methods}
 \alias{VarCorr}
-\alias{fixef}
 \alias{ngrps}
 \alias{sigma}
 \alias{nsamples}

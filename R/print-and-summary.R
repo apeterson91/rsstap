@@ -49,6 +49,116 @@ print.sstapreg <- function(x, digits = 1, ...) {
 
 }
 
+
+#' Summary method for sstapreg objects
+#' 
+#' Summaries of parameter estimates and MCMC convergence diagnostics 
+#' (Monte Carlo error, effective sample size, Rhat).
+#'
+#' @export
+#' @method summary sstapreg 
+#'
+#' @param object sstapreg object
+#' @param probs an optional numeric vector of probabilities pased to \code{\link[stats]{quantile}}
+#' @param digits Number of digits to use for formatting numbers when printing. 
+#'   When calling \code{summary}, the value of digits is stored as the 
+#'   \code{"print.digits"} attribute of the returned object.
+#' @return The \code{summary} method returns an object of class 
+#'   \code{"summary.stanreg"}  which is a matrix of 
+#'   summary statistics and diagnostics, with attributes storing information for use by the
+#'   \code{print} method. 
+#'
+#'
+#' @importMethodsFrom rstan summary
+summary.sstapreg <- function(object,probs=c(0.05,0.5,0.95),...,digits=1){
+
+	args <- list(object = object$stapfit, probs=probs) 
+	out <- do.call("summary",args)$summary
+	nms <- c(names(coef(object)),
+			 grep(pattern="smooth",x=rownames(out),value=T),
+			 grep(pattern="log-posterior",x=rownames(out),value=T))
+	out <- out[nms,]
+
+    stats <- colnames(out)
+    if ("n_eff" %in% stats) {
+      out[, "n_eff"] <- round(out[, "n_eff"])
+    }
+    if ("se_mean" %in% stats) {# So people don't confuse se_mean and sd
+      colnames(out)[stats %in% "se_mean"] <- "mcse"
+    }
+
+	structure(
+	out,
+	call = object$call,
+	family = family_plus_link(object),
+	formula = formula(object),
+    posterior_sample_size = posterior_sample_size(object),
+    nobs = nobs(object),
+	ngrps = if(is.mer(object)) ngrps(object) else NULL,
+	print.digits = digits,
+	class = "summary.sstapreg"
+	)
+}
+
+
+#' @rdname summary.sstapreg
+#' @export
+#' @method print summary.sstapreg
+#'
+#' @param x An object of class \code{"summary.sstapreg"}.
+print.summary.sstapreg <-
+  function(x, digits = max(1, attr(x, "print.digits")),
+           ...) {
+
+    atts <- attributes(x)
+    cat("\nModel Info:")
+    cat("\n family:      ", atts$family)
+    cat("\n formula:     ", formula_string(atts$formula))
+	cat("\n sample:      ", atts$posterior_sample_size, 
+	  "(posterior sample size)")
+    
+    cat("\n observations:", atts$nobs)
+    if (!is.null(atts$ngrps)) {
+      cat("\n groups:      ", paste0(names(atts$ngrps), " (", 
+                                     unname(atts$ngrps), ")", 
+                                     collapse = ", "))
+    }
+    
+	hat <- "Rhat"
+	str_diag <- "MCMC diagnostics"
+	str1 <- "and Rhat is the potential scale reduction factor on split chains"
+	str2 <- " (at convergence Rhat=1).\n"
+    sel <- which(colnames(x) %in% c("mcse", "n_eff", hat))
+    has_mc_diagnostic <- length(sel) > 0
+    if (has_mc_diagnostic) {
+      xtemp <- x[, -sel, drop = FALSE]
+      colnames(xtemp) <- paste(" ", colnames(xtemp))
+    } else {
+      xtemp <- x
+    }
+    
+    # print table of parameter stats
+    .printfr(xtemp, digits)
+    
+    if (has_mc_diagnostic) {
+      cat("\n", str_diag, "\n", sep = '')
+      mcse_hat <- format(round(x[, c("mcse", hat), drop = FALSE], digits), 
+                          nsmall = digits)
+      n_eff <- format(x[, "n_eff", drop = FALSE], drop0trailing = TRUE)
+      print(cbind(mcse_hat, n_eff), quote = FALSE)
+      cat("\nFor each parameter, mcse is Monte Carlo standard error, ", 
+          "n_eff is a crude measure of effective sample size, ", 
+          str1, 
+          str2, sep = '')
+    }
+    
+    invisible(x)
+  }
+
+
+
+# internal ----------------------------------------------------------------
+
 # Family name with link in parenthesis 
 # @param x sstapreg object
 family_plus_link <- function(x) {

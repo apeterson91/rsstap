@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">rsstap</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -95,7 +95,10 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/Introduction.html">Introduction</a>
+      <a href="../articles/BEF_Networks.html">Network Effects</a>
+    </li>
+    <li>
+      <a href="../articles/Introduction.html">Introduction to `rsstap`</a>
     </li>
     <li>
       <a href="../articles/Longitudinal_Models.html">Longitudinal Models</a>
@@ -169,8 +172,11 @@ Any use outside of what is defined here will likely result in erroneous behavior
 
 
 <p>A table showing the exact rsstap's mgcv counterparts are shown below:</p><table class='table'>
-<tr><td>rsstap</td><td>mgcv</td><td>sap(foo,k=1)</td><td>s(Distance,k=1,bs='ps')</td><td>sap(foo)</td></tr>
-<tr><td>s(Distance,bs='ps')</td><td>tap(foo)</td><td>s(Time,bs='ps')</td><td>stap(foo)</td><td>t2(Distance,Time,bs='ps'))</td></tr>
+<tr><td>rsstap</td><td>mgcv</td></tr>
+<tr><td>sap(foo,k=1)</td><td>s(Distance,k=1,bs='ps')</td></tr>
+<tr><td>sap(foo)</td><td>s(Distance,bs='ps')</td></tr>
+<tr><td>tap(foo)</td><td>s(Time,bs='ps')</td></tr>
+<tr><td>stap(foo)</td><td>t2(Distance,Time,bs='ps')</td></tr>
 </table>
 
 
