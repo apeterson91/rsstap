@@ -23,7 +23,7 @@ Currently the priors in \pkg{rsstap} are fixed and are always of the following f
 
  \deqn{\beta \sim MVN_L(0,\sum_k S_k \tau_k)}
 
- \deqn{\tau_k \sim \text{Exponential}(1)}
+ \deqn{\tau_k \sim Exp(1)}
 
 Where \eqn{S_k} are generated from the \code{\link[mgcv]{jagam}} function and sum to form a complete precision matrix with different \eqn{\tau} penalties along the diagonal.
 }

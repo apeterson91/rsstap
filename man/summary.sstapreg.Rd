@@ -14,6 +14,8 @@
 
 \item{probs}{an optional numeric vector of probabilities pased to \code{\link[stats]{quantile}}}
 
+\item{...}{ignored}
+
 \item{digits}{Number of digits to use for formatting numbers when printing. 
 When calling \code{summary}, the value of digits is stored as the 
 \code{"print.digits"} attribute of the returned object.}

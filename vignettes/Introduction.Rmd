@@ -53,7 +53,7 @@ $$
 E[g(\mu_i)] = Z_i^{T}\delta +   \sum_{j=0}^{J}\sum_{d \in \mathcal{D}_i}\beta_j\phi_j(d) \tag{2}
 $$
 
-Since the sum across distances, $\sum_{d\in \mathcal{D}_i} \phi_j(d)$ can be done prior to model fitting, standard methods (essentially a bayesian equivalent to `mgcv::gam`) can be used, dramatically decreasing computational complexity. Specifically, we use the No U-Turn sampler variant available via `rstan` for full bayesian inference of the posterior distribution of these functional terms. Finally, information about priors for `rsstap` models can be found [here](https:://apeterson91.github.io/references/priors.html). 
+Since the sum across distances, $\sum_{d\in \mathcal{D}_i} \phi_j(d)$ can be done prior to model fitting, standard methods (essentially a bayesian equivalent to `mgcv::gam`) can be used, dramatically decreasing computational complexity. Specifically, we use the No U-Turn sampler variant available via `rstan` for full bayesian inference of the posterior distribution of these functional terms. Finally, information about priors for `rsstap` models can be found [here](https://apeterson91.github.io/rsstap/reference/priors.html). 
 
 ## Illustration
 

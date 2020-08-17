@@ -167,45 +167,8 @@ matrix data structure</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
-<span class='kw'>if</span> (!<span class='fu'><a href='https://rdrr.io/r/base/exists.html'>exists</a></span>(<span class='st'>"example_model"</span>)) <span class='fu'><a href='https://rdrr.io/r/utils/example.html'>example</a></span>(<span class='no'>example_model</span>)</div><div class='output co'>#&gt; 
-#&gt; exmpl_&gt; example_model &lt;- 
-#&gt; exmpl_+   sstap_lm(BMI ~ sex + sap(FFR),
-#&gt; exmpl_+              benvo = rbenvo::example_benvo,
-#&gt; exmpl_+              # this next line is only to keep the example small in size!
-#&gt; exmpl_+              chains = 1, cores = 1, seed = 12345, iter = 500, refresh = 0)</div><div class='output co'>#&gt; <span class='warning'>Warning: The largest R-hat is 1.07, indicating chains have not mixed.</span>
-#&gt; <span class='warning'>Running the chains for more iterations may help. See</span>
-#&gt; <span class='warning'>http://mc-stan.org/misc/warnings.html#r-hat</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Bulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.</span>
-#&gt; <span class='warning'>Running the chains for more iterations may help. See</span>
-#&gt; <span class='warning'>http://mc-stan.org/misc/warnings.html#bulk-ess</span></div><div class='output co'>#&gt; <span class='warning'>Warning: Tail Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.</span>
-#&gt; <span class='warning'>Running the chains for more iterations may help. See</span>
-#&gt; <span class='warning'>http://mc-stan.org/misc/warnings.html#tail-ess</span></div><div class='output co'>#&gt; 
-#&gt; exmpl_&gt; example_model
-#&gt; 
-#&gt;  family:       gaussian [identity]
-#&gt;  formula:      BMI ~ sex + sap(FFR)
-#&gt;  observations: 1000
-#&gt;  fixed effects:  12
-#&gt; ------
-#&gt;             Median MAD 
-#&gt; (Intercept) 25.9    0.1
-#&gt; sex         -2.1    0.1
-#&gt; s(FFR).1     2.9    0.7
-#&gt; s(FFR).2     2.9    0.1
-#&gt; s(FFR).3     3.1    0.1
-#&gt; s(FFR).4     2.9    0.1
-#&gt; s(FFR).5     2.7    0.1
-#&gt; s(FFR).6     1.4    0.1
-#&gt; s(FFR).7     0.1    0.1
-#&gt; s(FFR).8     0.0    0.1
-#&gt; s(FFR).9    -0.1    0.1
-#&gt; s(FFR).10    0.7    0.8
-#&gt; 
-#&gt; Smoothing terms:
-#&gt;                           Median MAD_SD
-#&gt; smooth_precision[s(FFR)1] 4.0    1.7   
-#&gt; smooth_precision[s(FFR)2] 0.1    0.0   </div><div class='input'><span class='co'># Extract posterior sample after MCMC</span>
-<span class='no'>draws</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>example_model</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/dim.html'>dim</a></span>(<span class='no'>draws</span>))</div><div class='output co'>#&gt; [1] 250  15</div><div class='input'>
+<span class='kw'>if</span> (!<span class='fu'><a href='https://rdrr.io/r/base/exists.html'>exists</a></span>(<span class='st'>"example_model"</span>)) <span class='fu'><a href='https://rdrr.io/r/utils/example.html'>example</a></span>(<span class='no'>example_model</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: no help found for ‘example_model’</span></div><div class='input'><span class='co'># Extract posterior sample after MCMC</span>
+<span class='no'>draws</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span>(<span class='no'>example_model</span>)</div><div class='output co'>#&gt; <span class='error'>Error in as.matrix(example_model): object 'example_model' not found</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/dim.html'>dim</a></span>(<span class='no'>draws</span>))</div><div class='output co'>#&gt; <span class='error'>Error in print(dim(draws)): object 'draws' not found</span></div><div class='input'>
 # }
 
 </div></pre>

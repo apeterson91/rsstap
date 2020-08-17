@@ -22,13 +22,13 @@ knitr::opts_chunk$set(
 
 ## Motivation
 
-THe [introductory](https://apeterson91.github.io/rsstap/articles/Introduction.html) and [longitudinal](https://apeterson91.github.io/rsstap/articles/Introduction.html) vignettes introduced the STAP modeling framework for estimating the effect of Built Environment Features (BEFs) as a function of space - how far they are from where subjects are (e.g. residential addresses) - and time - how long they live at that distance in both a cross-sectional and longitudinal setting. In both settings the primary measurement was that between the subject and the BEF and consequently, the effect estimated corresponded to that of conceptually placing a BEF at a certain point in space and time relative to the subject, henceforth called a **Direct Effect**.   
+The [introductory](https://apeterson91.github.io/rsstap/articles/Introduction.html) and [longitudinal](https://apeterson91.github.io/rsstap/articles/Introduction.html) vignettes introduced the STAP modeling framework for estimating the effect of Built Environment Features (BEFs) as a function of space - how far they are from where subjects are (e.g. residential addresses) - and time - how long they live at that distance - in both a cross-sectional and longitudinal setting. In both settings the primary measurement was that between the subject and the BEF and consequently the effect estimated corresponded to that of conceptually placing a BEF at a certain point in space and time relative to the subject, henceforth called a **Direct Effect**.   
 
 In this vignette we introduce the concept of **Indirect Effects**, that is, the effect associated with placing a BEF of the same or different type near another BEF. For example, placing one Fast Food Restaurant (FFR) near another FFR may increase the overall effect of those two FFRs to be more than what either FFR would have alone.
 
-In this way, one can think of a *network* of BEFs and BEF-effects, each amplifying or dampening the effects of one another according to their type, placement, and quantity in space/time. 
+In this way, one can think of a *network* of BEFs, each amplifying or dampening the effects of one another according to their type, placement, and quantity in space/time. 
 
-What follows is a graphical illustration of this idea, as well as discussion of the nuances of data preparation, the model framework, notation and relevant software syntax for fitting the model in `rsstap`. A sample model fitting using simulated data generated to mimic the hypothetical FFR example previously described completes the vignette. Before we get started, we'll load the necessary libraries and data.
+What follows is a graphical illustration of this idea, a brief elaboration over the model framework as well as a discussion of the data set-up and relevant software syntax for fitting the model in `rsstap`. A sample model fitting using simulated data generated to mimic the hypothetical FFR example previously described completes the vignette. Before we get started, we'll load the necessary libraries and data.
 
 
 ```{r libraries,message=F,results='hide'}
@@ -62,7 +62,7 @@ nt %>%
 
 ```
 
-The gold-orange colored lines indicate how the direct effects are estimated and understood - as the distance between a FFR and a subject. Similarly, The blue lines illustrate how the indirect effects are both estimated and understood - as the distance between two - FFRs, the additional effect from having two FFRs located near one another. In the next section we'll demonstrate how these ideas manifest in the model math.
+The gold-orange colored lines indicate how the direct effects are estimated and understood - as the distance between a FFR and a subject. Similarly, The blue lines illustrate how the indirect effects are understood, the additional effect from having two FFRs located near one another. In the next section we'll demonstrate how these ideas manifest in the model mathematics.
 
 # BEF Network Effects Model
 
@@ -71,11 +71,11 @@ For outcome $Y_i$ measured on the $i$th subject, $i=1,...,n$ alongside subject c
 $$
 E[Y_i] = \alpha + \mathbf{Z}_i^T \mathbf{\delta} + f(\text{Direct FFR}_i) + f(\text{Indirect  FFR}_i),
 $$
-where
+where the direct effect is modeled similar to the first example in the introductory vignette and 
 $$
 f(\text{Indirect }FFR_i), = \sum_{l=1}^{L} \sum_{d \in \mathcal{\mathcal{Q}_i}} \beta_l\phi_l(d).
 $$
-In the above, $d$ is the distance between two nearby FFRs that are also near subject $i$ and $\mathcal{Q}$ is the set of all such between FFR distances for subject $i$.$\beta_l$ and $\phi_l$ are basis function coefficients and expansion functions as in the usual STAP model framework. It should be noted here that identifying concepts such as "near" likely require substantive knowledge to avoid over-including too many FFRs. Similarly,there is an important identifiability constraint here (as with all STAPs) that there be a different number of FFRs nearby one another. This is usually trivially satisfied in most practical applications, but it bears repeating.
+In the above, $d$ is the distance between two nearby FFRs that are also near subject $i$ and $\mathcal{Q}$ is the set of all such between FFR distances for subject $i$. Similar to all STAP models, $\beta_l$ and $\phi_l$ are basis function coefficients and expansion functions. It should be noted here that identifying concepts such as "near" likely require substantive knowledge to avoid over-including too many FFRs. Similarly,there is an important identifiability constraint here (as with all STAPs) that there be a different number of FFRs nearby one another. This is usually trivially satisfied in most practical applications, but it bears mentioning.
 
 With all this modelling notation out of the way, we'll move onto how to fit and explore these models using the `rsstap` package.
 
@@ -95,7 +95,7 @@ fit <- sstap_lm(BMI ~ sex + sap(`Direct FFR`) + sap(`Indirect FFR`),
                 benvo=network_benvo, QR=TRUE)
 ```
 
-Plotting the terms, alongside the true curves we can see that the model accurately captures both the direct and indirect effect.
+Plotting the estimates alongside the true curves we can see that the model accurately captures both the direct and indirect effect.
 
 ```{r truth1,echo=F}
 truth <- tibble(Distance = seq(from = 0, to = 1,by=0.01)) %>% 
