@@ -7,3 +7,7 @@ addons:
     packages: libnode-dev
 r_build_args: '--no-build-vignettes'
 r_check_args: '--ignore-vignettes'
+latex: true
+after_failure:
+  - cat rstanarm.Rcheck/00*
+

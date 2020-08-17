@@ -60,6 +60,7 @@ print.sstapreg <- function(x, digits = 1, ...) {
 #'
 #' @param object sstapreg object
 #' @param probs an optional numeric vector of probabilities pased to \code{\link[stats]{quantile}}
+#' @param ... ignored
 #' @param digits Number of digits to use for formatting numbers when printing. 
 #'   When calling \code{summary}, the value of digits is stored as the 
 #'   \code{"print.digits"} attribute of the returned object.
