@@ -33,3 +33,9 @@ test_that("Sample glm with multiple predictors works",{
   expect_equal(1,length(glm1$specification$term))
   expect_equal(2,length(glm2$specification$term))
 })
+
+test_that("sstap_glmer methods work as intended",{
+  expect_equal(1,length(ranef(lmer1)))
+  expect_error(ranef(glm1))
+  expect_equivalent(600,ngrps(lmer1))
+})

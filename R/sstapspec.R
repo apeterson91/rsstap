@@ -55,8 +55,8 @@ get_sstapspec <- function(f,benvo){
 	tap_bw <- get_indicator(f,tap_ics,c("tap_bw")) 
 	tms <- attr(terms(f),"term.labels")
 	stap_tms <- tms[stringr::str_detect(tms,"(^stap\\()|(^stap_bw\\()")]
-	tap_tms <- tms[stringr::str_detect(tms,"^tap\\(")]
-	sap_tms <- tms[stringr::str_detect(tms,"^sap\\(")]
+	tap_tms <- tms[stringr::str_detect(tms,"^tap\\(|(^tap_bw\\()")]
+	sap_tms <- tms[stringr::str_detect(tms,"^sap\\(|(^sap_bw\\()")]
 	stap_k <- get_k(stap_tms)
 	tap_k <- get_k(tap_tms)
 	sap_k <- get_k(sap_tms)

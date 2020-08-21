@@ -6,7 +6,7 @@
 #' those pages are provided in the \strong{See Also} section, below.
 #' 
 #' @name sstapreg-methods
-#' @aliases VarCorr ngrps sigma nsamples
+#' @aliases VarCorr ngrps sigma nsamples ranef
 #' 
 #' @param object sstapreg object
 #' @param ... Ignored
@@ -151,6 +151,70 @@ vcov.sstapreg <- function(object, correlation = FALSE, ...) {
   out <- object$covmat
   if (!correlation) return(out)
   cov2cor(out)
+}
+
+
+#' @rdname sstapreg-methods
+#' @export
+#' @export ranef
+#' @importFrom lme4 ranef
+#'
+ranef.sstapreg <- function(object,...){
+	.glmer_check(object)
+	b_nms <- paste0("b[",make_b_nms(object$glmod$reTrms),"]")
+	point_estimates <- summary(object)[b_nms,"50%"]
+	  out <- ranef_template(object)
+	  group_vars <- names(out)
+  for (j in seq_along(out)) {
+    tmp <- out[[j]]
+    pars <- colnames(tmp) 
+    levs <- rownames(tmp)
+    levs <- gsub(" ", "_", levs) 
+    for (p in seq_along(pars)) {
+      stan_pars <- paste0("b[", pars[p], " ", group_vars[j],  ":", levs, "]")
+      tmp[[pars[p]]] <- unname(point_estimates[stan_pars])
+    }
+    out[[j]] <- tmp
+  }
+  out
+}
+
+# Call lme4 to get the right structure for ranef objects
+#' @importFrom lme4 lmerControl glmerControl lmer glmer 
+ranef_template <- function(object) {
+  
+    new_formula <- object$specification$stapless_formula 
+	if(family(object)$family =="gaussian")
+		lme4_fun <- "lmer"
+	else
+		lme4_fun <- "glmer"
+
+	cntrl_args <- list(optimizer = "Nelder_Mead", optCtrl = list(maxfun = 1))
+	cntrl_args$check.conv.grad <- "ignore"
+	cntrl_args$check.conv.singular <- "ignore"
+	cntrl_args$check.conv.hess <- "ignore"
+	cntrl_args$check.nlev.gtreq.5 <- "ignore"
+	cntrl_args$check.nobs.vs.rankZ <- "ignore"
+	cntrl_args$check.nobs.vs.nlev <- "ignore"
+	cntrl_args$check.nobs.vs.nRE <- "ignore"
+	if (lme4_fun == "glmer") {
+      cntrl_args$check.response.not.const <- "ignore"
+    }
+  
+  cntrl <- do.call(paste0(lme4_fun, "Control"), cntrl_args)
+  
+  fit_args <- list(
+    formula = new_formula,
+    data = object$model$benvo@subject_data,
+    control = cntrl
+  )
+  
+  if(family(object)$family != "gaussian"){
+		fit_args$family <-family(object)
+  }
+
+	lme4_fit <- suppressWarnings(do.call(lme4_fun, args = fit_args))
+	ranef(lme4_fit)
 }
 
 #'

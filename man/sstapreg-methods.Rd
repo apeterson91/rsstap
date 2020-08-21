@@ -6,6 +6,7 @@
 \alias{ngrps}
 \alias{sigma}
 \alias{nsamples}
+\alias{ranef}
 \alias{coef.sstapreg}
 \alias{confint.sstapreg}
 \alias{fitted.sstapreg}
@@ -14,6 +15,7 @@
 \alias{VarCorr.sstapreg}
 \alias{ngrps.sstapreg}
 \alias{vcov.sstapreg}
+\alias{ranef.sstapreg}
 \alias{nsamples.sstapreg}
 \title{Methods for sstapreg objects}
 \usage{
@@ -32,6 +34,8 @@
 \method{ngrps}{sstapreg}(object, ...)
 
 \method{vcov}{sstapreg}(object, correlation = FALSE, ...)
+
+\method{ranef}{sstapreg}(object, ...)
 
 \method{nsamples}{sstapreg}(object, ...)
 }

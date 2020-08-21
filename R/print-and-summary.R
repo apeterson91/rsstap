@@ -77,6 +77,7 @@ summary.sstapreg <- function(object,probs=c(0.05,0.5,0.95),...,digits=1){
 	out <- do.call("summary",args)$summary
 	nms <- c(names(coef(object)),
 			 grep(pattern="smooth",x=rownames(out),value=T),
+			 paste0("b[",make_b_nms(object$glmod$reTrms), "]"),
 			 grep(pattern="log-posterior",x=rownames(out),value=T))
 	out <- out[nms,]
 
@@ -124,6 +125,7 @@ print.summary.sstapreg <-
                                      unname(atts$ngrps), ")", 
                                      collapse = ", "))
     }
+	cat("\n")
     
 	hat <- "Rhat"
 	str_diag <- "MCMC diagnostics"
