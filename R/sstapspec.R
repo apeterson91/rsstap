@@ -32,7 +32,7 @@ get_sstapspec <- function(f,benvo){
 		which(all.names(f) %in% vec_var)
 	}
 	get_k <- function(strings){
-	  out <- stringr::str_extract(strings,", ?k ?= ?[1-9][1-9]? *\\)")
+	  out <- stringr::str_extract(strings,", ?k ?= ?[1-9][0-9]? *\\)")
 	  out <- sapply(out,function(x) if(is.na(x)) return(")") else x)
 	  return(out)
 	}

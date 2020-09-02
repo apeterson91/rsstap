@@ -60,7 +60,9 @@ plot.sstapreg <- function(x,stap_term = NULL,...){
 
 	  dplyr::tibble(Distance = gd$Distance,
 	                Time = gd$Time,
+					Lower = apply(gd_eta$eta_within,1,function(x) quantile(x,0.025))
 	                Median = apply(gd_eta$eta_within,1,median),
+					Upper = apply(gd_eta$eta_within,1,function(x) quantile(x,0.975)),
 					Parameters = "within") -> pltdf2
 
 	pltdf %>% dplyr::mutate(Parameters = "between") %>% rbind(.,pltdf2) -> pltdf

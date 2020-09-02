@@ -23,11 +23,11 @@
 #' @param ... arguments for stan sampler
 #' 
 sstap_glm <- function(formula,
-					  benvo,
-					  weights = NULL,
-					  family = gaussian(),
-					  QR = TRUE,
-					   ...){
+                      benvo,
+                      weights = NULL,
+                      family = gaussian(),
+                      QR = TRUE,
+                      ...){
   
 	validate_family(family)
 	spec <- get_sstapspec(formula,benvo)

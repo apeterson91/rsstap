@@ -65,7 +65,7 @@ print.sstapreg <- function(x, digits = 1, ...) {
 #'   When calling \code{summary}, the value of digits is stored as the 
 #'   \code{"print.digits"} attribute of the returned object.
 #' @return The \code{summary} method returns an object of class 
-#'   \code{"summary.stanreg"}  which is a matrix of 
+#'   \code{"summary.sstapreg"}  which is a matrix of 
 #'   summary statistics and diagnostics, with attributes storing information for use by the
 #'   \code{print} method. 
 #'
