@@ -38,7 +38,7 @@ plot.sstapreg <- function(x,stap_term = NULL, p = 0.95, ...){
 
 	if(component %in% c("Distance","Time")){
 	  
-		pltdf %>% ggplot2::ggplot(ggplot2::aes(x = {{component}}, y = Median )) + 
+		pltdf %>% ggplot2::ggplot(ggplot2::aes(x = .data[[component]], y = Median )) + 
 			ggplot2::geom_line() + 
 			ggplot2::geom_ribbon(ggplot2::aes(ymin=Lower,ymax=Upper),alpha=0.3) + 
 			ggplot2::theme_bw() + 
@@ -61,7 +61,7 @@ plot.sstapreg <- function(x,stap_term = NULL, p = 0.95, ...){
 			rbind(.,pltdf2) -> pltdf
 
 		if(component %in% c("Distance","Time")){
-			pltdf %>% ggplot2::ggplot(ggplot2::aes(x=Distance,y=Median)) + 
+			pltdf %>% ggplot2::ggplot(ggplot2::aes(x=.data[[component]],y=Median)) + 
 					  ggplot2::geom_ribbon(ggplot2::aes(ymin=Lower,ymax=Upper),alpha=0.3) + 
 					  ggplot2::theme_bw() + 
 					  ggplot2::theme(strip.background=ggplot2::element_blank()) + 
