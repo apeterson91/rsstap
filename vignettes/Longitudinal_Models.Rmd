@@ -87,7 +87,7 @@ In order to fit this model in `rsstap` we can use the code below, setting the op
 
 
 ```{r model_fit1,message=F,results='hide',warning=FALSE}
-fit <- sstap_lmer(BMI ~ sex + year + stap(HFS) + (year|ID), benvo = bdf)
+fit <- sstap_lmer(BMI ~ sex + year + stap(HFS) + (year|id), benvo = bdf)
 ```
 
 Examining the model output, we'll first print the model quick summary followed by a graph of the posterior predictive checks to check model fit.
@@ -137,7 +137,7 @@ $$
 
 
 ```{r model_fit2,message=F,results='hide',warning=FALSE}
-bw_fit <- sstap_lmer(BMI ~ sex + stap_bw(HFS) + (year|ID), benvo = bdf)
+bw_fit <- sstap_lmer(BMI ~ sex + stap_bw(HFS) + (year|id), benvo = bdf)
 ```
 
 

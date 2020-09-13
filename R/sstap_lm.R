@@ -21,11 +21,13 @@
 #' @param formula Similar as for \code{\link[stats]{lm}} with the addition of \code{stap},\code{sap} \code{tap} terms as needed
 #' @param benvo built environment object from the rbenvo package containing the relevant data
 #' @param QR boolean denoting whether or not to perform a QR decomposition on the design matrix.
+#' @param weights for unequal variances
 #' @param ... arguments for stan sampler
 #' 
 sstap_lm <- function(formula,
 					  benvo,
 					  QR = TRUE,
+					  weights = NULL,
 					   ...){
   
 	spec <- get_sstapspec(formula,benvo)
@@ -34,14 +36,25 @@ sstap_lm <- function(formula,
 
 	mf <- rbenvo::subject_design(benvo,f)
 	check_for_longitudinal_benvo(benvo)
+	if(!is.null(weights)){
+		stopifnot(length(w)==length(mf$y))
+		y <- sqrt(weights) * mf$y
+		Z <- diag(sqrt(weights)) %*%  mf$X
+		X <- diag(sqrt(weights)) %*% spec$X
+	}else{
+		Z <- mf$X
+		y <- mf$y
+		X <- spec$X
+	}
+	S <- spec$S
 	
 
 
 	sstapfit <- sstap_glm.fit(
-	                          y = mf$y, 
-	                          Z = mf$X,
-	                          X = spec$X,
-	                          S = spec$S,
+	                          y = y, 
+	                          Z = Z,
+	                          X = X,
+	                          S = S,
 	                          family = gaussian(),
 							  QR = QR,
 	                          ...

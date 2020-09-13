@@ -35,7 +35,7 @@
 
 \method{vcov}{sstapreg}(object, correlation = FALSE, ...)
 
-\method{ranef}{sstapreg}(object, ...)
+\method{ranef}{sstapreg}(object, benvo, ...)
 
 \method{nsamples}{sstapreg}(object, ...)
 }
@@ -49,6 +49,8 @@
 \item{correlation}{For \code{vcov}, if \code{FALSE} (the default) the
 covariance matrix is returned. If \code{TRUE}, the correlation matrix is
 returned instead.}
+
+\item{benvo}{benvo object used to fit the model}
 }
 \description{
 The methods documented on this page are actually some of the least important 

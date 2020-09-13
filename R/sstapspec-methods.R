@@ -217,7 +217,7 @@ get_stap.sstapspec <- function(x,term,component,beta,family){
 	}
 
 	beta <- beta[,lbls] 
-	eta <- family$linkinv(tcrossprod(mat,beta))
+	eta <- tcrossprod(mat,beta)
 
 	return(list(grid=gd,
 	            eta = eta))

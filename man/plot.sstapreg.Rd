@@ -4,13 +4,15 @@
 \alias{plot.sstapreg}
 \title{Plot Spline Spatial Temporal Aggregated Predictors}
 \usage{
-\method{plot}{sstapreg}(x, stap_term = NULL, ...)
+\method{plot}{sstapreg}(x, stap_term = NULL, p = 0.95, ...)
 }
 \arguments{
 \item{x}{sstapreg object}
 
 \item{stap_term}{optional string for name of BEF smooth function to plot. 
 Alternatively plots first BEF smooth function}
+
+\item{p}{probability mass contained within uncertainty interval}
 
 \item{...}{ignored}
 }

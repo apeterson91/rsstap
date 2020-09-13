@@ -8,12 +8,13 @@
 #' @param x sstapreg object
 #' @param stap_term optional string for name of BEF smooth function to plot. 
 #' Alternatively plots first BEF smooth function 
+#' @param p probability mass contained within uncertainty interval
 #' @param ... ignored
 #' 
-plot.sstapreg <- function(x,stap_term = NULL,...){
+plot.sstapreg <- function(x,stap_term = NULL, p = 0.95, ...){
 
 	# to pass R CMD Check
-	Distance <- Time <- Median <- Grid <- Lower <- Upper <-  . <- NULL
+	Distance <- Time <- Median <- Parameters <- Grid <- Lower <- Upper <-  . <- NULL
 	spec <- x$specification
 
 	if(is.null(stap_term)){
@@ -33,24 +34,20 @@ plot.sstapreg <- function(x,stap_term = NULL,...){
 	gd <- gd_eta$grid
 	eta <- gd_eta$eta
 
+	pltdf <- get_pltdf(gd,eta,p,component)
 
 	if(component %in% c("Distance","Time")){
-		dplyr::tibble(Grid = gd[,1],
-					  Lower = apply(eta,1,function(x) quantile(x,0.025)),
-					  Median = apply(eta,1,median),
-					  Upper = apply(eta,1,function(x) quantile(x,0.975))) -> pltdf
 	  
-		pltdf %>% ggplot2::ggplot(ggplot2::aes(x = Grid, y = Median )) + 
+		pltdf %>% ggplot2::ggplot(ggplot2::aes(x = {{component}}, y = Median )) + 
 			ggplot2::geom_line() + 
 			ggplot2::geom_ribbon(ggplot2::aes(ymin=Lower,ymax=Upper),alpha=0.3) + 
-			ggplot2::theme_bw() + ggplot2::geom_hline(ggplot2::aes(yintercept = 0),
-													  linetype=2,color='red') + 
+			ggplot2::theme_bw() + 
+			ggplot2::geom_hline(ggplot2::aes(yintercept = 0),
+								linetype=2,color='red') + 
 			ggplot2::xlab(component) + 
-			ggplot2::ylab("") ->pl
+			ggplot2::ggtitle(stap_term) + 
+			ggplot2::ylab("") -> pl
 	}else{
-	  dplyr::tibble(Distance = gd$Distance,
-	                Time = gd$Time,
-	                Median = apply(eta,1,median)) -> pltdf
 	  pltdf %>% ggplot2::ggplot(ggplot2::aes(x=Distance,y=Time,z=Median)) + 
 		  ggplot2::theme_bw() + 
 	    ggplot2::geom_contour()  ->pl
@@ -58,25 +55,32 @@ plot.sstapreg <- function(x,stap_term = NULL,...){
 
 	if(has_bw(spec,stap_term)){
 
-	  dplyr::tibble(Distance = gd$Distance,
-	                Time = gd$Time,
-					Lower = apply(gd_eta$eta_within,1,function(x) quantile(x,0.025)),
-	                Median = apply(gd_eta$eta_within,1,median),
-					Upper = apply(gd_eta$eta_within,1,function(x) quantile(x,0.975)),
-					Parameters = "within") -> pltdf2
+		pltdf2 <- get_pltdf(gd,gd_eta$eta_within,p,component) %>% 
+			dplyr::mutate(Parameters = "Within")
+		pltdf %>% dplyr::mutate(Parameters=="Between") %>% 
+			rbind(.,pltdf2) -> pltdf
 
-	pltdf %>% dplyr::mutate(Parameters = "between") %>% rbind(.,pltdf2) -> pltdf
-
-	pltdf %>% ggplot2::ggplot(ggplot2::aes(x=Distance,y=Time,z=Median)) + 
-		ggplot2::geom_contour()  + ggplot2::theme_bw() + 
-		ggplot2::theme(strip.background=ggplot2::element_blank()) + 
-		ggplot2::facet_wrap(~Parameters) -> pl2
+		if(component %in% c("Distance","Time")){
+			pltdf %>% ggplot2::ggplot(ggplot2::aes(x=Distance,y=Median)) + 
+					  ggplot2::geom_ribbon(ggplot2::aes(ymin=Lower,ymax=Upper),alpha=0.3) + 
+					  ggplot2::theme_bw() + 
+					  ggplot2::theme(strip.background=ggplot2::element_blank()) + 
+					  ggplot2::facet_wrap(~Parameters) -> pl2
+		}else{
+			pltdf %>% ggplot2::ggplot(ggplot2::aes(x=Distance,y=Time,z=Median)) + 
+					  ggplot2::geom_contour() + 
+					  ggplot2::theme_bw() + 
+					  ggplot2::theme(strip.background=ggplot2::element_blank()) + 
+					  ggplot2::facet_wrap(~Parameters) -> pl2
+		}
+	
 
 	return(pl2)
 	}
 	
 	return(pl)
 }
+
 
 
 #' 3D plots for rsstap models
@@ -285,7 +289,27 @@ plot_xsection.sstapreg <- function(x,stap_term = NULL, component = "Distance",fi
 
 }
 
+# Internal ---------------------------------------------
+
 check_p <- function(p){
 	stopifnot(p<1 && p>0)
 }
 
+get_pltdf <- function(gd,eta,p,component){
+	check_p(p)
+	l <-  .5 - p/2
+	u <- .5 + p/2
+
+	pltdf <- dplyr::tibble(Lower = apply(eta,1,function(x) quantile(x,l)),
+						   Median = apply(eta,1,median),
+						  Upper = apply(eta,1,function(x) quantile(x,u)))  
+	if(component == "Distance-Time"){
+		pltdf$Time <- gd$Time
+		pltdf$Distance <- gd$Distance
+	}else if(component == "Distance")
+		pltdf$Distance <- gd$Distance
+	else
+		pltdf$Time <- gd$Time
+	return(pltdf)
+
+}

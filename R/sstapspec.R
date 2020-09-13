@@ -99,7 +99,8 @@ get_sstapspec <- function(f,benvo){
 	         )
 	  })
 
-	fake_formula <- purrr::map(str,function(x) as.formula(paste0("ID~ -1 + ",paste0(x,collapse="+"))))
+	id <- benvo@id
+	fake_formula <- purrr::map(str,function(x) as.formula(paste0(id[1],"~ -1 + ",paste0(x,collapse="+"))))
 
     return(
 		   sstapspec(stapless_formula = as.formula(new_f, env = environment(f)),

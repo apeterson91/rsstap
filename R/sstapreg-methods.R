@@ -158,12 +158,13 @@ vcov.sstapreg <- function(object, correlation = FALSE, ...) {
 #' @export
 #' @export ranef
 #' @importFrom lme4 ranef
+#' @param benvo benvo object used to fit the model
 #'
-ranef.sstapreg <- function(object,...){
+ranef.sstapreg <- function(object,benvo,...){
 	.glmer_check(object)
 	b_nms <- paste0("b[",make_b_nms(object$glmod$reTrms),"]")
 	point_estimates <- summary(object)[b_nms,"50%"]
-	  out <- ranef_template(object)
+	  out <- ranef_template(object,benvo)
 	  group_vars <- names(out)
   for (j in seq_along(out)) {
     tmp <- out[[j]]
@@ -181,7 +182,7 @@ ranef.sstapreg <- function(object,...){
 
 # Call lme4 to get the right structure for ranef objects
 #' @importFrom lme4 lmerControl glmerControl lmer glmer 
-ranef_template <- function(object) {
+ranef_template <- function(object,benvo) {
   
     new_formula <- object$specification$stapless_formula 
 	if(family(object)$family =="gaussian")
@@ -205,7 +206,7 @@ ranef_template <- function(object) {
   
   fit_args <- list(
     formula = new_formula,
-    data = object$model$benvo@subject_data,
+    data = benvo@subject_data,
     control = cntrl
   )
   

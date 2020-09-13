@@ -37,11 +37,8 @@ sjdf$BMI <- 33 +  sjdf$sex* -2.2 + .1*sjdf$year + sjdf$between + sjdf$within + s
 
 
 
-complex_longitudinal <- benvo(subject_data = sjdf,
-                          bef_data = list(HFS_distances_times),
-                          bef_names = "HFS",
-                          distance_col = "Distance",
-                          joining_id = c("id","measurement"),
-                          exposed_time_col = "Time")
+complex_longitudinal <- rbenvo::benvo(subject_data = sjdf,
+                          bef_data = list(HFS=HFS_distances_times),
+                          by = c("id","measurement"))
 
 usethis::use_data(complex_longitudinal, overwrite = TRUE)

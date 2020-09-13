@@ -1,20 +1,22 @@
 SW <- suppressWarnings
 bdf <- rbenvo::example_benvo
 capture_output(
-  lm1 <- SW(sstap_lm(BMI ~ sex  +sap(FFR), bdf,iter=500,chains=1))
+  lm1 <- SW(sstap_lm(BMI ~ sex  + sap(FFR), bdf,iter=50,chains=1))
   )
 capture_output(
   glm1 <- SW(sstap_glm(cbind(NumObese,Num_NotObese) ~ sex + Centered_Scaled_Income + sap(HFS),
                        benvo = binomial_benvo,
-                       family = binomial(),iter=500,chains=1))
+                       family = binomial(),iter=50,chains=1))
 )
 capture_output(
   glm2 <- SW(sstap_glm(NumObese ~ sex + Centered_Scaled_Income + sap(HFS) + sap(FFR),
                        benvo = poisson_benvo,
-                       family = poisson(),iter=500,chains=1))
+                       family = poisson(),iter=50,chains=1))
 )
 capture_output(
-  lmer1 <- SW(sstap_lmer(BMI ~ sex + year + stap(HFS) + (year|ID), benvo = complex_longitudinal,iter=200,chains=1))
+  lmer1 <- SW(sstap_lmer(BMI ~ sex + year + stap(HFS) + (year|id),
+                         benvo = complex_longitudinal,
+                         iter=50,chains=1))
 )
 
 test_that("Methods work on example models", {
@@ -27,15 +29,15 @@ test_that("Methods work on example models", {
   expect_equal(1171,nobs(lmer1))
 })
 
-# 
+
 test_that("Sample glm with multiple predictors works",{
-  
+
   expect_equal(1,length(glm1$specification$term))
   expect_equal(2,length(glm2$specification$term))
 })
 
 test_that("sstap_glmer methods work as intended",{
-  expect_equal(1,length(ranef(lmer1)))
-  expect_error(ranef(glm1))
+  expect_equal(1,length(ranef(lmer1,complex_longitudinal)))
+  expect_error(ranef(glm1,binomial_benvo))
   expect_equivalent(600,ngrps(lmer1))
 })

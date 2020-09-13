@@ -26,11 +26,8 @@ subj_df <- dplyr::tibble(ID= 1:num_subj,
 FFR <- purrr::map2_dfr(1:length(ldists),ldists,function(x,y) dplyr::tibble(ID=x,Distance=y))
 HFS <- purrr::map2_dfr(1:length(HFSdists),HFSdists,function(x,y) dplyr::tibble(ID=x,Distance=y))
 
-poisson_benvo <- benvo(subject_data = subj_df,
-                        bef_data = list(FFR,HFS),
-                        bef_names = c("FFR","HFS"),
-                        distance_col = c("Distance","Distance"),
-                        joining_id = c("ID"),
-                        exposed_time_col = rep(NA,2))
+poisson_benvo <- rbenvo::benvo(subject_data = subj_df,
+                        bef_data = list(FFR=FFR,HFS=HFS),
+                        by = c("ID"))
 
 usethis::use_data(poisson_benvo, overwrite = TRUE)
