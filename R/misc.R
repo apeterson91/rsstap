@@ -109,8 +109,8 @@ posterior_sample_size <- function(x) {
 # @param x benvo
 # @return warning message if appropriate
 check_for_longitudinal_benvo <- function(benvo){
-	if(benvo@longitudinal){
-		warning("This Benvo was constructed with longitudinal data \n but sstap_lm does not adjust for within subject correlation. \n Be advised that parameter standard errors may be overoptimistic.")
+	if(rbenvo::is.longitudinal(benvo)){
+		warning("This benvo was constructed with longitudinal data \n but sstap_lm does not adjust for within subject correlation. \n Be advised that parameter standard errors may be overoptimistic.")
 	}
 }
 

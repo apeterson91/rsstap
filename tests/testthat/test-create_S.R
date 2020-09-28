@@ -1,5 +1,5 @@
 ref_one <- mgcv::jagam(formula = id ~ -1 + s(Distance,bs='ps'), family = gaussian(),
-                       data = rbenvo::joinvo(rbenvo::example_benvo,"FFR","Distance",
+                       data = rbenvo::joinvo(rbenvo::FFbenvo,"FFR","Distance",
                                              NA_to_zero = TRUE),
                        file = tempfile(fileext = ".jags"),
                        offset = NULL,

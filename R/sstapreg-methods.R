@@ -206,7 +206,7 @@ ranef_template <- function(object,benvo) {
   
   fit_args <- list(
     formula = new_formula,
-    data = benvo@subject_data,
+    data = benvo$subject_data,
     control = cntrl
   )
   

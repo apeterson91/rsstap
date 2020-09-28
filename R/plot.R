@@ -14,7 +14,8 @@
 plot.sstapreg <- function(x,stap_term = NULL, p = 0.95, ...){
 
 	# to pass R CMD Check
-	Distance <- Time <- Median <- Parameters <- Grid <- Lower <- Upper <-  . <- NULL
+	Distance <- Time <- Median <- Parameters <- 
+		Grid <- Lower <- Upper <-  . <-  .data <- NULL
 	spec <- x$specification
 
 	if(is.null(stap_term)){

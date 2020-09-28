@@ -27,7 +27,7 @@ FFR <- purrr::map2_dfr(1:length(ldists),ldists,function(x,y) dplyr::tibble(ID=x,
 HFS <- purrr::map2_dfr(1:length(HFSdists),HFSdists,function(x,y) dplyr::tibble(ID=x,Distance=y))
 
 poisson_benvo <- rbenvo::benvo(subject_data = subj_df,
-                        bef_data = list(FFR=FFR,HFS=HFS),
-                        by = c("ID"))
+                               sub_bef_data = list(FFR=FFR,HFS=HFS),
+                               by = c("ID"))
 
 usethis::use_data(poisson_benvo, overwrite = TRUE)

@@ -1,8 +1,10 @@
 SW <- suppressWarnings
-bdf <- rbenvo::example_benvo
+bdf <- rbenvo::FFbenvo
+
 capture_output(
   lm1 <- SW(sstap_lm(BMI ~ sex  + sap(FFR), bdf,iter=50,chains=1))
   )
+
 capture_output(
   glm1 <- SW(sstap_glm(cbind(NumObese,Num_NotObese) ~ sex + Centered_Scaled_Income + sap(HFS),
                        benvo = binomial_benvo,
@@ -31,7 +33,6 @@ test_that("Methods work on example models", {
 
 
 test_that("Sample glm with multiple predictors works",{
-
   expect_equal(1,length(glm1$specification$term))
   expect_equal(2,length(glm2$specification$term))
 })

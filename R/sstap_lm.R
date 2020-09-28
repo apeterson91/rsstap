@@ -37,7 +37,7 @@ sstap_lm <- function(formula,
 	mf <- rbenvo::subject_design(benvo,f)
 	check_for_longitudinal_benvo(benvo)
 	if(!is.null(weights)){
-		stopifnot(length(w)==length(mf$y))
+		stopifnot(length(weights)==length(mf$y))
 		y <- sqrt(weights) * mf$y
 		Z <- diag(sqrt(weights)) %*%  mf$X
 		X <- diag(sqrt(weights)) %*% spec$X

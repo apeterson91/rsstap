@@ -16,7 +16,7 @@
 #' @export
 #'
 #' @param formula Similar as for \code{\link[stats]{glm}} with the addition of \code{stap},\code{sap} \code{tap} terms as needed
-#' @param benvo built environment \code{\link[rbenvo]{Benvo}} object from the \code{rbenvo} package containing the relevant subject-BEF data
+#' @param benvo built environment \code{\link[rbenvo]{benvo}} object from the \code{rbenvo} package containing the relevant subject-BEF data
 #' @param weights vector of positive integer weights 
 #' @param family One of \code{\link[stats]{family}}  currently gaussian, binomial and poisson are implimented with identity, logistic and  log links currently.
 #' @param QR boolean denoting whether or not to perform a QR decomposition on the design matrix.

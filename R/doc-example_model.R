@@ -34,7 +34,7 @@
 #' @examples
 #' example_model <- 
 #'   sstap_lm(BMI ~ sex + sap(FFR),
-#'              benvo = rbenvo::example_benvo,
+#'              benvo = rbenvo::FFbenvo,
 #'              # this next line is only to keep the example small in size!
 #'              chains = 1, cores = 1, seed = 12345, iter = 500, refresh = 0)
 #' example_model

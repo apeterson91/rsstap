@@ -26,23 +26,24 @@ subj_df <- dplyr::tibble(ID = 1:num_subj,
                          FFR_exposure = FFRexposure,
                          FFR_sq_exposure = FFR_sq_exposure)
 
-FFR_df <- purrr::map_dfr(1:num_subj,function(x) tibble(ID = x,
+FFR_df <- purrr::map_dfr(1:num_subj,function(x) dplyr::tibble(ID = x,
                                                        Distance = subj_FFR[x,]))
 
-FFR_df <- FFR_df %>% dplyr::filter(Distances<=1)
+FFR_df <- FFR_df %>% dplyr::filter(Distance<=1)
 
 FFR_FFR_df <- purrr::map_df(1:num_subj,function(x) {
   ics <- which(subj_FFR[x,]<=.5)
   mat <- FFR_FFR[ics,]
-  out <- tibble(ID = x,
-         Distance = mat[lower.tri(mat)])
+  out <- dplyr::tibble(ID = x,
+                       Distance = mat[lower.tri(mat)])
   return(out)
   })
 
 FFR_FFR_df <- FFR_FFR_df %>% dplyr::filter(Distance<=1)
 
 network_benvo <- rbenvo::benvo(subject_data = subj_df,
-                       bef_data = list(`Direct FFR`=FFR_df,`Indirect FFR`=FFR_FFR_df),by="ID")
+                               sub_bef_data = list(`Direct FFR`=FFR_df,
+                                                   `Indirect FFR`=FFR_FFR_df),by="ID")
 
 
 usethis::use_data(network_benvo, overwrite = TRUE)

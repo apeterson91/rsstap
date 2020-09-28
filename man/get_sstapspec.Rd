@@ -9,7 +9,7 @@ get_sstapspec(f, benvo)
 \arguments{
 \item{f}{formula from \code{\link{sstap_glm}}, \code{\link{sstap_glmer}}}
 
-\item{benvo}{Built Environment object - \code{\link[rbenvo]{Benvo}} - containing data for model}
+\item{benvo}{Built Environment object - \code{\link[rbenvo]{benvo}} - containing data for model}
 }
 \value{
 \code{\link{sstapspec}} object

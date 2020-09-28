@@ -9,7 +9,7 @@ sstap_glm(formula, benvo, weights = NULL, family = gaussian(), QR = TRUE, ...)
 \arguments{
 \item{formula}{Similar as for \code{\link[stats]{glm}} with the addition of \code{stap},\code{sap} \code{tap} terms as needed}
 
-\item{benvo}{built environment \code{\link[rbenvo]{Benvo}} object from the \code{rbenvo} package containing the relevant subject-BEF data}
+\item{benvo}{built environment \code{\link[rbenvo]{benvo}} object from the \code{rbenvo} package containing the relevant subject-BEF data}
 
 \item{weights}{vector of positive integer weights}
 

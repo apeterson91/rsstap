@@ -21,7 +21,7 @@
 #'
 #' @export
 #' @param f formula from \code{\link{sstap_glm}}, \code{\link{sstap_glmer}}
-#' @param benvo Built Environment object - \code{\link[rbenvo]{Benvo}} - containing data for model 
+#' @param benvo Built Environment object - \code{\link[rbenvo]{benvo}} - containing data for model 
 #' @return \code{\link{sstapspec}} object
 #'
 get_sstapspec <- function(f,benvo){
@@ -99,8 +99,7 @@ get_sstapspec <- function(f,benvo){
 	         )
 	  })
 
-	id <- benvo@id
-	fake_formula <- purrr::map(str,function(x) as.formula(paste0(id[1],"~ -1 + ",paste0(x,collapse="+"))))
+	fake_formula <- purrr::map(str,function(x) as.formula(paste0("tempix_~ -1 + ",paste0(x,collapse="+"))))
 
     return(
 		   sstapspec(stapless_formula = as.formula(new_f, env = environment(f)),
@@ -118,7 +117,7 @@ get_sstapspec <- function(f,benvo){
 #' @param stapless_formula from \code{\link{get_sstapspec}}
 #' @param fake_formula list of ``fake'' formulas from \code{\link{get_sstapspec}}
 #' @param stap_mat matrix of stap specification properties 
-#' @param benvo Built Environment object - \code{\link[rbenvo]{Benvo}} - containing data for model 
+#' @param benvo Built Environment object - \code{\link[rbenvo]{benvo}} - containing data for model 
 #'
 sstapspec <- function(stapless_formula,fake_formula,stap_mat,benvo){
 
@@ -130,25 +129,26 @@ sstapspec <- function(stapless_formula,fake_formula,stap_mat,benvo){
 	if(!(all(unique(term)==term)))
 		stop("Only one BEF name may be assigned to a stap term e.g. no sap(foo) + tap(foo)\n
 			 If you wish to model components this way create a different name e.g. sap(foo) + tap(foo_bar)")
-	if(!all(term %in% benvo@bef_names))
+	if(!all(term %in% rbenvo::bef_names(benvo)))
 		stop("All stap terms must have data with corresponding name in benvo")
 
 	jd <- purrr::pmap(list(term,component,fake_formula),
 	                  function(x,y,z) {
+						  temp_df <- rbenvo::joinvo(benvo,x,y,NA_to_zero = TRUE)
+						  temp_df$tempix_ <- 1:nrow(temp_df)
 	                    out <- mgcv::jagam(formula = z, family = gaussian(), 
-	                                       data = rbenvo::joinvo(benvo,x,y,
-	                                                             NA_to_zero = TRUE), 
-	                                       file = tempfile(fileext = ".jags"), 
+	                                       data = temp_df,
+										   file = tempfile(fileext = ".jags"), 
 	                                       offset = NULL,
 	                                       centred = FALSE,
 	                                       diagonalize = FALSE)
 	                    out$name <- x
-						ix <- which(benvo@bef_names==x)
+						ix <- which(rbenvo::bef_names(benvo)==x)
 						ranges <- list()
 						if(y=="Distance"|y=="Distance-Time")
-							ranges$Distance <- range(benvo@bef_data[[ix]]$Distance,na.rm=T)
+							ranges$Distance <- range(benvo$sub_bef_data[[ix]]$Distance,na.rm=T)
 						if(y=="Time"|y=="Distance-Time")
-							ranges$Time = range(benvo@bef_data[[ix]]$Time,na.rm=T)
+							ranges$Time = range(benvo$sub_bef_data[[ix]]$Time,na.rm=T)
 						out$ranges <- ranges
 	                    return(out)
 	                    })
@@ -157,8 +157,7 @@ sstapspec <- function(stapless_formula,fake_formula,stap_mat,benvo){
 	X <- purrr::pmap(list(term,component,between_within,jd),function(x,y,z,jdi){
 			X <- create_X(x,y,z,
 			              jdi$jags.data$X,benvo,
-			              jdi$pregam$term.names)
-						})
+			              jdi$pregam$term.names)})
 
 	S <- purrr::pmap(list(1:length(jd),between_within),function(ix,bw_){create_S(jd[[ix]],bw_)})
 	names(S) <- create_S_nms(term,component)

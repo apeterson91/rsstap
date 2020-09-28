@@ -2,7 +2,6 @@
 % Please edit documentation in R/posterior_interval.R
 \name{posterior_interval.sstapreg}
 \alias{posterior_interval.sstapreg}
-\alias{posterior_interval}
 \title{Posterior uncertainty intervals}
 \usage{
 \method{posterior_interval}{sstapreg}(object, prob = 0.95, pars = NULL, ...)

@@ -3,6 +3,7 @@
 <!-- badges: start -->
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Travis build status](https://travis-ci.org/apeterson91/rsstap.svg?branch=master)](https://travis-ci.org/apeterson91/rsstap)
+[![R build status](https://github.com/apeterson91/rsstap/workflows/R-CMD-check/badge.svg)](https://github.com/apeterson91/rsstap/actions)
 <!-- badges: end -->
 
 ## About

@@ -19,7 +19,6 @@
 #' intervals. These intervals are often referred to as \emph{credible}
 #' intervals. This text is inspired by the same function documentation from \pkg{rstanarm}.
 #'
-#' @aliases posterior_interval
 #' @export
 #'
 #' @param object sstapreg object
@@ -63,3 +62,6 @@ posterior_interval.sstapreg <-
     mat <- as.matrix.sstapreg(object, pars = pars)
     rstantools::posterior_interval(mat, prob = prob)
   }
+
+#' @export
+rstantools::posterior_interval

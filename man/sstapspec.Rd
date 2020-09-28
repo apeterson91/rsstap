@@ -13,7 +13,7 @@ sstapspec(stapless_formula, fake_formula, stap_mat, benvo)
 
 \item{stap_mat}{matrix of stap specification properties}
 
-\item{benvo}{Built Environment object - \code{\link[rbenvo]{Benvo}} - containing data for model}
+\item{benvo}{Built Environment object - \code{\link[rbenvo]{benvo}} - containing data for model}
 }
 \description{
 Create STAP data structure
