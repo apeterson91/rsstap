@@ -10,6 +10,8 @@
 #' @import Rcpp
 #' @importFrom rstan sampling
 #' @importFrom stats as.formula cov cov2cor gaussian binomial poisson quantile terms
+#' @import rstantools 
+#' @export posterior_interval posterior_predict
 #'
 #' @section STAP models:
 #' For link function \eqn{g()}, outcome \eqn{\mu_i},  \eqn{i=1,...,n}, STAP Models are 

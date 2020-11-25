@@ -169,8 +169,7 @@ sstap_glm.fit <- function(y,
 			if(family$family=="gaussian") "sigma",
 			"tau",
 			if(length(group)) "b",
-		    if(standata$len_theta_L) "theta_L",
-			"yhat"
+		    if(standata$len_theta_L) "theta_L"
 			)
 
   stanfit <- pick_stanmodel(family$family)
@@ -230,7 +229,6 @@ sstap_glm.fit <- function(y,
 					Reduce(c,purrr::map2(1:length(stap_penalties),stap_penalties,function(x,y) paste0("smooth_precision[",S_nms[x],1:y,"]"))),
                    if (length(group) && length(group$flist)) c(paste0("b[", b_nms, "]")),
                    if (standata$len_theta_L) paste0("Sigma[", Sigma_nms, "]"),
-				   paste0("yhat[",1:N,"]"),
 				   "log-posterior"
 					)
 

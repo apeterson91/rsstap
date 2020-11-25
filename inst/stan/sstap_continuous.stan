@@ -81,6 +81,5 @@ model{
 
 }
 generated quantities {
-	vector[N] yhat =  Q * beta_tilde ;
 	vector[ncol_Z] delta_coef = beta[1:ncol_Z];
 }

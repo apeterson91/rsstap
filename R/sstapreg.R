@@ -29,9 +29,8 @@ sstapreg <- function(object){
 	stapfit <- object$stapfit
 	stanmat <- as.matrix(stapfit)
 	stap_terms <- object$specification$term
-	ynames <- grep("yhat",colnames(stanmat))
 	nms <- colnames(object$mf$X)
-	nms <- union(nms,Reduce(union,lapply(stap_terms,function(x) grep(paste0("^(s\\(|t2\\()",x),colnames(stanmat),value=T))))
+	nms <- union(nms,Reduce(union,lapply(object$specification$X,function(x) colnames(x))))
 	coefs <- apply(stanmat[,nms],2,median)
 	covmat <- cov(stanmat[,nms])
 	colnames(covmat) <-nms 
@@ -42,11 +41,13 @@ sstapreg <- function(object){
 	y <- object$mf$y
 	Z <- object$mf$X
 
+	fitted.values <- cbind(Z,Reduce(cbind,object$specification$X))  %*% coefs
+
 
     out <- list(
 				coefficients = coefs, 
 				ses = ses,
-				fitted.values = apply(stanmat[,ynames],2,median),
+				fitted.values = fitted.values,
 				covmat = covmat,
 				model = list(y=y,
 							 Z=Z),

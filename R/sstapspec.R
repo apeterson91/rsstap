@@ -28,86 +28,70 @@ get_sstapspec <- function(f,benvo){
 
     with_bars <- lme4::findbars(f)
     f <- lme4::nobars(f)
-	get_ics <- function(f,vec_var){
-		which(all.names(f) %in% vec_var)
-	}
-	get_k <- function(strings){
-	  out <- stringr::str_extract(strings,", ?k ?= ?[1-9][0-9]? *\\)")
-	  out <- sapply(out,function(x) if(is.na(x)) return(")") else x)
-	  return(out)
-	}
-	get_names <- function(f,ics){
-		all.names(f)[ics +1] 
-	}
-	get_indicator <- function(f,ics,vec_var){
-		(all.names(f)[ics] %in% vec_var)*1
-	}
-    stap_ics <- get_ics(f, c("stap","stap_bw"))
-    sap_ics <- get_ics(f,c("sap","sap_bw"))
-    tap_ics <- get_ics(f,c("tap","tap_bw"))
-    if(!length(stap_ics) & !length(sap_ics) & !length(tap_ics))
-        stop("No covariates designated as 'stap','sap',or 'tap'  in formula", .call = F)
-	stap_nms <- get_names(f,stap_ics)
-	stap_bw <- get_indicator(f,stap_ics, c("stap_bw"))
-	sap_nms <- get_names(f,sap_ics)
-	sap_bw <- get_indicator(f,sap_ics,c("sap_bw"))
-    tap_nms <- get_names(f,tap_ics)
-	tap_bw <- get_indicator(f,tap_ics,c("tap_bw")) 
-	tms <- attr(terms(f),"term.labels")
-	stap_tms <- tms[stringr::str_detect(tms,"(^stap\\()|(^stap_bw\\()")]
-	tap_tms <- tms[stringr::str_detect(tms,"^tap\\(|(^tap_bw\\()")]
-	sap_tms <- tms[stringr::str_detect(tms,"^sap\\(|(^sap_bw\\()")]
-	stap_k <- get_k(stap_tms)
-	tap_k <- get_k(tap_tms)
-	sap_k <- get_k(sap_tms)
 	
-	if(length(stap_nms)>0){
-		stap_nms <- cbind(stap_nms,"Distance-Time",stap_bw,stap_k)
-	}
-	if(length(sap_nms)>0)
-		sap_nms <- cbind(sap_nms,"Distance",sap_bw,sap_k)
-	if(length(tap_nms)>0)
-		tap_nms <- cbind(tap_nms,"Time",tap_bw,tap_k)
+	stapinfo <- get_bef_info(c("stap","sap","tap","gap"),f)
+	if(is.null(stapinfo))
+		stop("No covariates designated as ",paste0(c("stap","sap","tap","gap"),collapse=","),call. = F)
 
-	stap_mat <-rbind(stap_nms,sap_nms,tap_nms)
+	new_f <- get_new_f(f,with_bars,stapinfo[,2])
 
-    not_needed <- c(stap_nms,sap_nms,tap_nms)
-    formula_components <- all.vars(f)[!(all.vars(f) %in% not_needed)]
-    if(!attr(terms(f),"intercept"))
-        formula_components <- c(formula_components,"0")
-    if(grepl("cbind",all.names(f))[2]){
-        new_f1 <- paste0("cbind(",formula_components[1],", ",formula_components[2], ")", " ~ ")
-        ix <- 3
-    }
-    else{
-        new_f1 <- paste0(formula_components[1],' ~ ')
-        ix <- 2
-    }
-
-    new_f2 <- paste(formula_components[ix:length(formula_components)],collapse = "+")
-    new_f <- paste0(new_f1,new_f2)
-	if(length(with_bars)){
-		mer_f <- paste0(lapply(with_bars,function(x) paste0("(",deparse(x),")")),collapse = " + ")
-		new_f <- paste0(new_f," + ",mer_f)
-	}
-
-	str <- purrr::map2(stap_mat[,2],stap_mat[,4],function(x,y) {
+	str <- purrr::map2(stapinfo[,1],stapinfo[,3],function(x,y) {
 	  switch(x,
-	         "Distance-Time"= paste0("t2(Distance,Time,bs='ps'",y ),
-	         "Distance" = paste0("s(Distance,bs='ps'",y),
-	         "Time"= paste0("s(Time,bs='ps'",y)
+	         "stap"= paste0("t2(Distance,Time,bs='ps'",y ),
+	         "sap" = paste0("s(Distance,bs='ps'",y),
+	         "tap"= paste0("s(Time,bs='ps'",y),
+			 "gap" = paste0("t2(Distance,Rank,bs='ps'",y)
 	         )
-	  })
+	  }
+	)
 
-	fake_formula <- purrr::map(str,function(x) as.formula(paste0("tempix_~ -1 + ",paste0(x,collapse="+"))))
+	fake_formula <- purrr::map(str,function(x) as.formula(paste0("tempix_ ~ -1 + ",paste0(x,collapse="+"))))
 
     return(
 		   sstapspec(stapless_formula = as.formula(new_f, env = environment(f)),
 					  fake_formula = fake_formula,
-					  stap_mat = stap_mat,
+					  stap_mat = stapinfo,
 					  benvo = benvo
 			   )
 		   )
+}
+
+get_bef_info <- function(nm_v, f){
+
+	get_ics <- function(nm,f){
+		which(all.names(f) %in% nm)
+	}
+	get_k <- function(nm,f){
+		sig <- paste0("(^",nm,"\\()",collapse="|")
+		tm <- attr(terms(f),"term.labels")
+		strings <- tm[stringr::str_detect(tm,sig)]
+		out <- stringr::str_extract(strings,", ?k ?= ?[1-9][0-9]? *\\)")
+		out <- sapply(out,function(x) if(is.na(x)) return(")") else x)
+		return(out)
+	}
+	get_names <- function(ics,f){
+		all.names(f)[ics +1] 
+	}
+	get_indicator <- function(ics,nm,f){
+		(all.names(f)[ics] %in% nm)*1
+	}
+	get_one_info <- function(nm,f){
+	  nm <- c(nm,paste0(nm,"_bw"))
+	  ics <- get_ics(nm,f)
+	  if(length(ics)==0)
+	    return(NULL)
+	  nms <- get_names(ics,f)
+	  bwi <- get_indicator(ics,nm[2],f)
+	  k <- get_k(nm,f)
+	  type <- nm[1]
+	  out <- cbind(type,nms,k,bwi)
+	  if(nrow(out)>0)
+	    rownames(out) <-NULL
+	  return(out)
+	}
+	out <- purrr::reduce(lapply(nm_v,function(x) get_one_info(x,f)),rbind)
+	
+	return(out)
 }
 
 
@@ -121,22 +105,26 @@ get_sstapspec <- function(f,benvo){
 #'
 sstapspec <- function(stapless_formula,fake_formula,stap_mat,benvo){
 
-
-	term <- stap_mat[,1]
-	component <- stap_mat[,2]
-	between_within <- as.integer(stap_mat[,3])
-	dimension <- as.integer(stringr::str_replace(stap_mat[,4],"\\)","-1"))
+  component <- sapply(stap_mat[,1],function(x) switch(x,"sap"="Distance",
+                                                          "tap"="Time",
+                                                          "stap" = "Distance-Time",
+                                                       "gap" = "Distance"))
+	term <- stap_mat[,2]
+	dimension <- as.integer(stringr::str_replace_na(stringr::str_extract(stap_mat[,3],"[1-9][0-9]?"),"-1"))
+	between_within <- as.integer(stap_mat[,4])
 	if(!(all(unique(term)==term)))
 		stop("Only one BEF name may be assigned to a stap term e.g. no sap(foo) + tap(foo)\n
 			 If you wish to model components this way create a different name e.g. sap(foo) + tap(foo_bar)")
 	if(!all(term %in% rbenvo::bef_names(benvo)))
 		stop("All stap terms must have data with corresponding name in benvo")
 
+
 	jd <- purrr::pmap(list(term,component,fake_formula),
 	                  function(x,y,z) {
 						  temp_df <- rbenvo::joinvo(benvo,x,y,NA_to_zero = TRUE)
 						  temp_df$tempix_ <- 1:nrow(temp_df)
-	                    out <- mgcv::jagam(formula = z, family = gaussian(), 
+	                    out <- mgcv::jagam(formula = z, 
+	                                       family = gaussian(), 
 	                                       data = temp_df,
 										   file = tempfile(fileext = ".jags"), 
 	                                       offset = NULL,
@@ -171,9 +159,6 @@ sstapspec <- function(stapless_formula,fake_formula,stap_mat,benvo){
 	X <- combine_list_entries(X)
 	S <- combine_list_entries(S)
 	
-
-
-
 	out <- list(stapless_formula = stapless_formula,
 				fake_formula = fake_formula,
 				term = term,
@@ -188,6 +173,7 @@ sstapspec <- function(stapless_formula,fake_formula,stap_mat,benvo){
 
 	structure(out,class=c("sstapspec"))
 }
+## Internal ------------
 
 
 create_S_nms <- function(term,component){
@@ -198,4 +184,32 @@ create_S_nms <- function(term,component){
 		   "Distance-Time"="t2("))
 	out <- paste0(first,term,")")
 	return(out)
+
+}
+
+get_new_f <- function(f,with_bars,not_needed){
+
+	formula_components <- all.vars(f)[!(all.vars(f) %in% not_needed)]
+
+	if(!attr(terms(f),"intercept"))
+		formula_components <- c(formula_components,"0")
+
+	if(grepl("cbind",all.names(f))[2]){
+		new_f1 <- paste0("cbind(",formula_components[1],", ",formula_components[2], ")", " ~ ")
+		ix <- 3
+	}
+	else{
+		new_f1 <- paste0(formula_components[1],' ~ ')
+		ix <- 2
+	}
+
+	new_f2 <- paste(formula_components[ix:length(formula_components)],collapse = "+")
+	new_f <- paste0(new_f1,new_f2)
+
+	if(length(with_bars)){
+		mer_f <- paste0(lapply(with_bars,function(x) paste0("(",deparse(x),")")),collapse = " + ")
+		new_f <- paste0(new_f," + ",mer_f)
+	}
+	return(new_f)
+
 }

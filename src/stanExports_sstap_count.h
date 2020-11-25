@@ -57,7 +57,7 @@ stan::io::program_reader prog_reader__() {
     reader.add_event(278, 0, "start", "tparameters/tparameters_glmer_noaux.stan");
     reader.add_event(300, 22, "end", "tparameters/tparameters_glmer_noaux.stan");
     reader.add_event(300, 41, "restart", "model_sstap_count");
-    reader.add_event(332, 71, "end", "model_sstap_count");
+    reader.add_event(330, 69, "end", "model_sstap_count");
     return reader;
 }
 template <typename T2__, typename T3__, typename T4__, typename T5__, typename T6__, typename T7__>
@@ -1589,7 +1589,6 @@ public:
         names__.push_back("eta");
         names__.push_back("b");
         names__.push_back("theta_L");
-        names__.push_back("yhat");
         names__.push_back("delta_coef");
     }
     void get_dims(std::vector<std::vector<size_t> >& dimss__) const {
@@ -1630,9 +1629,6 @@ public:
         dimss__.push_back(dims__);
         dims__.resize(0);
         dims__.push_back(len_theta_L);
-        dimss__.push_back(dims__);
-        dims__.resize(0);
-        dims__.push_back(N);
         dimss__.push_back(dims__);
         dims__.resize(0);
         dims__.push_back(ncol_Z);
@@ -1814,29 +1810,13 @@ public:
             if (!include_gqs__) return;
             // declare and define generated quantities
             current_statement_begin__ = 327;
-            validate_non_negative_index("yhat", "N", N);
-            std::vector<int> yhat(N, int(0));
-            stan::math::fill(yhat, std::numeric_limits<int>::min());
-            current_statement_begin__ = 328;
             validate_non_negative_index("delta_coef", "ncol_Z", ncol_Z);
             Eigen::Matrix<double, Eigen::Dynamic, 1> delta_coef(ncol_Z);
             stan::math::initialize(delta_coef, DUMMY_VAR__);
             stan::math::fill(delta_coef, DUMMY_VAR__);
             stan::math::assign(delta_coef,stan::model::rvalue(beta, stan::model::cons_list(stan::model::index_min_max(1, ncol_Z), stan::model::nil_index_list()), "beta"));
-            // generated quantities statements
-            current_statement_begin__ = 329;
-            stan::math::assign(yhat, poisson_rng(eta, base_rng__));
             // validate, write generated quantities
             current_statement_begin__ = 327;
-            size_t yhat_i_0_max__ = N;
-            for (size_t i_0__ = 0; i_0__ < yhat_i_0_max__; ++i_0__) {
-                check_greater_or_equal(function__, "yhat[i_0__]", yhat[i_0__], 0);
-            }
-            size_t yhat_k_0_max__ = N;
-            for (size_t k_0__ = 0; k_0__ < yhat_k_0_max__; ++k_0__) {
-                vars__.push_back(yhat[k_0__]);
-            }
-            current_statement_begin__ = 328;
             size_t delta_coef_j_1_max__ = ncol_Z;
             for (size_t j_1__ = 0; j_1__ < delta_coef_j_1_max__; ++j_1__) {
                 vars__.push_back(delta_coef(j_1__));
@@ -1947,12 +1927,6 @@ public:
             }
         }
         if (!include_gqs__) return;
-        size_t yhat_k_0_max__ = N;
-        for (size_t k_0__ = 0; k_0__ < yhat_k_0_max__; ++k_0__) {
-            param_name_stream__.str(std::string());
-            param_name_stream__ << "yhat" << '.' << k_0__ + 1;
-            param_names__.push_back(param_name_stream__.str());
-        }
         size_t delta_coef_j_1_max__ = ncol_Z;
         for (size_t j_1__ = 0; j_1__ < delta_coef_j_1_max__; ++j_1__) {
             param_name_stream__.str(std::string());
@@ -2040,12 +2014,6 @@ public:
             }
         }
         if (!include_gqs__) return;
-        size_t yhat_k_0_max__ = N;
-        for (size_t k_0__ = 0; k_0__ < yhat_k_0_max__; ++k_0__) {
-            param_name_stream__.str(std::string());
-            param_name_stream__ << "yhat" << '.' << k_0__ + 1;
-            param_names__.push_back(param_name_stream__.str());
-        }
         size_t delta_coef_j_1_max__ = ncol_Z;
         for (size_t j_1__ = 0; j_1__ < delta_coef_j_1_max__; ++j_1__) {
             param_name_stream__.str(std::string());

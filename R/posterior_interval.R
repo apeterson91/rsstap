@@ -21,6 +21,7 @@
 #'
 #' @export
 #'
+#' @aliases posterior_interval
 #' @param object sstapreg object
 #' @param prob A number \eqn{p \in (0,1)}{p (0 < p < 1)} indicating the desired
 #'   probability mass to include in the intervals. The default is to report
@@ -51,7 +52,6 @@
 #'
 #' @template reference-gelman-carlin
 #' @template reference-morey
-#' @importFrom rstantools posterior_interval
 #'
 posterior_interval.sstapreg <-
   function(object,
@@ -61,7 +61,8 @@ posterior_interval.sstapreg <-
     
     mat <- as.matrix.sstapreg(object, pars = pars)
     rstantools::posterior_interval(mat, prob = prob)
-  }
+}
 
-#' @export
-rstantools::posterior_interval
+
+
+

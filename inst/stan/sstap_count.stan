@@ -65,7 +65,5 @@ model{
 
 }
 generated quantities {
-	int<lower=0> yhat[N];
 	vector[ncol_Z] delta_coef = beta[1:ncol_Z];
-	yhat = poisson_rng(eta);
 }

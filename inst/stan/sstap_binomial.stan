@@ -70,7 +70,5 @@ model{
 
 }
 generated quantities {
-	int<lower=0> yhat[N];
 	vector[ncol_Z] delta_coef = beta[1:ncol_Z];
-	yhat = binomial_rng(num_trials,exp(eta) ./ (1+exp(eta)));
 }

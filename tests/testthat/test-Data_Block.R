@@ -8,4 +8,5 @@ test_that("sstapspec object and methods work correctly", {
                                            benvo = bdf)))
   expect_error(get_sstapspec(BMI ~ sex,
                              benvo=bdf),regexp="No covariates")
+  
 })

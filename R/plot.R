@@ -167,17 +167,20 @@ ppc.sstapreg <- function(x,num_reps = 20){
 
 	Samples <- Parameter <- iteration_ix <- NULL
 
-	samp <- sample(1:nrow(as.matrix(x$stapfit)),num_reps)
-	yhatmat <- as.matrix(x$stapfit)
-	yhats <- grep("yhat",colnames(yhatmat))
-	yhatmat <- yhatmat[samp,yhats]
-	pltdf <- suppressMessages(dplyr::as_tibble(yhatmat)) %>% dplyr::mutate(iteration_ix = 1:dplyr::n()) %>%
-						  tidyr::gather(dplyr::contains('yhat'),key="Parameter",value="Samples") %>% 
-						  dplyr::mutate(Parameter = 'yrep')
+	samp <- sample(1:nsamples(x),size=num_reps)
+
 	if(is.matrix(x$model$y))
-	  y <- x$model$y[,1]
+	  y <- x$model$y[,1] / rowSums(x$model$y)
 	else
 	  y <- x$model$y
+
+	yhatmat <- posterior_predict(x,'response')
+	yhatmat <- yhatmat[samp,]
+	colnames(yhatmat) <- paste0("yhat_",colnames(yhatmat))
+
+	pltdf <- dplyr::as_tibble(yhatmat,silent=TRUE) %>% dplyr::mutate(iteration_ix = 1:dplyr::n()) %>%
+						  tidyr::pivot_longer(dplyr::contains('yhat'),names_to="Parameter",values_to="Samples") %>% 
+						  dplyr::mutate(Parameter = 'yrep')
 	
 	pltdf <- rbind(pltdf,
 				   dplyr::tibble(iteration_ix = 0, Parameter='y',Samples= y ))

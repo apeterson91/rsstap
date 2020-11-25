@@ -132,6 +132,7 @@ get_range.sstapspec <- function(x,term,component){
 	return(x$range[[which(x$term==term)]][[component]])
 }
 
+
 # Get Stap Grid
 #
 get_grid <- function(x,term, component = NULL)
@@ -210,9 +211,9 @@ get_stap.sstapspec <- function(x,term,component,beta,family){
 		lbls_bw <- lbls[stringr::str_detect(lbls,"_bw")]
 		lbls_wi <- lbls[stringr::str_detect(lbls,"_wi")]
 		beta_ <- beta[,lbls_bw]
-		eta_within = family$linkinv(tcrossprod(mat,beta_))
+		eta_within = tcrossprod(mat,beta_)
 		beta_ <- beta[,lbls_wi] 
-		eta <- family$linkinv(tcrossprod(mat,beta_))
+		eta <- tcrossprod(mat,beta_)
 		return(list(grid=gd,eta=eta,eta_within=eta_within))
 	}
 

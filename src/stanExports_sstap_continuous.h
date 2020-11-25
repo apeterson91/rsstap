@@ -57,7 +57,7 @@ stan::io::program_reader prog_reader__() {
     reader.add_event(284, 0, "start", "tparameters/tparameters_glmer.stan");
     reader.add_event(305, 21, "end", "tparameters/tparameters_glmer.stan");
     reader.add_event(305, 47, "restart", "model_sstap_continuous");
-    reader.add_event(346, 86, "end", "model_sstap_continuous");
+    reader.add_event(345, 85, "end", "model_sstap_continuous");
     return reader;
 }
 template <typename T2__, typename T3__, typename T4__, typename T5__, typename T6__, typename T7__>
@@ -1619,7 +1619,6 @@ public:
         names__.push_back("eta");
         names__.push_back("b");
         names__.push_back("theta_L");
-        names__.push_back("yhat");
         names__.push_back("delta_coef");
     }
     void get_dims(std::vector<std::vector<size_t> >& dimss__) const {
@@ -1662,9 +1661,6 @@ public:
         dimss__.push_back(dims__);
         dims__.resize(0);
         dims__.push_back(len_theta_L);
-        dimss__.push_back(dims__);
-        dims__.resize(0);
-        dims__.push_back(N);
         dimss__.push_back(dims__);
         dims__.resize(0);
         dims__.push_back(ncol_Z);
@@ -1846,12 +1842,6 @@ public:
             if (!include_gqs__) return;
             // declare and define generated quantities
             current_statement_begin__ = 342;
-            validate_non_negative_index("yhat", "N", N);
-            Eigen::Matrix<double, Eigen::Dynamic, 1> yhat(N);
-            stan::math::initialize(yhat, DUMMY_VAR__);
-            stan::math::fill(yhat, DUMMY_VAR__);
-            stan::math::assign(yhat,multiply(Q, beta_tilde));
-            current_statement_begin__ = 343;
             validate_non_negative_index("delta_coef", "ncol_Z", ncol_Z);
             Eigen::Matrix<double, Eigen::Dynamic, 1> delta_coef(ncol_Z);
             stan::math::initialize(delta_coef, DUMMY_VAR__);
@@ -1859,11 +1849,6 @@ public:
             stan::math::assign(delta_coef,stan::model::rvalue(beta, stan::model::cons_list(stan::model::index_min_max(1, ncol_Z), stan::model::nil_index_list()), "beta"));
             // validate, write generated quantities
             current_statement_begin__ = 342;
-            size_t yhat_j_1_max__ = N;
-            for (size_t j_1__ = 0; j_1__ < yhat_j_1_max__; ++j_1__) {
-                vars__.push_back(yhat(j_1__));
-            }
-            current_statement_begin__ = 343;
             size_t delta_coef_j_1_max__ = ncol_Z;
             for (size_t j_1__ = 0; j_1__ < delta_coef_j_1_max__; ++j_1__) {
                 vars__.push_back(delta_coef(j_1__));
@@ -1977,12 +1962,6 @@ public:
             }
         }
         if (!include_gqs__) return;
-        size_t yhat_j_1_max__ = N;
-        for (size_t j_1__ = 0; j_1__ < yhat_j_1_max__; ++j_1__) {
-            param_name_stream__.str(std::string());
-            param_name_stream__ << "yhat" << '.' << j_1__ + 1;
-            param_names__.push_back(param_name_stream__.str());
-        }
         size_t delta_coef_j_1_max__ = ncol_Z;
         for (size_t j_1__ = 0; j_1__ < delta_coef_j_1_max__; ++j_1__) {
             param_name_stream__.str(std::string());
@@ -2073,12 +2052,6 @@ public:
             }
         }
         if (!include_gqs__) return;
-        size_t yhat_j_1_max__ = N;
-        for (size_t j_1__ = 0; j_1__ < yhat_j_1_max__; ++j_1__) {
-            param_name_stream__.str(std::string());
-            param_name_stream__ << "yhat" << '.' << j_1__ + 1;
-            param_names__.push_back(param_name_stream__.str());
-        }
         size_t delta_coef_j_1_max__ = ncol_Z;
         for (size_t j_1__ = 0; j_1__ < delta_coef_j_1_max__; ++j_1__) {
             param_name_stream__.str(std::string());

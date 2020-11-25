@@ -15,7 +15,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  eval = F
+  eval = T
 )
 ```
 
@@ -34,7 +34,6 @@ library(rbenvo)
 library(dplyr)
 library(ggplot2)
 theme_set(theme_bw())
-data("example_benvo")
 ```
 # Model Specification
 
@@ -71,11 +70,11 @@ truth <- geom_line(aes(x=x,y=y),
             color='red')
 ```
 
-As can be seen below, the model formula and syntax are akin to the typical `lm` function, with the addition of a `sap(FFR)` term to represent the fact that we'll be modelling FFR exposure as a spatial aggregated predictor. Let's fit this model using the standard sampling defaults of 2000 samples drawn from 4 independent chains, using the first 1000 from each as burn-in.
+As can be seen below, the model formula and syntax are akin to the typical `lm` function, with the addition of a `sap(FFR)` term to represent the fact that we'll be modeling FFR exposure as a spatial aggregated predictor. Let's fit this model using the standard sampling defaults of 2000 samples drawn from 4 independent chains, using the first 1000 from each as burn-in.
 
 ```{r model_fit,message=F,results='hide'}
 fit <- sstap_lm(BMI ~ sex + sap(FFR),
-                example_benvo)
+                FFbenvo)
 ```
 
 We'll examine the model fit by first looking at a print out summary of the model followed by the posterior predictive checks - a basic model check tool.
