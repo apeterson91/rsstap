@@ -178,8 +178,11 @@ ppc.sstapreg <- function(x,num_reps = 20){
 	yhatmat <- yhatmat[samp,]
 	colnames(yhatmat) <- paste0("yhat_",colnames(yhatmat))
 
-	pltdf <- dplyr::as_tibble(yhatmat,silent=TRUE) %>% dplyr::mutate(iteration_ix = 1:dplyr::n()) %>%
-						  tidyr::pivot_longer(dplyr::contains('yhat'),names_to="Parameter",values_to="Samples") %>% 
+	pltdf <- dplyr::as_tibble(yhatmat,silent=TRUE) %>% 
+		dplyr::mutate(iteration_ix = 1:dplyr::n()) %>%
+		tidyr::pivot_longer(dplyr::contains('yhat'),
+							names_to = "Parameter",
+							values_to="Samples") %>% 
 						  dplyr::mutate(Parameter = 'yrep')
 	
 	pltdf <- rbind(pltdf,
