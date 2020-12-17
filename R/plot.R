@@ -239,7 +239,7 @@ plot_xsection.sstapreg <- function(x,stap_term = NULL, component = "Distance",fi
 
 	beta <- as.matrix(x$stapfit)
 
-	gd_eta <- get_stap(spec,stap_term,"Distance-Time",beta,x$family)
+	gd_eta <- get_stap(spec,stap_term,"Distance-Time",beta,x$family,grid)
 	gd <- gd_eta$grid
 	eta <- gd_eta$eta
 	
