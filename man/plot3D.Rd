@@ -5,14 +5,16 @@
 \alias{plot3D.sstapreg}
 \title{3D plots for rsstap models}
 \usage{
-plot3D(x, stap_term = NULL)
+plot3D(x, stap_term = NULL, grid = NULL)
 
-\method{plot3D}{sstapreg}(x, stap_term = NULL)
+\method{plot3D}{sstapreg}(x, stap_term = NULL, grid = NULL)
 }
 \arguments{
 \item{x}{sstapreg object}
 
 \item{stap_term}{string argument for which \code{stap()} bef term to plot}
+
+\item{grid}{optional grid argument by default is NULL corresponding to a .1 step grid from the min-max of the covariate space}
 }
 \description{
 3D plots for rsstap models

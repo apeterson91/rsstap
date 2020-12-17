@@ -29,9 +29,9 @@ get_sstapspec <- function(f,benvo){
     with_bars <- lme4::findbars(f)
     f <- lme4::nobars(f)
 	
-	stapinfo <- get_bef_info(c("stap","sap","tap","gap"),f)
+	stapinfo <- get_bef_info(c("stap","sap","tap"),f)
 	if(is.null(stapinfo))
-		stop("No covariates designated as ",paste0(c("stap","sap","tap","gap"),collapse=","),call. = F)
+		stop("No covariates designated as ",paste0(c("stap","sap","tap"),collapse=","),call. = F)
 
 	new_f <- get_new_f(f,with_bars,stapinfo[,2])
 

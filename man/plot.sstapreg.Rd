@@ -4,7 +4,7 @@
 \alias{plot.sstapreg}
 \title{Plot Spline Spatial Temporal Aggregated Predictors}
 \usage{
-\method{plot}{sstapreg}(x, stap_term = NULL, p = 0.95, ...)
+\method{plot}{sstapreg}(x, stap_term = NULL, p = 0.95, grid = NULL, ...)
 }
 \arguments{
 \item{x}{sstapreg object}
@@ -13,6 +13,8 @@
 Alternatively plots first BEF smooth function}
 
 \item{p}{probability mass contained within uncertainty interval}
+
+\item{grid}{by default is NULL corresponding to a .1 step grid from the min-max of the covariate space}
 
 \item{...}{ignored}
 }

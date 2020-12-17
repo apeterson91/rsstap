@@ -9,9 +9,10 @@
 #' @param stap_term optional string for name of BEF smooth function to plot. 
 #' Alternatively plots first BEF smooth function 
 #' @param p probability mass contained within uncertainty interval
+#' @param grid by default is NULL corresponding to a .1 step grid from the min-max of the covariate space
 #' @param ... ignored
 #' 
-plot.sstapreg <- function(x,stap_term = NULL, p = 0.95, ...){
+plot.sstapreg <- function(x,stap_term = NULL, p = 0.95, grid = NULL,...){
 
 	# to pass R CMD Check
 	Distance <- Time <- Median <- Parameters <- 
@@ -31,7 +32,7 @@ plot.sstapreg <- function(x,stap_term = NULL, p = 0.95, ...){
 		stop("stap_term must be NULL or one of the stap terms in the model object")
 
 	beta <- as.matrix(x$stapfit)
-	gd_eta <- get_stap(spec,stap_term,component,beta,x$family)
+	gd_eta <- get_stap(spec,stap_term,component,beta,x$family,grid)
 	gd <- gd_eta$grid
 	eta <- gd_eta$eta
 
@@ -89,15 +90,16 @@ plot.sstapreg <- function(x,stap_term = NULL, p = 0.95, ...){
 #' @export
 #' @param x sstapreg object
 #' @param stap_term string argument for which \code{stap()} bef term to plot
+#' @param grid  optional grid argument by default is NULL corresponding to a .1 step grid from the min-max of the covariate space
 #'
-plot3D <- function(x,stap_term = NULL)
+plot3D <- function(x,stap_term = NULL,grid = NULL)
 	UseMethod("plot3D")
 
 #'
 #' @describeIn plot3D 3d stap plot
 #' @export 
 #'
-plot3D.sstapreg <- function(x,stap_term = NULL){
+plot3D.sstapreg <- function(x,stap_term = NULL, grid = NULL){
 
 	spec <- x$specification
 	if(!has_any_staps(spec))
@@ -116,7 +118,7 @@ plot3D.sstapreg <- function(x,stap_term = NULL){
 
 	beta <- as.matrix(x$stapfit)
 
-	gd_eta <- get_stap(spec,stap_term,"Distance-Time",beta,x$family)
+	gd_eta <- get_stap(spec,stap_term,"Distance-Time",beta,x$family,grid)
 	gd <- gd_eta$grid
 	eta <- gd_eta$eta
 
@@ -206,8 +208,9 @@ ppc.sstapreg <- function(x,num_reps = 20){
 #' @param component one of c("Distance","Time")
 #' @param fixed_val vector that contains fixed values for whichever component was not specified
 #' @param p probability_interval
+#' @param optional grid by default is NULL corresponding to a .1 step grid from the min-max of the covariate space
 #'
-plot_xsection <- function(x,stap_term = NULL, component = "Distance",fixed_val = 1, p = 0.95)
+plot_xsection <- function(x,stap_term = NULL, component = "Distance",fixed_val = 1, p = 0.95,grid = NULL)
 	UseMethod("plot_xsection")
 
 #' Plot Cross-Sections
@@ -215,7 +218,7 @@ plot_xsection <- function(x,stap_term = NULL, component = "Distance",fixed_val =
 #' @export
 #' @describeIn plot_xsection
 #'
-plot_xsection.sstapreg <- function(x,stap_term = NULL, component = "Distance",fixed_val =1 , p = 0.95){
+plot_xsection.sstapreg <- function(x,stap_term = NULL, component = "Distance",fixed_val =1 , p = 0.95,grid = NULL){
 
 	Distance <- Time <- Median <- Grid <- Lower <- Upper <-  . <- .data <-  NULL
 	check_p(p)

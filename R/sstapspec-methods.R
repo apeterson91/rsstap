@@ -193,13 +193,15 @@ get_smooth_obj <- function(x,term = NULL){
 	return(x$smooth_objs[[ix]])
 }
 
-
-get_stap <- function(x,term,component,beta,family)
+get_stap <- function(x,term,component,beta,family,grid = NULL)
 	UseMethod("get_stap")
 
-get_stap.sstapspec <- function(x,term,component,beta,family){
+get_stap.sstapspec <- function(x,term,component,beta,family, grid = NULL){
 
-	gd <- get_grid(x,term,component)
+	if(is.null(grid))
+		gd <- get_grid(x,term,component)
+	else
+		gd <- grid
 
 	sob <- get_smooth_obj(x,term)
 

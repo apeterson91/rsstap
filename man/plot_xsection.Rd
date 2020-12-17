@@ -10,7 +10,8 @@ plot_xsection(
   stap_term = NULL,
   component = "Distance",
   fixed_val = 1,
-  p = 0.95
+  p = 0.95,
+  grid = NULL
 )
 
 \method{plot_xsection}{sstapreg}(
@@ -18,7 +19,8 @@ plot_xsection(
   stap_term = NULL,
   component = "Distance",
   fixed_val = 1,
-  p = 0.95
+  p = 0.95,
+  grid = NULL
 )
 }
 \arguments{
@@ -31,6 +33,8 @@ plot_xsection(
 \item{fixed_val}{vector that contains fixed values for whichever component was not specified}
 
 \item{p}{probability_interval}
+
+\item{optional}{grid by default is NULL corresponding to a .1 step grid from the min-max of the covariate space}
 }
 \description{
 Plot Cross-Sections
