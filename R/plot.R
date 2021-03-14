@@ -83,6 +83,50 @@ plot.sstapreg <- function(x,stap_term = NULL, p = 0.95, grid = NULL,...){
 	return(pl)
 }
 
+#' Spatial-Temporal Effects DataFrame
+#' 
+#' Returns a dataframe with the betas evaluated at either a default or given grid points
+#' If no stap term is selected, the first stap component is plotted by default.
+#' @export
+#' @param x sstapreg object
+#' @param stap_term optional string for name of BEF smooth function to plot. 
+#' Alternatively plots first BEF smooth function 
+#' @param p probability mass contained within uncertainty interval
+#' @param grid by default is NULL corresponding to a .1 step grid from the min-max of the covariate space
+plotdf <- function(x,stap_term = NULL, p = 0.95, grid = NULL)
+	UseMethod("plotdf")
+
+#' @describeIn  plotdf
+#' @export
+plotdf.sstapreg <- function(x,stap_term = NULL, p = 0.95, grid = NULL){
+
+	# to pass R CMD Check
+	Distance <- Time <- Median <- Parameters <- 
+		Grid <- Lower <- Upper <-  . <-  .data <- NULL
+	spec <- x$specification
+
+	if(is.null(stap_term)){
+		ix <- 1
+		stap_term <- spec$term[ix]
+		component <- get_component(spec,stap_term)
+	}
+	else if(stap_term %in% spec$term){
+		ix <- which(spec$term==stap_term)
+		component <- get_component(spec,stap_term)
+	}
+	else
+		stop("stap_term must be NULL or one of the stap terms in the model object")
+
+	beta <- as.matrix(x$stapfit)
+	gd_eta <- get_stap(spec,stap_term,component,beta,x$family,grid)
+	gd <- gd_eta$grid
+	eta <- gd_eta$eta
+
+	pltdf <- get_pltdf(gd,eta,p,component)
+	return(pltdf)
+}
+
+
 
 
 #' 3D plots for rsstap models
