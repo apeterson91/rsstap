@@ -24,6 +24,7 @@
 #'   having the structure of that produced by \code{\link[lme4]{mkReTrms}} to
 #'   indicate the group-specific part of the model. 
 #' @param QR boolean denoting whether or not to perform a QR decomposition on the design matrix, note that this is an experimental feature and bugs are still being worked out.
+#' @param weights for unequal variances
 #' @param ... arguments for stan sampler
 #' @importFrom Matrix t
 #' 
@@ -34,6 +35,7 @@ sstap_glm.fit <- function(y,
 						  family,
 						  group = list(),
 						  QR = F,
+						  weights = NULL,
 						  ...){
   
 	if(is.matrix(y))
@@ -160,6 +162,15 @@ sstap_glm.fit <- function(y,
       standata$regularization <- rep(0, 0)
     standata$len_concentration <- 0L
     standata$len_regularization <- 0L
+  }
+  if(is.null(weights)){
+	  standata$has_weights <- 0L 
+	  standata$weights <- numeric()
+  }else{
+	  stopifnot(length(weights)==length(y))
+	  stopifnot(all(is.numeric(weights)))
+	  standata$has_weights <- 1L
+	  standata$weights <- weights 
   }
 
 

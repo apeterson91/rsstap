@@ -44,6 +44,7 @@ sstap_glm <- function(formula,
 	                          S = spec$S,
 							  family = family,
 							  QR = QR,
+							  weights = weights,
 	                          ...
 	                          )
 	

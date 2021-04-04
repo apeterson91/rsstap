@@ -1,6 +1,24 @@
 // GLM for a Poisson outcome with smooth terms
 functions {
 #include functions/common_functions.stan
+#
+  /** 
+  * Pointwise (pw) log-likelihood vector for the Poisson distribution
+  *
+  * @param y The integer array corresponding to the outcome variable.
+  * @param eta The vector of linear predictors
+  * @param link An integer indicating the link function
+  * @return A vector
+  */
+  vector pw_pois(int[] y, vector eta, int link) {
+    int N = rows(eta);
+    vector[N] ll;
+    if (link == 1)  // log
+      for (n in 1:N) ll[n] = poisson_log_lpmf(y[n] | eta[n]);
+    else reject("Invalid link");
+    return ll;
+  }
+
 }
 data{ 
 	int<lower=1> N;
@@ -19,6 +37,8 @@ data{
 	matrix[N,P] Q;
 	matrix[P,P] R_inv;
 	matrix[ncol_smooth,K_smooth] S;
+	// data for weights
+#include data/weights.stan
 	//data for glmer
 #include data/glmer_stuff.stan
 #include data/glmer_stuff2.stan
@@ -50,7 +70,10 @@ transformed parameters{
 }
 model{
 	tau ~ exponential(1);
-	y ~ poisson(eta);
+	if(has_weights)
+		target += dot_product(weights,pw_pois(y,eta,1)); // Currently only allows log link
+	else
+		y ~ poisson(eta);
 
 
 	for(i in 1:num_stap){

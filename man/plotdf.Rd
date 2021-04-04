@@ -3,7 +3,7 @@
 \name{plotdf}
 \alias{plotdf}
 \alias{plotdf.sstapreg}
-\title{Spatial Effect DataFrame}
+\title{Spatial-Temporal Effects DataFrame}
 \usage{
 plotdf(x, stap_term = NULL, p = 0.95, grid = NULL)
 

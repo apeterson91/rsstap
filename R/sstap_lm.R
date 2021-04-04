@@ -57,6 +57,7 @@ sstap_lm <- function(formula,
 	                          S = S,
 	                          family = gaussian(),
 							  QR = QR,
+							  weights = weights,
 	                          ...
 	                          )
 	

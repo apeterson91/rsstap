@@ -2,6 +2,11 @@
 functions {
 
 #include functions/common_functions.stan
+#
+  vector pw_gaussian(vector y, vector eta, real sigma) {
+    return -0.5 * log(6.283185307179586232 * sigma) - 
+            0.5 * square((y - eta) / sigma);
+  }
   
 }
 data{ 
@@ -17,10 +22,13 @@ data{
 	int<lower=1> pen_ix[num_stap_penalties,2];
 	int<lower=1> beta_ix[num_stap,2];
 	int<lower=1> P;
+
 	vector[N] y;
 	matrix[N,P] Q;
 	matrix[P,P] R_inv;
 	matrix[ncol_smooth,K_smooth] S;
+	// data for weights
+#include data/weights.stan
 
 	//data for glmer
 #include data/glmer_stuff.stan
@@ -60,7 +68,10 @@ model{
 
 	sigma ~ cauchy(0,5);
 	tau ~ exponential(1);
-	y ~ normal(eta,sigma);
+	if(has_weights)
+		target += dot_product(weights,pw_gaussian(y,eta,sigma));
+	else
+		y ~ normal(eta,sigma);
 
 
 	// add penalty

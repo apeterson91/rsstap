@@ -4,7 +4,14 @@
 \alias{sstap_glmer}
 \title{Spline Spatial Temporal Aggregated Generalized Mixed Effects Regression Model}
 \usage{
-sstap_glmer(formula, benvo, family = gaussian(), QR = TRUE, ...)
+sstap_glmer(
+  formula,
+  benvo,
+  family = gaussian(),
+  QR = TRUE,
+  weights = NULL,
+  ...
+)
 }
 \arguments{
 \item{formula}{Similar as for \code{\link[lme4]{glmer}}.}
@@ -14,6 +21,8 @@ sstap_glmer(formula, benvo, family = gaussian(), QR = TRUE, ...)
 \item{family}{One of \code{\link[stats]{family}}  currently gaussian, binomial and poisson are implimented with identity, logistic and  log links currently.}
 
 \item{QR}{boolean denoting whether or not to perform a QR decomposition on the design matrix, note that this is an experimental feature and bugs are still being worked out.}
+
+\item{weights}{for unequal variances}
 
 \item{...}{optional arguments for stan sampler}
 }

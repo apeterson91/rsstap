@@ -1,6 +1,23 @@
 // GLM for a Binomial outcome with smooth terms
 functions {
 #include functions/common_functions.stan
+  /** 
+  * Pointwise (pw) log-likelihood vector
+  *
+  * @param y The integer array corresponding to the outcome variable.
+  * @param link An integer indicating the link function
+  * @return A vector
+  */
+  vector pw_binom(int[] y, int[] trials, vector eta, int link) {
+    int N = rows(eta);
+    vector[N] ll;
+    if (link == 1) {  // logit
+      for (n in 1:N) 
+        ll[n] = binomial_logit_lpmf(y[n] | trials[n], eta[n]);
+    }
+    else reject("Invalid link");
+    return ll;
+  }
 }
 data{ 
 	int<lower=1> N;
@@ -20,6 +37,8 @@ data{
 	matrix[N,P] Q;
 	matrix[P,P] R_inv;
 	matrix[ncol_smooth,K_smooth] S;
+	// data for weights
+#include data/weights.stan
 	//data for glmer
 #include data/glmer_stuff.stan
 #include data/glmer_stuff2.stan
@@ -49,7 +68,10 @@ transformed parameters{
 }
 model{
 	tau ~ exponential(1);
-	y ~ binomial_logit(num_trials,eta);
+	if(has_weights)
+		target += dot_product(weights,pw_binom(y,num_trials,eta,1)); //  currently only logit link implemented
+	else
+		y ~ binomial_logit(num_trials,eta);
 
 
 	// add penalty
