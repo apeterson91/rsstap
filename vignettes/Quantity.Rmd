@@ -1,0 +1,30 @@
+---
+title: "Quantity Effects"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Quantity Effects}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(rsstap)
+library(tidyverse)
+options(mc.cores=4)
+```
+
+
+
+```{r}
+fit <- rvc_lm(mean_formula = BMI ~ Sex + sap(FFR),
+              rvc_formula = ~ gd_ten,
+              benvo=rvc_bdf,
+              chains=1)
+```
