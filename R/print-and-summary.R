@@ -1,8 +1,6 @@
-
-
 #' Print method for sstapreg objects
 #'
-#' The \code{print} method for stanreg objects displays a compact summary of the
+#' The \code{print} method for sstapreg objects displays a compact summary of the
 #' fitted model. 
 #' @export
 #' @method print sstapreg
@@ -29,7 +27,7 @@ print.sstapreg <- function(x, digits = 1, ...) {
 
 	.printfr(mat,digits)
 
-    mat <- as.matrix(x$stapfit) # don't used as.matrix.stanreg method b/c want access to mean_PPD
+    mat <- as.matrix(x$stapfit) # don't used as.matrix.stapreg method b/c want access to mean_PPD
 
 	smooth_nms <- grep("^smooth_precision\\[", colnames(mat), value = TRUE)
 	smooth_mat <- mat[,smooth_nms,drop=F]
@@ -157,6 +155,37 @@ print.summary.sstapreg <-
     
     invisible(x)
   }
+
+#' Print method for rvcreg objects
+#' @export
+#' @method print rvcreg 
+#' @param x sstapreg object
+#' @param digits number of digits to round to
+#' @param ... ignored
+print.rvcreg <- function(x, digits = 2, ...){
+
+    cat("\n family:      ", family_plus_link(x))
+    cat("\n Mean formula:     ", formula_string(x$mformula))
+    cat("\n Rvc formula:     ", formula_string(x$rformula))
+    cat("\n observations:", nobs(x))
+	cat("\n fixed effects: ", ncol(x$spec$mf$X))
+    cat("\n------\n")
+
+	mat <- cbind(coef(x),se(x))
+	colnames(mat) <- c("Median","MAD")
+
+	.printfr(mat,digits)
+
+    mat <- as.matrix(x$rvcfit) # don't used as.matrix.rvcreg method b/c want access to mean_PPD
+
+	smooth_nms <- grep("^smooth_precision\\[", colnames(mat), value = TRUE)
+	smooth_mat <- mat[,smooth_nms,drop=F]
+	smooth_ests <- .median_and_madsd(smooth_mat)
+
+      cat("\nSmoothing terms:\n")
+	.printfr(smooth_ests,digits)
+
+}
 
 
 

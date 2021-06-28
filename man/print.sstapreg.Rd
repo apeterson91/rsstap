@@ -14,6 +14,6 @@
 \item{...}{ignored}
 }
 \description{
-The \code{print} method for stanreg objects displays a compact summary of the
+The \code{print} method for sstapreg objects displays a compact summary of the
 fitted model.
 }

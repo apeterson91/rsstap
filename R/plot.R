@@ -122,7 +122,7 @@ plotdf.sstapreg <- function(x,stap_term = NULL, p = 0.95, grid = NULL){
 	gd <- gd_eta$grid
 	eta <- gd_eta$eta
 
-	pltdf <- get_pltdf(gd,eta,p,component)
+	pltdf <- get_pltdf(gd,eta,p,component,eta_wi = gd_eta$eta_wi)
 	return(pltdf)
 }
 
@@ -343,27 +343,70 @@ plot_xsection.sstapreg <- function(x,stap_term = NULL, component = "Distance",fi
 
 }
 
+#' Plotting a random varying  coefficients regression model
+#'
+#' @export
+#'
+#' @param x rvcreg object
+#'
+plot.rvcreg <- function(x,...){
+
+	grid <- dplyr::tibble(Distance = seq(from = floor(x$spec$ranges[1]),to = ceiling(x$spec$ranges[2]), by = 0.01))
+	dmat <- mgcv::PredictMat(x$spec$smooth_objs[[1]],grid)
+	beta <- get_coefnames(x$spec,'smooth')
+	beta <- x$stanmat[,beta]
+	eta <- tcrossprod(dmat,beta)
+	pltdf <- get_pltdf(grid,eta,.95,"Distance")
+
+	alpha <- get_coefnames(x$spec,)
+
+	pltdf %>% 
+		ggplot2::ggplot(ggplot2::aes(x = Distance,y = Median)) + 
+	  ggplot2::geom_line() + 
+		ggplot2::geom_ribbon(ggplot2::aes(ymin=Lower,ymax=Upper),alpha=0.3) + 
+		ggplot2::theme_bw() + 
+		ggplot2::geom_hline(ggplot2::aes(yintercept = 0),
+							linetype=2,color='red') + 
+		ggplot2::xlab("Distance") + 
+		ggplot2::ylab("") ->pl
+
+	return(pl)
+}
+
 # Internal ---------------------------------------------
 
 check_p <- function(p){
 	stopifnot(p<1 && p>0)
 }
 
-get_pltdf <- function(gd,eta,p,component){
+get_pltdf <- function(gd,eta,p,component,eta_wi = NULL){
 	check_p(p)
 	l <-  .5 - p/2
 	u <- .5 + p/2
 
 	pltdf <- dplyr::tibble(Lower = apply(eta,1,function(x) quantile(x,l)),
-						   Median = apply(eta,1,median),
-						  Upper = apply(eta,1,function(x) quantile(x,u)))  
-	if(component == "Distance-Time"){
-		pltdf$Time <- gd$Time
-		pltdf$Distance <- gd$Distance
-	}else if(component == "Distance")
-		pltdf$Distance <- gd$Distance
-	else
-		pltdf$Time <- gd$Time
+                         Median = apply(eta,1,median),
+                         Upper = apply(eta, 1, function(x) quantile(x,u))
+                         )
+
+  pltdf <- cbind(pltdf,gd)
+
+  if(!is.null(eta_wi)){
+    pltdf <- pltdf %>% dplyr::mutate(Function = "Between")
+    
+    pltdf_  <- dplyr::tibble(Lower = apply(eta_wi,1, function(x) quantile(x,l)),
+                  Median  = apply(eta_wi,1,median),
+                  Function = "Within",
+                  Upper = apply(eta_wi,1,function(x) quantile(x,u)))
+
+    pltdf <- rbind(pltdf,
+                  cbind(pltdf_,gd))
+
+  }
+
+
 	return(pltdf)
 
 }
+
+

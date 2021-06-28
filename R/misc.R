@@ -160,3 +160,10 @@ is.mer <- function(x){
 	else
 		return(FALSE)
 }
+
+create_unique_ID_mat <- function(id_one,id_two = NULL){
+	tmp <- paste0(id_one,"_",id_two)
+	lvls <- unique(tmp)
+	new_id <- factor(tmp,levels=lvls)
+	Matrix::fac2sparse(new_id)
+}
